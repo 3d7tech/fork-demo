@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fork by 3d7 Technologies — demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --ground: #F4F5F2; --surface: #FFFFFF; --ink: #14171A; --ink-2: #3A3F45; --muted: #5B6168;
+    --line: #DADDD6; --line-soft: #ECEEEA;
+    --blue: #1F3FA8; --blue-dark: #142C7A; --blue-soft: #E8ECF8;
+    --orange: #E07A2E; --orange-dark: #9A4A10; --tip: #F6B98A; --warn-bg: #FFF4E5; --good: #1C6B3A;
+    --sans: 'IBM Plex Sans', 'Helvetica Neue', system-ui, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+    --verdict: #14171A; --field: #FFFFFF;
+    box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #111315; --surface: #1A1D20; --ink: #ECEEF0; --ink-2: #C9CDD2; --muted: #9AA1A9;
+      --line: #2E3337; --line-soft: #24282C; --blue: #6F8DEB; --blue-dark: #A9BCF5; --blue-soft: #1E2740;
+      --warn-bg: #3A2A16; --good: #5FBF85; --verdict: #0B0C0E; --field: #1F2326;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #111315; --surface: #1A1D20; --ink: #ECEEF0; --ink-2: #C9CDD2; --muted: #9AA1A9;
+    --line: #2E3337; --line-soft: #24282C; --blue: #6F8DEB; --blue-dark: #A9BCF5; --blue-soft: #1E2740;
+    --warn-bg: #3A2A16; --good: #5FBF85; --verdict: #0B0C0E; --field: #1F2326;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5; }
+  button, input, textarea { font: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .num { font-variant-numeric: tabular-nums; }
+  .note { font-size: 13px; color: var(--muted); }
+  [hidden] { display: none !important; }
+
+  .demo { background: #111; color: #EDEDED; font-family: var(--mono); font-size: 13px; }
+  .demo-in { max-width: 1200px; margin: 0 auto; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+  .demo-in > span { color: #9A9A9A; }
+  .tog { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tog button { min-height: 36px; padding: 0 12px; border-radius: 6px; border: 1px solid #3A3A3A; background: transparent; color: #DADADA; font-family: inherit; font-size: 13px; }
+  .tog button[aria-pressed="true"] { background: #EDEDED; color: #111; border-color: #EDEDED; }
+
+  header { background: var(--surface); border-bottom: 1px solid var(--line); }
+  .bar { max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand strong { font-size: 18px; letter-spacing: -0.01em; }
+  .brand .by { font-size: 13px; color: var(--muted); }
+  .site-foot { max-width: 1200px; margin: 0 auto; padding: 8px 24px 32px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 20px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); }
+  .site-foot strong { color: var(--ink); font-weight: 600; }
+  .brand .co { color: var(--muted); font-size: 14px; border-left: 1px solid var(--line); padding-left: 10px; }
+  .user { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .user small { display: block; color: var(--muted); font-size: 12px; line-height: 1.2; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--blue-soft); color: var(--blue-dark); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 28px 24px 48px; display: flex; flex-direction: column; gap: 22px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; }
+  h1 { margin: 0; font-size: 28px; letter-spacing: -0.015em; }
+  h2 { margin: 0; font-size: 19px; }
+  h3 { margin: 0; font-size: 15px; }
+  .lead { margin: 4px 0 0; color: var(--ink-2); max-width: 70ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+  .grow { flex: 999 1 560px; min-width: 0; }
+  .col { display: flex; flex-direction: column; gap: 22px; }
+  .side { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 22px; }
+
+  /* Decision grammar */
+  .check { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between; background: var(--ground); border-radius: 10px; padding: 14px 16px; }
+  .check.flag { background: var(--warn-bg); }
+  .check p { margin: 0; font-size: 15px; flex: 1 1 280px; }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pills button { min-height: 44px; min-width: 56px; padding: 0 16px; border-radius: 999px; border: 1px solid #C9CDC5; background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px; }
+  .pills button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+  .verdict { background: var(--verdict); color: #fff; border-radius: 12px; padding: 22px 26px; display: flex; flex-direction: column; gap: 8px; }
+  .verdict h3 { margin: 0; font-size: clamp(21px, 2.6vw, 27px); line-height: 1.25; font-weight: 600; }
+  .verdict p { margin: 0; color: #D3D6D9; font-size: 16px; max-width: 74ch; }
+  .verdict .tip { font-family: var(--mono); font-size: 14px; color: var(--tip); }
+  .decision { display: flex; flex-direction: column; gap: 18px; }
+  .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px 28px; }
+  .lever { display: flex; flex-direction: column; gap: 4px; }
+  .lever .top-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .lever label { font-weight: 500; font-size: 15px; }
+  .lever .val { font-weight: 600; font-family: var(--mono); }
+  .lever .src { font-size: 12px; color: var(--muted); }
+  input[type=range] { width: 100%; height: 28px; margin: 0; accent-color: var(--blue); }
+  .outs { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .out { border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .out span { display: block; font-size: 13px; color: var(--muted); }
+  .out strong { display: block; font-size: 24px; font-weight: 600; font-family: var(--mono); margin-top: 2px; letter-spacing: -0.02em; }
+  .out em { font-style: normal; font-size: 13px; color: var(--muted); }
+  .out.hero { background: var(--blue-soft); border-color: #C5CFEE; }
+  .out.hero strong { color: var(--blue-dark); }
+  .vis h4 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
+  .crow { display: grid; grid-template-columns: 130px minmax(0,1fr) 84px; gap: 10px; align-items: center; margin-bottom: 10px; font-size: 14px; }
+  .crow .tot { text-align: right; font-weight: 600; font-family: var(--mono); font-size: 13px; }
+  .stack { display: flex; height: 30px; border-radius: 6px; overflow: hidden; background: var(--line-soft); }
+  .stack span { height: 100%; transition: width .3s ease; }
+  .k-keep { background: var(--blue); } .k-pass { background: #7E95DB; } .k-fee { background: #B9BEC4; } .k-gone { background: repeating-linear-gradient(135deg, #E9D3C0, #E9D3C0 5px, #F4E6DA 5px, #F4E6DA 10px); }
+  .k1 { background: var(--ink-2); } .k2 { background: #8E949B; } .k3 { background: #C3C7CB; } .k4 { background: var(--blue); }
+  .keys { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+  .keys i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .method { border-top: 1px solid var(--line-soft); }
+  .method > button { width: 100%; min-height: 48px; display: flex; justify-content: space-between; align-items: center; background: transparent; border: 0; padding: 0; font-weight: 600; font-size: 15px; color: var(--ink); text-align: left; }
+  .method > button span { color: var(--blue); font-size: 14px; }
+  .method ul { margin: 0; padding: 0 0 8px 18px; font-size: 14px; color: var(--ink-2); display: grid; gap: 6px; }
+  .method li b { color: var(--ink); }
+  .act { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn { min-height: 48px; padding: 0 20px; border-radius: 10px; font-weight: 600; font-size: 15px; border: 0; }
+  .btn.primary { background: var(--blue); color: #fff; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary { color: #0B0C0E; } }
+  :root[data-theme="dark"] .btn.primary { color: #0B0C0E; }
+  .btn.primary:hover { background: var(--blue-dark); }
+  .btn.primary:disabled { background: #B9BCB6; cursor: not-allowed; }
+  .btn.secondary { background: var(--surface); color: var(--ink); border: 1px solid #C9CDC5; }
+  .btn.ghost { background: transparent; color: var(--blue); padding: 0 8px; }
+  .done { background: var(--blue-soft); border-radius: 10px; padding: 14px 16px; margin: 0; }
+  .fine { font-size: 12px; color: var(--muted); margin: 0; }
+
+  /* Owner sidebar */
+  .setup { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+  .setup li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; }
+  .setup .ok { width: 20px; height: 20px; border-radius: 50%; background: var(--good); color: #fff; font-size: 12px; display: grid; place-items: center; margin-top: 1px; }
+  .setup b { display: block; font-weight: 600; }
+  .themes { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .themes li { display: grid; grid-template-columns: minmax(0,1fr) 34px; gap: 6px 10px; align-items: center; font-size: 14px; }
+  .themes .meter { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--line-soft); overflow: hidden; }
+  .themes .meter span { display: block; height: 100%; background: var(--blue); }
+  .themes .n { text-align: right; font-family: var(--mono); font-size: 13px; }
+  .private { margin-top: 12px; padding: 12px 14px; background: var(--ground); border-radius: 10px; font-size: 13px; color: var(--ink-2); }
+
+  /* Employee ask */
+  .ask { display: flex; flex-direction: column; gap: 14px; }
+  .ask-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .ask-row textarea { flex: 1 1 320px; min-height: 52px; resize: vertical; border: 1px solid #C9CDC5; border-radius: 10px; padding: 12px 14px; color: var(--ink); background: var(--field); }
+  .qs { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px; }
+  .qs button { text-align: left; min-height: 44px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--field); color: var(--ink-2); font-size: 14px; line-height: 1.4; }
+  .qs button:hover { border-color: var(--blue); color: var(--ink); }
+  .qs button[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-soft); color: var(--ink); }
+  .qs small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .steps { display: flex; flex-direction: column; gap: 8px; }
+  .step { display: flex; gap: 10px; font-size: 14px; color: var(--muted); opacity: .35; transition: opacity .25s; }
+  .step.on { opacity: 1; color: var(--ink-2); }
+  .step .dot { width: 16px; height: 16px; flex: none; margin-top: 3px; border-radius: 50%; border: 2px solid var(--line); }
+  .step.on .dot { background: var(--blue); border-color: var(--blue); box-shadow: inset 0 0 0 3px var(--surface); }
+  .step b { color: var(--ink); font-weight: 600; }
+  .q-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px; }
+  .q-head p { margin: 2px 0 0; font-size: 14px; color: var(--muted); font-style: italic; }
+  .privacy-line { font-size: 13px; color: var(--good); font-weight: 600; }
+
+  /* Ladder */
+  .ladder { position: relative; height: 92px; margin: 6px 0 4px; }
+  .track { position: absolute; left: 0; right: 0; top: 40px; height: 14px; border-radius: 7px; background: var(--line-soft); overflow: hidden; }
+  .zone { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, #F3C9A5, #F3C9A5 6px, #F8DCC4 6px, #F8DCC4 12px); }
+  .mk { position: absolute; transform: translateX(-50%); font-size: 12px; white-space: nowrap; display: flex; flex-direction: column; align-items: center; transition: left .3s ease; }
+  .mk::after { content: ''; width: 2px; height: 14px; background: currentColor; margin-top: 2px; }
+  .mk.now { top: 0; color: var(--muted); }
+  .mk.new { top: 54px; color: var(--blue-dark); font-weight: 700; flex-direction: column-reverse; }
+  .mk.new::after { margin: 0 0 2px; }
+  .ticks { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+
+  @media (max-width: 600px) { main { padding: 18px 14px 40px; } .card { padding: 18px; } .crow { grid-template-columns: 96px minmax(0,1fr) 72px; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="demo" role="region" aria-label="Demo controls">
+  <div class="demo-in">
+    <span>Fork demo · 3d7 Technologies</span>
+    <div class="tog" role="group" aria-label="View">
+      <button type="button" data-view="owner" aria-pressed="true">Owner view</button>
+      <button type="button" data-view="employee" aria-pressed="false">Employee view</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="bar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V12"/><path d="M12 12L5 4"/><path d="M12 12l7-8"/></svg>
+      <strong>Fork</strong><span class="by">by 3d7 Technologies</span><span class="co">Larkfield Analytics · 34 people</span>
+    </div>
+    <div class="user"><span><span id="uName">Maya Hart</span><small id="uRole">Managing Director</small></span><span class="avatar" id="uAv" aria-hidden="true">MH</span></div>
+  </div>
+</header>
+
+<!-- ======================= OWNER VIEW ======================= -->
+<main id="ownerView">
+  <div>
+    <h1>Your team’s money decisions, and yours</h1>
+    <p class="lead">Ask about the money decisions you face as an employer. Fork has already found one for Larkfield that pays for itself.</p>
+  </div>
+
+  <div class="row">
+    <div class="grow col">
+    <section class="card ask" aria-labelledby="oAskH">
+      <div>
+        <h2 id="oAskH">What are you deciding as an employer?</h2>
+        <p class="lead">Ask in your own words. Fork uses Larkfield’s payroll, pension details and handbook.</p>
+      </div>
+      <div class="ask-row">
+        <label for="o_qText" style="position:absolute;left:-9999px">Your question</label>
+        <textarea id="o_qText" rows="2" placeholder="e.g. what does a new hire really cost us?"></textarea>
+        <button type="button" class="btn primary" id="o_askBtn">Ask</button>
+      </div>
+      <div class="qs" id="o_qs"></div>
+    </section>
+
+    <section class="card" id="o_build" hidden aria-live="polite">
+      <h2 style="margin-bottom:10px">Building your decision</h2>
+      <div class="steps" id="o_steps"></div>
+    </section>
+
+    <section class="card" id="o_plain" hidden aria-live="polite"></section>
+
+    <section class="card decision" id="o_fork" hidden aria-live="polite">
+      <div class="q-head"><div><h2 id="o_fTitle"></h2><p id="o_fAsked"></p></div></div>
+      <div class="check" id="o_fCheck"></div>
+      <div class="verdict"><h3 id="o_vHead"></h3><p id="o_vWhy"></p><p class="tip" id="o_vTip"></p></div>
+      <div class="levers" id="o_fLevers"></div>
+      <div class="outs" id="o_fOuts"></div>
+      <div class="vis" id="o_fVis"></div>
+      <div class="method">
+        <button type="button" class="mBtn" aria-expanded="false" aria-controls="o_fMethod">How this was worked out <span>Show</span></button>
+        <ul id="o_fMethod" hidden></ul>
+      </div>
+      <div class="act"><button type="button" class="btn primary" id="o_fAct"></button></div>
+      <p class="done" id="o_fDone" hidden></p>
+      <p class="fine">Guidance, not tax advice. Your accountant makes any payroll changes.</p>
+    </section>
+
+    <section class="card decision" id="ownerSS" aria-labelledby="oQ">
+      <div class="q-head"><div><h2 id="oQ">Should Larkfield introduce salary sacrifice for pensions?</h2><p>Built from your payroll export and pension scheme details</p></div></div>
+
+      <div class="check flag">
+        <p id="nlwText"></p>
+        <span class="note">Handled automatically</span>
+      </div>
+
+      <div class="verdict" aria-live="polite"><h3 id="oHead"></h3><p id="oWhy"></p><p class="tip" id="oTip"></p></div>
+
+      <div class="levers">
+        <div class="lever"><div class="top-row"><label for="oTake">Staff who take it up</label><span class="val" id="oTakeV"></span></div><input id="oTake" type="range" min="10" max="100" step="5"><span class="src">Typical take-up when people see their own numbers is high; set your own estimate</span></div>
+        <div class="lever"><div class="top-row"><label for="oPass">Share of your saving passed to staff pensions</label><span class="val" id="oPassV"></span></div><input id="oPass" type="range" min="0" max="100" step="5"><span class="src">Optional. Many employers share some of the saving to encourage take-up</span></div>
+        <div class="lever"><div class="top-row"><label for="oCon">Average staff contribution</label><span class="val" id="oConV"></span></div><input id="oCon" type="range" min="3" max="10" step="1"><span class="src">Today: 5%, from your pension scheme details</span></div>
+      </div>
+
+      <div class="outs">
+        <div class="out hero"><span>Larkfield keeps each year</span><strong id="oKeep"></strong><em>After passing on and Fork’s fee</em></div>
+        <div class="out"><span>Employer NI saved each year</span><strong id="oSave"></strong><em id="oSaveSub"></em></div>
+        <div class="out"><span>Extra for each employee who joins</span><strong id="oEmp"></strong><em>Take-home plus pension, a year on average</em></div>
+      </div>
+
+      <div class="vis">
+        <h4>Where the employer NI saving goes</h4>
+        <div class="crow"><span>Now</span><div class="stack" id="barNow"></div><span class="tot" id="totNow"></span></div>
+        <div class="crow"><span>From April 2029</span><div class="stack" id="bar29"></div><span class="tot" id="tot29"></span></div>
+        <div class="keys"><span><i class="k-keep"></i>Kept by Larkfield</span><span><i class="k-pass"></i>Passed to staff pensions</span><span><i class="k-fee"></i>Fork’s fee</span><span><i class="k-gone"></i>Lost to the 2029 cap</span></div>
+      </div>
+
+      <div class="method">
+        <button type="button" class="mBtn" aria-expanded="false" aria-controls="oMethod">How this was worked out <span>Show</span></button>
+        <ul id="oMethod" hidden>
+          <li><b>Your payroll:</b> 34 employees, salaries from £25,200 to £108,000, average £46,000. Source: payroll export from your accountant, October 2026.</li>
+          <li><b>Employer National Insurance</b> is 15% on pay above £5,000. Salary sacrificed into a pension is not counted as pay, so you don’t pay NI on it.</li>
+          <li><b>Employment Allowance:</b> your yearly employer NI bill is about <span id="niBill"></span>, far above the £10,500 allowance, so every pound saved is real.</li>
+          <li><b>From 6 April 2029</b> only the first £2,000 each employee sacrifices each year stays free of National Insurance. Source: gov.uk.</li>
+          <li><b>Minimum wage:</b> sacrifice can’t take anyone’s pay below the National Living Wage of £12.71 an hour (2026/27), so 2 employees are excluded.</li>
+          <li><b>Fork’s fee:</b> £4 per employee a month, £1,632 a year for 34 people. Illustrative.</li>
+        </ul>
+      </div>
+
+      <div class="act">
+        <button type="button" class="btn primary" id="oAct">Send this plan to our accountant</button>
+        <button type="button" class="btn secondary" id="oInvite">Let staff see their own numbers</button>
+      </div>
+      <p class="done" id="oDone" hidden></p>
+      <p class="fine">Guidance, not tax advice. Your accountant sets up salary sacrifice in contracts and payroll.</p>
+    </section>
+    </div>
+
+    <div class="side">
+      <section class="card" aria-labelledby="setH">
+        <h2 id="setH">Set up in 40 minutes</h2>
+        <ul class="setup">
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>Payroll export</b>34 employees, from your accountant’s payroll software</span></li>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>Staff handbook</b>Leave, sick pay, flexible working, expenses</span></li>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>Pension scheme</b>Employer 3%, staff 5%, provider details</span></li>
+          <li><span class="ok" aria-hidden="true">✓</span><span><b>Team invited</b>29 of 34 have joined</span></li>
+        </ul>
+      </section>
+      <section class="card" aria-labelledby="thH">
+        <h2 id="thH">What your team asked this month</h2>
+        <ul class="themes">
+          <li><span>Pension and salary sacrifice</span><span class="n">11</span><span class="meter"><span style="width:100%"></span></span></li>
+          <li><span>Pay rises and tax</span><span class="n">7</span><span class="meter"><span style="width:64%"></span></span></li>
+          <li><span>Parental leave and childcare</span><span class="n">5</span><span class="meter"><span style="width:45%"></span></span></li>
+        </ul>
+        <p class="private">Individual questions are private. You only see a topic once 5 or more people have asked about it, and never who asked. 4 other topics are hidden for that reason.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- ======================= EMPLOYEE VIEW ======================= -->
+<main id="empView" hidden>
+  <section class="card ask" aria-labelledby="askH">
+    <div>
+      <h1 id="askH">What are you trying to decide?</h1>
+      <p class="lead">Ask in your own words. Fork uses your pay, Larkfield’s pension and handbook, and current tax rules.</p>
+      <p class="privacy-line">Private to you. Maya and Larkfield never see your questions.</p>
+    </div>
+    <div class="ask-row">
+      <label for="qText" style="position:absolute;left:-9999px">Your question</label>
+      <textarea id="qText" rows="2" placeholder="e.g. is salary sacrifice worth it for me?"></textarea>
+      <button type="button" class="btn primary" id="askBtn">Ask</button>
+    </div>
+    <div class="qs" id="qs"></div>
+  </section>
+
+  <section class="card" id="build" hidden aria-live="polite">
+    <h2 style="margin-bottom:10px">Building your decision</h2>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <section class="card" id="plain" hidden aria-live="polite"></section>
+
+  <section class="card decision" id="fork" hidden aria-live="polite">
+    <div class="q-head"><div><h2 id="fTitle"></h2><p id="fAsked"></p></div></div>
+    <div class="check" id="fCheck"></div>
+    <div class="verdict"><h3 id="vHead"></h3><p id="vWhy"></p><p class="tip" id="vTip"></p></div>
+    <div class="levers" id="fLevers"></div>
+    <div class="outs" id="fOuts"></div>
+    <div class="vis" id="fVis"></div>
+    <div class="method">
+      <button type="button" class="mBtn" aria-expanded="false" aria-controls="fMethod">How this was worked out <span>Show</span></button>
+      <ul id="fMethod" hidden></ul>
+    </div>
+    <div class="act"><button type="button" class="btn primary" id="fAct"></button></div>
+    <p class="done" id="fDone" hidden></p>
+    <p class="fine">Guidance to help you decide, not regulated financial or tax advice.</p>
+  </section>
+</main>
+
+<footer class="site-foot">
+  <span><strong>Fork</strong> is built by <strong>3d7 Technologies</strong>.</span>
+  <span>Demo only: Larkfield Analytics and everyone in it are fictional.</span>
+</footer>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var gbp = function (v) { return (v < 0 ? '−£' : '£') + Math.abs(Math.round(v)).toLocaleString('en-GB'); };
+  var sgn = function (v, u) { if (Math.abs(v) < 0.5) return 'No change'; return (v > 0 ? '+' : '−') + '£' + Math.abs(Math.round(v)).toLocaleString('en-GB') + (u || ''); };
+  var clamp = function (v, a, b) { return Math.max(a, Math.min(b, v)); };
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Shared rules (rest of UK, 2026/27) ----------
+  var NLW_YEAR = 12.71 * 37.5 * 52, ER_NI = 0.15, ER_THRESH = 5000, CAP = 2000, FEE = 34 * 4 * 12;
+  function incomeTax(pay) {
+    var pa = pay > 100000 ? Math.max(0, 12570 - (pay - 100000) / 2) : 12570;
+    var t = Math.max(0, pay - pa);
+    return Math.min(t, 37700) * 0.2 + Math.max(0, Math.min(t, 125140) - 37700) * 0.4 + Math.max(0, t - 125140) * 0.45;
+  }
+  function eeNI(pay) { return 0.08 * Math.max(0, Math.min(pay, 50270) - 12570) + 0.02 * Math.max(0, pay - 50270); }
+  function takeHome(pay) { return pay - incomeTax(pay) - eeNI(pay); }
+
+  // ---------- Larkfield payroll (34 people) ----------
+  var SAL = [25200,26000,28500,29000,30000,31000,32000,32000,33500,34000,35000,35000,36000,37500,38000,39000,40000,41000,42000,42000,44000,45000,46000,48000,50000,52000,55000,58000,60000,65000,72000,80000,95000,108000];
+  var niBill = SAL.reduce(function (a, s) { return a + ER_NI * Math.max(0, s - ER_THRESH); }, 0);
+  var owner = { take: 70, pass: 50, con: 5 };
+
+  function ownerCalc(o) {
+    var c = o.con / 100;
+    var elig = SAL.filter(function (s) { return s * (1 - c) >= NLW_YEAR; });
+    var excluded = SAL.length - elig.length;
+    var full = 0, capped = 0, eeGain = 0;
+    elig.forEach(function (s) {
+      var sac = s * c;
+      full += ER_NI * sac; capped += ER_NI * Math.min(sac, CAP);
+      eeGain += (eeNI(s) - eeNI(s - sac)) + ER_NI * sac * o.pass / 100;
+    });
+    var t = o.take / 100;
+    var save = full * t, save29 = capped * t;
+    var pass = save * o.pass / 100, pass29 = save29 * o.pass / 100;
+    var perPerson = elig.length ? full / elig.length * (1 - o.pass / 100) : 0;
+    return {
+      excluded: excluded, eligible: elig.length, joiners: Math.round(elig.length * t),
+      save: save, save29: save29, pass: pass, pass29: pass29,
+      keep: save - pass - FEE, keep29: save29 - pass29 - FEE,
+      eeAvg: elig.length ? eeGain / elig.length : 0,
+      payback: perPerson > 0 ? Math.ceil(FEE / perPerson) : null
+    };
+  }
+
+  function renderOwner() {
+    var r = ownerCalc(owner);
+    $('oTake').value = owner.take; $('oPass').value = owner.pass; $('oCon').value = owner.con;
+    $('oTakeV').textContent = owner.take + '% (' + r.joiners + ' people)';
+    $('oPassV').textContent = owner.pass + '%';
+    $('oConV').textContent = owner.con + '%';
+    $('nlwText').textContent = r.excluded + ' employees are close to the minimum wage. Fork leaves them out, so sacrifice never takes anyone below £12.71 an hour.';
+    if (r.keep > 0) {
+      $('oHead').textContent = 'Introduce salary sacrifice. Larkfield keeps about ' + gbp(r.keep) + ' a year, after sharing ' + gbp(r.pass) + ' with staff and paying for Fork.';
+      $('oWhy').textContent = 'You stop paying 15% National Insurance on pay that goes into pensions. Each employee who joins also gains about ' + gbp(r.eeAvg) + ' a year. From April 2029 the saving shrinks to ' + gbp(r.save29) + ' because of the £2,000 cap, and Larkfield still keeps ' + gbp(r.keep29) + '.';
+    } else {
+      $('oHead').textContent = 'At these settings, the saving doesn’t cover Fork’s fee.';
+      $('oWhy').textContent = 'You would save ' + gbp(r.save) + ' in employer National Insurance, but share ' + gbp(r.pass) + ' of it and pay ' + gbp(FEE) + ' for Fork. More take-up, or keeping more of the saving, changes this.';
+    }
+    $('oTip').textContent = r.payback ? 'Tipping point: Fork pays for itself once ' + r.payback + ' of your ' + r.eligible + ' eligible staff use salary sacrifice.' : '';
+    $('oKeep').textContent = gbp(r.keep);
+    $('oSave').textContent = gbp(r.save);
+    $('oSaveSub').textContent = gbp(r.save29) + ' a year from April 2029';
+    $('oEmp').textContent = gbp(r.eeAvg);
+    function bar(el, keep, pass, lost, total) {
+      var parts = [['k-keep', Math.max(0, keep)], ['k-pass', pass], ['k-fee', Math.min(FEE, total)], ['k-gone', lost]];
+      var max = r.save + 1;
+      el.innerHTML = parts.map(function (p) { return '<span class="' + p[0] + '" style="width:' + (p[1] / max * 100).toFixed(2) + '%"></span>'; }).join('');
+    }
+    bar($('barNow'), r.keep, r.pass, 0, r.save);
+    bar($('bar29'), r.keep29, r.pass29, r.save - r.save29, r.save29);
+    $('totNow').textContent = gbp(r.save);
+    $('tot29').textContent = gbp(r.save29);
+    $('niBill').textContent = gbp(niBill);
+  }
+  ['oTake', 'oPass', 'oCon'].forEach(function (id) {
+    $(id).addEventListener('input', function (e) {
+      owner[{ oTake: 'take', oPass: 'pass', oCon: 'con' }[id]] = parseFloat(e.target.value);
+      renderOwner();
+    });
+  });
+  $('oAct').addEventListener('click', function () {
+    var r = ownerCalc(owner);
+    $('oDone').textContent = 'Sent to Hollins & Co, your accountant: a salary sacrifice plan for ' + r.eligible + ' eligible staff, ' + owner.pass + '% of the saving shared, estimated saving ' + gbp(r.save) + ' a year. They’ll set up contracts and payroll.';
+    $('oDone').hidden = false;
+  });
+  $('oInvite').addEventListener('click', function () {
+    $('oDone').textContent = 'Your team now sees a “Should I switch to salary sacrifice?” prompt with their own numbers. Their answers stay private.';
+    $('oDone').hidden = false;
+  });
+
+  // ---------- Employee decisions ----------
+  var SPECS = {
+    switchss: {
+      user: ['Ella Brooks', 'Junior Designer · £32,000', 'EB'],
+      q: 'maya says we can switch the pension to salary sacrifice?? I’m on 32k, is it worth it or is there a catch',
+      label: 'Switch to salary sacrifice', hint: 'The decision that saves both sides money',
+      title: 'Should you switch to salary sacrifice?',
+      steps: [['Understood the question', 'switching how you pay into your pension'], ['Read your pay', '£32,000, paying 5% into the pension from take-home pay'], ['Read Larkfield’s plan', 'salary sacrifice from January, ' + 'sharing part of its saving with staff'], ['Checked the catches', 'mortgage applications, parental leave pay, minimum wage'], ['Chose the screen', 'before-and-after comparison, contribution lever, two checks']],
+      check: { key: 'mort', q: 'Applying for a mortgage in the next 12 months?', opts: [['no', 'No'], ['yes', 'Yes']], def: 'no' },
+      check2: { key: 'leave', q: 'Expecting parental leave in the next 12 months?', opts: [['no', 'No'], ['yes', 'Yes']], def: 'no' },
+      levers: [{ key: 'c', label: 'Your pension contribution', min: 3, max: 10, step: 1, def: 5, fmt: function (v) { return v + '%'; } }],
+      calc: function (s) {
+        var S = 32000, c = s.c / 100, con = S * c;
+        var thBefore = takeHome(S) - con * 0.8;   // relief at source: pay 80% from net pay
+        var thAfter = takeHome(S - con);
+        var share = ER_NI * con * owner.pass / 100;
+        var gainTH = thAfter - thBefore;
+        var capPct = (CAP / S * 100);
+        var head = 'Switch. You take home ' + gbp(gainTH) + ' more a year' + (share > 0.5 ? ', and Larkfield adds ' + gbp(share) + ' to your pension.' : '.');
+        var why = 'Your pension gets the same ' + gbp(con) + ' either way. The difference is National Insurance: on salary sacrifice you don’t pay 8% on the part that goes into your pension.';
+        var cautions = [];
+        if (s.mort === 'yes') cautions.push('Some mortgage lenders look at your salary after sacrifice. Ask your lender or broker which figure they use before you switch.');
+        if (s.leave === 'yes') cautions.push('Statutory parental pay is based on your earnings, which will be slightly lower. On ' + s.c + '% that’s about ' + gbp(con * 0.9 / 52 * 6) + ' less over the first six weeks.');
+        if (cautions.length) { head = 'Probably switch, but check one thing first.'; why = cautions.join(' ') + ' Otherwise you gain ' + gbp(gainTH + share) + ' a year.'; }
+        return {
+          head: head, why: why,
+          tip: 'Tipping point: ' + capPct.toFixed(2).replace(/\.?0+$/, '') + '% of your pay. From April 2029, sacrifice above £2,000 a year loses the National Insurance saving.',
+          outs: [['Extra take-home a year', gbp(gainTH), 'From not paying NI on your contribution', ''], ['Extra into your pension', gbp(share), owner.pass + '% of Larkfield’s saving, shared', ''], ['Into your pension a year', gbp(con + S * 0.03 + share), 'You, Larkfield’s 3%, and the share', '']],
+          vis: compare([['Today', [[thBefore, 'k1']], thBefore, 'take-home'], ['On salary sacrifice', [[thAfter, 'k4']], thAfter, 'take-home']], 'Your take-home pay a year', ['k1', 'Today'], ['k4', 'On salary sacrifice'], thBefore * 0.97),
+          act: 'Switch me to salary sacrifice', done: 'Request sent. Your pay and pension change from the January payroll. Maya sees that someone switched, not who or why.'
+        };
+      },
+      method: ['<b>Your pay:</b> £32,000, paying 5% from take-home pay with basic-rate tax relief added by the provider. Source: payroll and pension records.', '<b>On salary sacrifice</b> your salary is reduced by the contribution, so you pay no income tax or National Insurance on it.', '<b>Larkfield’s share:</b> part of the employer National Insurance it saves goes into your pension. Set by Larkfield.', '<b>From April 2029</b> only the first £2,000 a year stays free of National Insurance. Source: gov.uk.']
+    },
+
+    threshold: {
+      user: ['Daniel Okafor', 'Head of Data · £108,000', 'DO'],
+      q: 'Just found out my pay rise takes me to £108k. Someone at lunch said going over 100k is actually bad?? Do I need to do something',
+      label: 'Pay rise over £100k', hint: 'Tax, pension and childcare at once',
+      title: 'Your pay rise and the £100,000 threshold',
+      steps: [['Understood the question', 'a threshold decision at £100,000'], ['Read your pay', '£108,000, 5% pension by salary sacrifice'], ['Applied tax rules', 'personal allowance taper and Tax-Free Childcare limit'], ['Chose the screen', 'income ladder, one amount lever, childcare check']],
+      check: { key: 'kids', q: 'How many of your children use Tax-Free Childcare?', opts: [['0', '0'], ['1', '1'], ['2', '2']], def: '2' },
+      levers: [{ key: 'x', label: 'Extra into your pension a year', min: 0, max: 15000, step: 100, def: 0, fmt: function (v) { return gbp(v); } }],
+      calc: function (s) {
+        var S = 108000, base = 5400, kids = +s.kids;
+        function at(x) { var pay = S - base - x; return { pay: pay, th: takeHome(pay), tfc: pay <= 100000 ? kids * 2000 : 0 }; }
+        var now = at(0), nx = at(s.x), star = S - base - 100000, st = at(star);
+        var head, why;
+        if (nx.pay > 100000) {
+          head = kids ? 'Put an extra ' + gbp(star) + ' into your pension. It keeps ' + gbp(kids * 2000) + ' of childcare support.' : 'Consider an extra ' + gbp(star) + ' into your pension. It costs you only ' + gbp(now.th - st.th) + '.';
+          why = 'That slice of pay is taxed at about 62%, so your take-home falls by just ' + gbp(now.th - st.th) + ' a year. Larkfield also saves employer National Insurance on it.';
+        } else {
+          head = 'You’re under £100,000. You keep your full allowance' + (kids ? ' and ' + gbp(nx.tfc) + ' of childcare support.' : '.');
+          why = 'Compared with doing nothing: take-home ' + sgn(nx.th - now.th) + ', childcare ' + sgn(nx.tfc - now.tfc) + ', pension ' + sgn(s.x) + ' a year.' + (s.x > star + 500 ? ' Beyond ' + gbp(star) + ', each extra £1 costs you 58p.' : '');
+        }
+        return {
+          head: head, why: why,
+          tip: 'Tipping point: £100,000. Above it you lose £1 of tax-free allowance for every £2 earned, and Tax-Free Childcare stops completely.',
+          outs: [['Take-home pay a year', gbp(nx.th), sgn(nx.th - now.th) + ' vs doing nothing', ''], ['Childcare support kept', gbp(nx.tfc), sgn(nx.tfc - now.tfc), ''], ['Into your pension a year', gbp(base + s.x + S * 0.03), sgn(s.x) + ' from you', '']],
+          vis: ladder(now.pay, nx.pay),
+          act: s.x > 0 ? 'Add ' + gbp(s.x) + ' a year to my pension' : null, actHint: 'Move the slider to choose an amount',
+          done: 'Request sent to payroll. Your sacrifice rises by ' + gbp(s.x) + ' a year from the next pay run.'
+        };
+      },
+      method: ['<b>Adjusted net income</b> is salary minus salary-sacrificed pension. Above £100,000 the personal allowance falls by £1 for every £2.', '<b>Tax-Free Childcare</b> is worth up to £2,000 a year per child and stops above £100,000. Source: gov.uk.', '<b>From April 2029</b> sacrifice above £2,000 a year pays National Insurance, but still reduces adjusted net income.']
+    },
+
+    compare: {
+      user: ['Tom Reilly', 'Account Director · £58,000', 'TR'],
+      q: 'is the EV salary sacrifice thing actually cheaper than just leasing my own car? I do about 9k miles. Be honest',
+      label: 'Electric car scheme or own car', hint: 'A straight comparison',
+      title: 'Electric car scheme or your own car',
+      steps: [['Understood the question', 'comparing two options over three years'], ['Read your pay', '£58,000: 40% tax and 2% NI on the top slice'], ['Read Larkfield’s EV scheme', '£600 a month including insurance, list price £42,000'], ['Chose the screen', 'side-by-side costs, mileage lever, home charging check']],
+      check: { key: 'home', q: 'Can you charge at home?', opts: [['yes', 'Yes'], ['no', 'No']], def: 'yes' },
+      levers: [{ key: 'm', label: 'Miles a year', min: 3000, max: 25000, step: 500, def: 9000, fmt: function (v) { return v.toLocaleString('en-GB'); } }],
+      calc: function (s) {
+        var bik = 42000 * 0.0533 * 0.40, perP = 1 / 45 * 4.546 * 1.40, per = s.home === 'yes' ? 0.10 / 3.5 : 0.70 / 3.5;
+        var P = 5160 + 1200 + s.m * perP, eL = 7200 * 0.58, E = eL + bik + s.m * per, save = P - E;
+        var cross = (eL + bik - 6360) / (perP - 0.20);
+        return {
+          head: save > 0 ? 'The electric car scheme saves you about ' + gbp(save) + ' a year, ' + gbp(save * 3) + ' over three years.' : 'Your own petrol car is cheaper by about ' + gbp(-save) + ' a year at this mileage.',
+          why: save > 0 ? 'The lease comes out of your pay before 42% tax and National Insurance, and company car tax on an electric car is low. Larkfield saves about £800 a year in employer NI on it too.' : 'Without home charging, public charging costs more per mile than petrol, and at high mileage that outweighs the tax saving.',
+          tip: 'Tipping point: home charging. Without it, the scheme stops being cheaper above about ' + (Math.round(cross / 500) * 500).toLocaleString('en-GB') + ' miles a year.',
+          outs: [['Own petrol car a year', gbp(P), 'From take-home pay', ''], ['EV scheme a year', gbp(E), 'After tax savings', ''], ['Difference over three years', gbp(Math.abs(save * 3)), save > 0 ? 'In favour of the scheme' : 'In favour of your own car', '']],
+          vis: compare([['Own petrol car', [[5160, 'k1'], [1200, 'k2'], [s.m * perP, 'k3']], P], ['EV scheme', [[eL, 'k1'], [bik, 'k4'], [s.m * per, 'k3']], E]], 'Cost a year, from your take-home pay', null, null, 0, true),
+          act: save > 0 ? 'Start an application' : 'Save this comparison',
+          done: save > 0 ? 'Application sent to Maya for approval. Larkfield’s EV provider will be in touch with car options.' : 'Saved. We’ll tell you if charging costs or scheme prices change the answer.'
+        };
+      },
+      method: ['<b>EV scheme:</b> £600 a month gross, including insurance and servicing; list price £42,000. Source: Larkfield’s scheme terms.', '<b>Company car tax:</b> average of published electric-car rates over three years, at 40%. Source: HMRC.', '<b>Own car:</b> £430 a month lease, £1,200 insurance and servicing, 45 mpg at £1.40 a litre. Charging 10p a kWh at home, 70p public. Estimates.']
+    },
+
+    none: { user: ['Sam Patel', 'Data Analyst', 'SP'], q: 'where is my p60 lol', label: 'Not every question is a decision', hint: 'Fork knows when not to build a screen' }
+  };
+
+  function ladder(nowPay, newPay) {
+    var lo = 90000, hi = 130000, pos = function (v) { return clamp((v - lo) / (hi - lo) * 100, 0, 100); };
+    return '<h4>Where your income sits</h4><div class="ladder" aria-hidden="true"><div class="track"><div class="zone" style="left:' + pos(100000) + '%;width:' + (pos(125140) - pos(100000)) + '%"></div></div>' +
+      '<div class="mk now" style="left:' + pos(nowPay) + '%">Doing nothing ' + gbp(nowPay) + '</div><div class="mk new" style="left:' + pos(newPay) + '%">With your choice ' + gbp(newPay) + '</div></div>' +
+      '<div class="ticks"><span>£90k</span><span>£100k</span><span>£110k</span><span>£120k</span><span>£130k</span></div><p class="note" style="margin:6px 0 0">Shaded: £100,000 to £125,140, where each extra £1 is taxed at about 62% and childcare support is lost.</p>';
+  }
+  function compare(rows, title, k1, k2, floor, carKeys) {
+    var max = Math.max.apply(null, rows.map(function (r) { return r[2]; }));
+    var base = floor || 0;
+    var out = '<h4>' + title + '</h4>' + rows.map(function (r) {
+      return '<div class="crow"><span>' + r[0] + '</span><div class="stack">' + r[1].map(function (p, i) {
+        var w = i === 0 && base ? (p[0] - base) / (max - base) * 100 : p[0] / max * 100;
+        return '<span class="' + p[1] + '" style="width:' + w.toFixed(2) + '%"></span>';
+      }).join('') + '</div><span class="tot">' + gbp(r[2]) + '</span></div>';
+    }).join('');
+    if (carKeys) out += '<div class="keys"><span><i class="k1"></i>Lease</span><span><i class="k2"></i>Insurance and servicing</span><span><i class="k4"></i>Company car tax</span><span><i class="k3"></i>Fuel or charging</span></div>';
+    else if (base) out += '<p class="note" style="margin:4px 0 0">Bars start at ' + gbp(base) + ' so the difference is visible.</p>';
+    return out;
+  }
+
+  function pills(key, opts, val) {
+    return '<div class="pills" role="group">' + opts.map(function (o) { return '<button type="button" data-k="' + key + '" data-v="' + o[0] + '" aria-pressed="' + (o[0] === val) + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  }
+  function setUser(u) { $('uName').textContent = u[0]; $('uRole').textContent = u[1]; $('uAv').textContent = u[2]; }
+  // ---------- Owner decision specs ----------
+  var OSPECS = {
+    ss: {
+      custom: true,
+      q: 'should we bring in salary sacrifice for pensions? what would we actually save',
+      label: 'Introduce salary sacrifice', hint: 'The decision that pays for Fork'
+    },
+    hire: {
+      q: 'thinking of hiring a project manager at around 40k. what does that actually cost us all in?',
+      label: 'True cost of a new hire', hint: 'Salary is only part of it',
+      title: 'What a new hire really costs Larkfield',
+      steps: [['Understood the question', 'the full yearly cost of one new employee'], ['Read your payroll', 'employer pension 3%, salary sacrifice now available'], ['Applied tax rules', 'employer National Insurance 15% above £5,000, 2026/27'], ['Checked your NI bill', 'well above the Employment Allowance, so the full cost applies'], ['Chose the screen', 'cost breakdown, salary and extras levers, one check']],
+      check: { key: 'ss', q: 'Will they pay into their pension by salary sacrifice?', opts: [['yes', 'Yes'], ['no', 'No']], def: 'yes' },
+      levers: [
+        { key: 's', label: 'Salary', min: 22000, max: 90000, step: 1000, def: 40000, fmt: function (v) { return gbp(v); } },
+        { key: 'p', label: 'Employer pension', min: 3, max: 10, step: 1, def: 3, fmt: function (v) { return v + '%'; } },
+        { key: 'e', label: 'Laptop, software and extras a year', min: 0, max: 6000, step: 250, def: 2000, fmt: function (v) { return gbp(v); } }
+      ],
+      calc: function (s) {
+        var sac = s.ss === 'yes' ? s.s * 0.05 : 0;
+        var ni = ER_NI * Math.max(0, s.s - sac - ER_THRESH), pen = s.s * s.p / 100, tot = s.s + ni + pen + s.e;
+        var saved = ER_NI * sac, per1k = (s.s + ni + pen) / s.s * 1000;
+        return {
+          head: 'A ' + gbp(s.s) + ' hire costs Larkfield about ' + gbp(tot) + ' a year, ' + gbp(tot / 12) + ' a month.',
+          why: 'On top of salary: ' + gbp(ni) + ' employer National Insurance, ' + gbp(pen) + ' pension and ' + gbp(s.e) + ' for equipment and software.' + (sac ? ' Salary sacrifice saves you ' + gbp(saved) + ' of the National Insurance.' : ' If they used salary sacrifice, you would save about ' + gbp(ER_NI * s.s * 0.05) + ' a year.'),
+          tip: 'Rule of thumb at this salary: every £1,000 of pay costs you about ' + gbp(per1k) + ' before extras.',
+          outs: [['Total cost a year', gbp(tot), 'Salary, NI, pension and extras', ''], ['Each month', gbp(tot / 12), 'For cash-flow planning', ''], ['Above the salary', '+' + Math.round((tot / s.s - 1) * 100) + '%', gbp(tot - s.s) + ' a year', '']],
+          vis: compare([['Total cost', [[s.s, 'k1'], [ni, 'k2'], [pen, 'k4'], [s.e, 'k3']], tot]], 'Where the money goes') + '<div class="keys"><span><i class="k1"></i>Salary</span><span><i class="k2"></i>Employer NI</span><span><i class="k4"></i>Employer pension</span><span><i class="k3"></i>Equipment and extras</span></div>',
+          act: 'Add this to our hiring budget', done: 'Saved to your hiring budget: ' + gbp(tot) + ' a year. We’ll update it if tax rates or your pension terms change.'
+        };
+      },
+      method: ['<b>Employer National Insurance</b> is 15% on pay above £5,000 a year. Pay sacrificed into a pension is not counted. Source: HMRC 2026/27.', '<b>Employment Allowance:</b> Larkfield’s NI bill is far above the £10,500 allowance, so a new hire’s NI is a real cost.', '<b>Pension:</b> Larkfield pays 3% of salary; staff pay 5%. Source: your pension scheme details.', '<b>Not included:</b> recruitment fees, training, and any bonus or car allowance.']
+    },
+    bonus: {
+      q: 'want to give everyone a £1,000 christmas bonus. cash or into their pension? which is better for us and them',
+      label: 'Christmas bonus: cash or pension', hint: 'Same reward, different cost',
+      title: 'Christmas bonus: cash or pension?',
+      steps: [['Understood the question', 'comparing two ways to pay the same bonus'], ['Read your payroll', '34 staff, most basic-rate taxpayers'], ['Applied tax rules', 'employer NI on cash bonuses; none on employer pension contributions'], ['Checked timing', 'a bonus sacrifice must be agreed before the bonus is paid'], ['Chose the screen', 'side-by-side cost, two levers, one choice']],
+      check: { key: 'choice', q: 'How should staff receive it?', opts: [['pension', 'All into pensions'], ['choose', 'Let each person choose']], def: 'choose' },
+      levers: [
+        { key: 'a', label: 'Bonus per person', min: 250, max: 3000, step: 50, def: 1000, fmt: function (v) { return gbp(v); } },
+        { key: 'n', label: 'People receiving it', min: 5, max: 34, step: 1, def: 34, fmt: function (v) { return v; } }
+      ],
+      calc: function (s) {
+        var share = s.choice === 'pension' ? 1 : 0.5;
+        var cash = s.a * s.n * (1 + ER_NI), mix = s.a * s.n * share + s.a * s.n * (1 - share) * (1 + ER_NI), save = cash - mix;
+        var head = s.choice === 'pension' ? 'Pay it into pensions. It costs Larkfield ' + gbp(save) + ' less than cash.' : 'Offer the choice. If half choose their pension, Larkfield saves about ' + gbp(save) + '.';
+        var why = 'A ' + gbp(s.a) + ' cash bonus reaches a basic-rate employee as about ' + gbp(s.a * 0.72) + ' after tax and NI. Into their pension, all ' + gbp(s.a) + ' arrives, and you pay no employer National Insurance on it.' + (s.choice === 'choose' ? ' Letting people choose keeps it feeling like a reward, not a policy.' : ' Some staff may prefer cash before Christmas, so think about offering the choice.');
+        return {
+          head: head, why: why,
+          tip: 'Every £1 paid as cash costs you £1.15 and reaches a basic-rate employee as 72p. Every £1 into a pension costs you £1 and arrives as £1.',
+          outs: [['All as cash', gbp(cash), 'Including employer NI', ''], [s.choice === 'pension' ? 'All into pensions' : 'Half choose pension', gbp(mix), 'What Larkfield pays', ''], ['Larkfield saves', gbp(save), 'Could fund ' + Math.floor(save / s.a) + ' more bonuses', 'up']],
+          vis: compare([['All as cash', [[s.a * s.n, 'k1'], [s.a * s.n * ER_NI, 'k2']], cash], [s.choice === 'pension' ? 'Into pensions' : 'Half choose pension', [[s.a * s.n, 'k4'], [s.a * s.n * (1 - share) * ER_NI, 'k2']], mix]], 'What the bonus costs Larkfield') + '<div class="keys"><span><i class="k1"></i>Bonus as cash</span><span><i class="k4"></i>Bonus into pensions</span><span><i class="k2"></i>Employer National Insurance</span></div>',
+          act: 'Send the bonus plan to Hollins & Co', done: 'Sent to Hollins & Co. Staff will get a private Fork prompt to choose cash or pension before 1 December; the choice has to be made before payroll runs.'
+        };
+      },
+      method: ['<b>Cash bonus:</b> employer NI at 15%; the employee pays income tax and NI, 28% for most basic-rate staff.', '<b>Into a pension:</b> an employer pension contribution has no employer or employee NI and no income tax now. It is taxed when drawn, with 25% usually tax-free.', '<b>Timing:</b> a bonus sacrifice has to be agreed before the bonus is paid. Your accountant sets it up.', '<b>Not included:</b> staff above the £2,000 salary sacrifice cap from April 2029, which doesn’t apply to employer contributions made this way.']
+    },
+    reenrol: {
+      q: 'when is our pension re-enrolment due again?',
+      label: 'Not every question is a decision', hint: 'Fork knows when not to build a screen',
+      plain: '<h2>That’s a date, not a decision</h2><p class="lead">Larkfield’s next auto-enrolment re-enrolment date is 1 March 2027. It comes round every three years. Fork will remind you and Hollins & Co a month before.</p>'
+    }
+  };
+
+  // ---------- Question-to-screen renderer (shared by owner and employee) ----------
+  function createAsk(px, specs, order, route, opts) {
+    var P = function (id) { return $(px + id); };
+    var cur = null, st = {}, asked = null;
+
+    function build(id, typed) {
+      var spec = specs[id]; cur = id; st = {};
+      if (!typed) asked = null;
+      if (spec.user) setUser(spec.user);
+      P('qs').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.id === id); });
+      P('qText').value = asked || spec.q;
+      P('fork').hidden = true; P('plain').hidden = true;
+      if (opts.onPick) opts.onPick(id);
+      if (spec.plain) { P('build').hidden = true; P('plain').hidden = false; P('plain').innerHTML = spec.plain; return; }
+      if (spec.custom) { P('build').hidden = true; return; }
+      P('build').hidden = false;
+      P('steps').innerHTML = spec.steps.map(function (s) { return '<div class="step"><span class="dot"></span><span><b>' + s[0] + ':</b> ' + s[1] + '</span></div>'; }).join('');
+      var steps = P('steps').children, i = 0;
+      (function go() {
+        if (cur !== id) return;
+        if (i < steps.length) { steps[i].classList.add('on'); i++; setTimeout(go, reduced ? 0 : 320); }
+        else render(spec);
+      })();
+    }
+
+    function render(spec) {
+      spec.levers.forEach(function (l) { st[l.key] = l.def; });
+      st[spec.check.key] = spec.check.def;
+      if (spec.check2) st[spec.check2.key] = spec.check2.def;
+      P('fTitle').textContent = spec.title;
+      P('fAsked').textContent = '“' + (asked || spec.q) + '”';
+      P('fCheck').innerHTML = '<p>' + spec.check.q + '</p>' + pills(spec.check.key, spec.check.opts, st[spec.check.key]) + (spec.check2 ? '<p>' + spec.check2.q + '</p>' + pills(spec.check2.key, spec.check2.opts, st[spec.check2.key]) : '');
+      P('fLevers').innerHTML = spec.levers.map(function (l) {
+        return '<div class="lever"><div class="top-row"><label for="' + px + 'lv-' + l.key + '">' + l.label + '</label><span class="val" id="' + px + 'lvv-' + l.key + '"></span></div><input id="' + px + 'lv-' + l.key + '" type="range" min="' + l.min + '" max="' + l.max + '" step="' + l.step + '" value="' + l.def + '"></div>';
+      }).join('');
+      P('fMethod').innerHTML = spec.method.map(function (m) { return '<li>' + m + '</li>'; }).join('');
+      P('fMethod').hidden = true;
+      P('fork').querySelector('.mBtn').setAttribute('aria-expanded', 'false');
+      P('fork').querySelector('.mBtn span').textContent = 'Show';
+      P('fDone').hidden = true;
+      spec.levers.forEach(function (l) { P('lv-' + l.key).addEventListener('input', function (e) { st[l.key] = parseFloat(e.target.value); update(); }); });
+      P('fCheck').querySelectorAll('button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          st[b.dataset.k] = b.dataset.v;
+          P('fCheck').querySelectorAll('[data-k="' + b.dataset.k + '"]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+          update();
+        });
+      });
+      P('build').hidden = true; P('fork').hidden = false;
+      update();
+    }
+
+    function update() {
+      var spec = specs[cur], r = spec.calc(st);
+      spec.levers.forEach(function (l) { P('lvv-' + l.key).textContent = l.fmt(st[l.key]); });
+      P('vHead').textContent = r.head; P('vWhy').textContent = r.why; P('vTip').textContent = r.tip;
+      P('fOuts').innerHTML = r.outs.map(function (o) { return '<div class="out"><span>' + o[0] + '</span><strong>' + o[1] + '</strong><em>' + o[2] + '</em></div>'; }).join('');
+      P('fVis').innerHTML = r.vis;
+      var a = P('fAct');
+      if (r.act) { a.disabled = false; a.textContent = r.act; } else { a.disabled = true; a.textContent = r.actHint; }
+      a.dataset.done = r.done;
+      P('fCheck').classList.toggle('flag', spec.flag ? spec.flag(st) : false);
+    }
+
+    order.forEach(function (id) {
+      var s = specs[id], b = document.createElement('button');
+      b.type = 'button'; b.dataset.id = id; b.setAttribute('aria-pressed', 'false');
+      b.innerHTML = '“' + s.q + '”<small>' + s.label + ' · ' + s.hint + '</small>';
+      b.addEventListener('click', function () { build(id); });
+      P('qs').appendChild(b);
+    });
+    P('askBtn').addEventListener('click', function () {
+      var id = route(P('qText').value.toLowerCase());
+      if (id) { asked = P('qText').value.trim() || null; build(id, true); return; }
+      cur = null; P('build').hidden = true; P('fork').hidden = true; P('plain').hidden = false;
+      if (opts.onPick) opts.onPick(null);
+      P('plain').innerHTML = opts.fallback;
+    });
+    P('fAct').addEventListener('click', function () { P('fDone').textContent = this.dataset.done; P('fDone').hidden = false; });
+
+    return {
+      build: build,
+      current: function () { return cur; },
+      refresh: function () { if (cur && specs[cur].calc && !P('fork').hidden) update(); }
+    };
+  }
+
+  SPECS.switchss.flag = function (s) { return s.mort === 'yes' || s.leave === 'yes'; };
+  SPECS.compare.flag = function (s) { return s.home === 'no'; };
+  SPECS.none.plain = '<h2>That’s not a decision, so no screen needed</h2><p class="lead">Your P60 for 2025/26 is in the documents your accountant sent on 31 May 2026. <a href="#" style="color:var(--blue);font-weight:600">Open it</a></p>';
+
+  var emp = createAsk('', SPECS, ['switchss', 'threshold', 'compare', 'none'], function (t) {
+    return /sacrifice|switch|salary exchange/.test(t) ? 'switchss' :
+           /100k|100,000|£100|pay rise|payrise|allowance|\btax\b/.test(t) ? 'threshold' :
+           /\bev\b|electric|\bcar\b|lease|miles/.test(t) ? 'compare' :
+           /p60|payslip|p45/.test(t) ? 'none' : null;
+  }, { fallback: '<h2>In the full product, Fork would build a screen for this</h2><p class="lead">This demo has three employee decisions wired up. Try salary sacrifice, a pay rise over £100k, or the electric car scheme.</p>' });
+
+  var own = createAsk('o_', OSPECS, ['ss', 'hire', 'bonus', 'reenrol'], function (t) {
+    return /sacrifice|national insurance|\bni\b|save/.test(t) ? 'ss' :
+           /hire|hiring|recruit|new starter|cost us/.test(t) ? 'hire' :
+           /bonus|christmas/.test(t) ? 'bonus' :
+           /re-?enrol|auto-?enrol/.test(t) ? 'reenrol' : null;
+  }, {
+    onPick: function (id) { $('ownerSS').hidden = id !== 'ss'; },
+    fallback: '<h2>In the full product, Fork would build a screen for this</h2><p class="lead">This demo has three owner decisions wired up. Try salary sacrifice, the cost of a new hire, or a Christmas bonus.</p>'
+  });
+
+  document.querySelectorAll('.mBtn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var open = btn.getAttribute('aria-expanded') !== 'true', list = $(btn.getAttribute('aria-controls'));
+      btn.setAttribute('aria-expanded', open); btn.querySelector('span').textContent = open ? 'Hide' : 'Show'; list.hidden = !open;
+    });
+  });
+
+  // ---------- View switch ----------
+  document.querySelectorAll('[data-view]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('[data-view]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+      var ownerOn = b.dataset.view === 'owner';
+      $('ownerView').hidden = !ownerOn; $('empView').hidden = ownerOn;
+      if (ownerOn) { setUser(['Maya Hart', 'Managing Director', 'MH']); own.refresh(); }
+      else if (emp.current()) { setUser(SPECS[emp.current()].user); emp.refresh(); }
+      else setUser(['A Larkfield employee', 'Pick a question to sign in as its asker', 'LA']);
+    });
+  });
+
+  renderOwner();
+  own.build('ss');
+})();
+</script>
+</body>
+</html>
