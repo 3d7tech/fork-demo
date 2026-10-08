@@ -1,9 +1,9 @@
 import 'server-only';
-import { AnthropicProvider, JsonLinesLogger, loadRegistry } from '@fork/models';
+import { AnthropicProvider, anthropicApiKey, JsonLinesLogger, loadRegistry } from '@fork/models';
 import { DEMO_FACTS, DEMO_SUBJECT, DemoModels, FAMILIES, type DecisionScreen, type PipelineDeps, type Subject } from '@fork/pipeline';
 
 /** Demo mode when no API key is set: real engine and checks, templated wording. */
-export const DEMO = !process.env.ANTHROPIC_API_KEY;
+export const DEMO = !anthropicApiKey();
 
 let deps: PipelineDeps | undefined;
 export function pipelineDeps(): PipelineDeps {

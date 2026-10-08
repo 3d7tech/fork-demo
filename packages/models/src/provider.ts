@@ -34,12 +34,20 @@ export interface ModelProvider {
   complete(req: ProviderRequest): Promise<ProviderResponse>;
 }
 
+/**
+ * The key Fork's own model calls use. FORK_ANTHROPIC_API_KEY comes first because cloud
+ * environments reserve ANTHROPIC_API_KEY for the coding agent and don't pass it through.
+ */
+export function anthropicApiKey(env: Record<string, string | undefined> = process.env): string | undefined {
+  return env.FORK_ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY || undefined;
+}
+
 export class AnthropicProvider implements ModelProvider {
   readonly id = 'anthropic';
   private readonly client: Anthropic;
 
   constructor(client?: Anthropic) {
-    this.client = client ?? new Anthropic();
+    this.client = client ?? new Anthropic({ apiKey: anthropicApiKey() });
   }
 
   async complete(req: ProviderRequest): Promise<ProviderResponse> {

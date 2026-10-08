@@ -21,7 +21,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
 | 10 | "How to add a decision family" guide, tested by adding one | To do |
 
-**First thing to do in a new session:** the live model check (open question 6). The Anthropic key is set as an **environment variable**, `ANTHROPIC_API_KEY`, on the Default environment (the network-secret form wouldn't save). Check it is present without printing it (for example `test -n "$ANTHROPIC_API_KEY" && echo set`, and that it starts `sk-ant-`), make one tiny request to confirm the API accepts it, then run `pnpm smoke:models`. Report each question's timing against the 10-second target and any role schema the API rejects, and fix what fails. With the key set, `apps/web` leaves demo mode automatically. Never print, log or commit the key.
+**First thing to do in a new session:** the live model check (open question 6). The Anthropic key goes in the Default environment as **`FORK_ANTHROPIC_API_KEY`**. The cloud environment reserves `ANTHROPIC_API_KEY` for Claude Code and doesn't pass it into the session; the code reads `FORK_ANTHROPIC_API_KEY` first, then `ANTHROPIC_API_KEY` (`anthropicApiKey()` in `packages/models`). Check it is present without printing it (for example `test -n "$FORK_ANTHROPIC_API_KEY" && echo set`, and that it starts `sk-ant-`), make one tiny request to confirm the API accepts it, then run `pnpm smoke:models`. Report each question's timing against the 10-second target and any role schema the API rejects, and fix what fails. With the key set, `apps/web` leaves demo mode automatically. Never print, log or commit the key.
 
 ## Layout
 
@@ -42,7 +42,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 
 ```sh
 pnpm install
-pnpm test            # unit and golden tests (109)
+pnpm test            # unit and golden tests (110)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev

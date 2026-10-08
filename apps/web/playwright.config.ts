@@ -25,7 +25,7 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 60_000,
     // Demo mode: no key, so the run is free and repeatable.
-    env: { ANTHROPIC_API_KEY: '' },
+    env: { FORK_ANTHROPIC_API_KEY: '', ANTHROPIC_API_KEY: '' },
   },
 });
 void devices;

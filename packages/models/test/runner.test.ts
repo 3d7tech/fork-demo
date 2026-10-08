@@ -165,3 +165,12 @@ describe('output JSON schemas for constrained decoding', () => {
   });
 });
 
+
+describe('anthropicApiKey', async () => {
+  const { anthropicApiKey } = await import('../src/index');
+  it('prefers FORK_ANTHROPIC_API_KEY, falls back to ANTHROPIC_API_KEY, treats empty as unset', () => {
+    expect(anthropicApiKey({ FORK_ANTHROPIC_API_KEY: 'a', ANTHROPIC_API_KEY: 'b' })).toBe('a');
+    expect(anthropicApiKey({ FORK_ANTHROPIC_API_KEY: '', ANTHROPIC_API_KEY: 'b' })).toBe('b');
+    expect(anthropicApiKey({ FORK_ANTHROPIC_API_KEY: '', ANTHROPIC_API_KEY: '' })).toBeUndefined();
+  });
+});

@@ -26,7 +26,7 @@ Fork gives guidance, not regulated financial or tax advice.
 pnpm install
 pnpm test       # unit and golden tests
 pnpm typecheck
-ANTHROPIC_API_KEY=… pnpm smoke:models   # live: the whole pipeline on four questions, with timing
+FORK_ANTHROPIC_API_KEY=… pnpm smoke:models   # live: the whole pipeline on four questions, with timing
 ```
 
 Run the app (demo mode without a key, real models with one):

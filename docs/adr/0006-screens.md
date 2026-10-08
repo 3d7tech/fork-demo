@@ -8,7 +8,7 @@ Date: 2026-10-08 · Status: accepted
 - **Visuals** render `VisualData` that code builds from the results (each family's `visual()`), never a model: bars (before-and-after and side-by-side), threshold ladder, change checklist and saving flow. Every bar has its value written out and a key with text, so nothing depends on colour.
 - **Styling**: one stylesheet (`fork.css`) with tokens on `:root`, the demo's palette and IBM Plex type, light and dark themes (`prefers-color-scheme`, overridable with `data-theme`), and `--fk-accent` for a company's brand colour. Mobile first; tested at 360px.
 - **`apps/web`**: Next.js 15. `/api/ask` streams building steps then the answer; `/api/recalculate` re-runs numbers instantly in code; `/api/reexplain` rewrites the words 700 ms after the person settles; `/api/action` confirms the next step (sending to the accountant is step 8). `/preview` shows every screen state.
-- **Demo mode**: with no `ANTHROPIC_API_KEY`, a stand-in replaces the models. The engine, the code checks and the pipeline are real; the wording is templated and the page says so.
+- **Demo mode**: with no `FORK_ANTHROPIC_API_KEY` (or `ANTHROPIC_API_KEY`), a stand-in replaces the models. The engine, the code checks and the pipeline are real; the wording is templated and the page says so.
 
 ## Accessibility
 

@@ -1,6 +1,6 @@
 // Live check of the whole pipeline against the real API, on the demo's Larkfield data.
 // Proves every role's schema is accepted, the prompts produce valid output, and shows timing.
-// Needs ANTHROPIC_API_KEY. Costs a few pence. Run: pnpm smoke:models
+// Needs FORK_ANTHROPIC_API_KEY (or ANTHROPIC_API_KEY). Costs a few pence. Run: pnpm smoke:models
 import { AnthropicProvider, JsonLinesLogger, loadRegistry } from '@fork/models';
 import { askFork, InMemoryFactStore, type Subject } from '@fork/pipeline';
 import type { Fact } from '@fork/spec';
