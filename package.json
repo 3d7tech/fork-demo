@@ -8,18 +8,22 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "pnpm typecheck && pnpm test",
     "smoke:models": "tsx scripts/smoke-models.ts",
-    "e2e": "pnpm --filter web build && pnpm --filter web e2e"
+    "e2e": "pnpm --filter web build && pnpm --filter web e2e",
+    "db": "tsx scripts/db.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
     "typescript": "5.9.3",
     "vitest": "3.2.7",
-    "tsx": "4.23.15"
+    "tsx": "4.23.15",
+    "pg": "8.23.0",
+    "@types/pg": "8.23.1"
   },
   "dependencies": {
     "@fork/models": "workspace:*",
     "@fork/calc": "workspace:*",
     "@fork/pipeline": "workspace:*",
-    "@fork/spec": "workspace:*"
+    "@fork/spec": "workspace:*",
+    "@fork/db": "workspace:*"
   }
 }
