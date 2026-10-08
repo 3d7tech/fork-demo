@@ -21,7 +21,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
 | 10 | "How to add a decision family" guide, tested by adding one | To do |
 
-**First thing to do in a new session:** the live model check (open question 6). The Anthropic key is a **network secret** on the Default environment: the proxy adds an `x-api-key` header to requests to `api.anthropic.com`, so `ANTHROPIC_API_KEY` is *not* visible inside the container. The app currently treats "no `ANTHROPIC_API_KEY`" as demo mode (`apps/web/lib/server.ts`, `DEMO`), and the SDK refuses to start without a key. So: confirm a request reaches Anthropic through the proxy, then add a setting (for example `FORK_MODELS=live`) that uses real models with a placeholder key for the proxy to replace, and run `pnpm smoke:models`. Report timings against the 10-second target and any schema the API rejects.
+**First thing to do in a new session:** the live model check (open question 6). The Anthropic key is set as an **environment variable**, `ANTHROPIC_API_KEY`, on the Default environment (the network-secret form wouldn't save). Check it is present without printing it (for example `test -n "$ANTHROPIC_API_KEY" && echo set`, and that it starts `sk-ant-`), make one tiny request to confirm the API accepts it, then run `pnpm smoke:models`. Report each question's timing against the 10-second target and any role schema the API rejects, and fix what fails. With the key set, `apps/web` leaves demo mode automatically. Never print, log or commit the key.
 
 ## Layout
 
