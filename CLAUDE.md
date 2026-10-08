@@ -15,7 +15,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 3 | Model registry, role interfaces, prompts, logging | Done |
 | 4 | Pipeline end to end for "switch to salary sacrifice" | Done |
 | 5 | Component library and screen grammar, web app | Done |
-| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **Next.** Needs PostgreSQL; propose the data model first |
+| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **Next.** Data model proposed in ADR 0007, waiting for go-ahead |
 | 7 | Remaining owner and employee decisions, lookups, "not yet" | To do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | To do |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
