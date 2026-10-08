@@ -3,3 +3,7 @@ dist/
 coverage/
 .env
 .env.*
+.next/
+test-results/
+playwright-report/
+*.tsbuildinfo

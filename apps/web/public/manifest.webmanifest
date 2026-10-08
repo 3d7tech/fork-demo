@@ -1,0 +1,9 @@
+{
+  "name": "Fork",
+  "short_name": "Fork",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f5f2",
+  "theme_color": "#1f3fa8",
+  "icons": []
+}

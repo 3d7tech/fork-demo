@@ -186,6 +186,44 @@ export const ScreenCopy = z.object({
 });
 export type ScreenCopy = z.infer<typeof ScreenCopy>;
 
+// ---------- Visual data (built by code from the results, never by a model) ----------
+
+const Shown = z.object({ value: z.number(), display: z.string() });
+const Tone = z.enum(['a', 'b', 'c', 'd', 'muted']);
+
+export const VisualData = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('bars'),
+    title: z.string(),
+    rows: z.array(
+      z.object({ label: z.string(), total: Shown, segments: z.array(z.object({ value: z.number(), tone: Tone, label: z.string() })) }),
+    ),
+    keys: z.array(z.object({ tone: Tone, label: z.string() })),
+    /** Bars start here so a small difference is visible; the screen says so. */
+    floor: Shown.nullable(),
+  }),
+  z.object({
+    type: z.literal('ladder'),
+    title: z.string(),
+    min: z.number(),
+    max: z.number(),
+    band: z.object({ from: z.number(), to: z.number(), label: z.string() }),
+    markers: z.array(z.object({ value: z.number(), display: z.string(), label: z.string(), tone: Tone })),
+    ticks: z.array(Shown),
+  }),
+  z.object({
+    type: z.literal('checklist'),
+    title: z.string(),
+    items: z.array(z.object({ label: z.string(), status: z.enum(['changes', 'same', 'check']), detail: z.string() })),
+  }),
+  z.object({
+    type: z.literal('flow'),
+    title: z.string(),
+    columns: z.array(z.object({ label: z.string(), total: Shown, parts: z.array(z.object({ value: z.number(), display: z.string(), label: z.string(), tone: Tone })) })),
+  }),
+]);
+export type VisualData = z.infer<typeof VisualData>;
+
 export function toJsonSchemas() {
   return {
     DecisionSpec: z.toJSONSchema(DecisionSpec, { io: 'input', unrepresentable: 'any' }),

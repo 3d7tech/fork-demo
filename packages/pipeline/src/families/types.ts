@@ -1,5 +1,5 @@
 import type { ModuleId, ModuleInput } from '@fork/calc';
-import type { DecisionSpec, Fact, ScreenLayout } from '@fork/spec';
+import type { CalcResult, DecisionSpec, Fact, ScreenLayout, VisualData } from '@fork/spec';
 import { z } from 'zod';
 
 export interface FactDef {
@@ -30,6 +30,8 @@ export interface FamilyDef<M extends ModuleId = ModuleId> {
   buildInput(facts: Record<string, Fact['value']>, answers: Record<string, string>, levers: Record<string, number>): ModuleInput<M>;
   /** Used when the composer's layout fails validation, so a bad layout never blocks a good answer. */
   defaultLayout: ScreenLayout;
+  /** The data for the screen's visual. Code, so every bar and label comes from the results. */
+  visual(calc: CalcResult, display: (key: string) => string): VisualData;
   /** Plain-English label for each building step shown while the screen is made. */
   steps: { facts: string; checks: string };
 }

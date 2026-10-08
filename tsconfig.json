@@ -10,7 +10,16 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "types": ["node"]
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ]
   },
-  "include": ["packages/*/src", "packages/*/test", "scripts"]
+  "include": [
+    "packages/*/src",
+    "packages/*/test",
+    "scripts"
+  ]
 }

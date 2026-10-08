@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
 import { z } from 'zod';
+import { repoPath } from './paths';
 
 export const ROLE_IDS = ['router', 'spec_writer', 'screen_composer', 'explainer', 'verifier'] as const;
 export type RoleId = (typeof ROLE_IDS)[number];
@@ -48,9 +49,9 @@ export class Registry {
   }
 }
 
-export const DEFAULT_CONFIG_PATH = new URL('../../../config/models.yaml', import.meta.url);
+export const DEFAULT_CONFIG_PATH = repoPath('config/models.yaml');
 
 /** Load the registry from YAML. FORK_MODELS_CONFIG points at another file, so an eval can swap models with no code change. */
-export function loadRegistry(path: string | URL = process.env.FORK_MODELS_CONFIG ?? DEFAULT_CONFIG_PATH): Registry {
+export function loadRegistry(path: string = process.env.FORK_MODELS_CONFIG ?? DEFAULT_CONFIG_PATH): Registry {
   return new Registry(RegistryConfig.parse(parse(readFileSync(path, 'utf8'))));
 }

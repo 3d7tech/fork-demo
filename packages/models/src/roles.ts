@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { CalcResult, DecisionSpec, DecisionSpecDraft, Fact, ScreenCopy, ScreenLayout } from '@fork/spec';
 import { z } from 'zod';
+import { repoPath } from './paths';
 import type { RoleId } from './registry';
 
 /**
@@ -123,12 +124,12 @@ export type Roles = typeof ROLES;
 export type RoleInput<R extends RoleId> = z.input<Roles[R]['input']>;
 export type RoleOutput<R extends RoleId> = z.output<Roles[R]['output']>;
 
-const PROMPTS = new URL('../prompts/', import.meta.url);
+const PROMPTS = repoPath('packages/models/prompts');
 
 /** The versioned system prompt for a role. Shared rules come first so the prefix caches across roles. */
 export function loadPrompt(role: RoleId, version: string): string {
-  const shared = readFileSync(new URL('shared.md', PROMPTS), 'utf8');
-  const own = readFileSync(new URL(`${role}/${version}.md`, PROMPTS), 'utf8');
+  const shared = readFileSync(`${PROMPTS}/shared.md`, 'utf8');
+  const own = readFileSync(`${PROMPTS}/${role}/${version}.md`, 'utf8');
   return `${shared.trim()}\n\n${own.trim()}\n`;
 }
 

@@ -1,6 +1,6 @@
 import { runModule, type ModuleId } from '@fork/calc';
 import { RoleFailedError, runRole, type RoleContext, type RoleId, type RoleOutput } from '@fork/models';
-import { CalcResult, DecisionSpec, ScreenLayout, type Fact, type ScreenCopy } from '@fork/spec';
+import { CalcResult, DecisionSpec, ScreenLayout, type Fact, type ScreenCopy, type VisualData } from '@fork/spec';
 import { checkCopy } from './checks';
 import { FAMILIES, familiesFor, type FamilyDef } from './families';
 import type { FactStore, Subject } from './facts';
@@ -41,6 +41,7 @@ export interface DecisionScreen {
   numbers: ScreenNumber[];
   layout: ScreenLayout;
   copy: ScreenCopy;
+  visual: VisualData;
   checks: {
     code: string[];
     verifier: RoleOutput<'verifier'>;
@@ -105,6 +106,10 @@ export function screenNumbers(family: FamilyDef, calc: CalcResult, facts: Fact[]
     if (tp.from) out.push({ key: 'tipping_point_from', label: 'Date the tipping point applies from', display: formatDate(tp.from), estimate: false });
   }
   return out;
+}
+
+function visualFor(family: FamilyDef, calc: CalcResult, numbers: ScreenNumber[]): VisualData {
+  return family.visual(calc, (key) => numbers.find((n) => n.key === key)?.display ?? '');
 }
 
 // ---------- Spec ----------
@@ -268,6 +273,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
           numbers,
           layout,
           copy,
+          visual: visualFor(family, calc, numbers),
           checks: { code: v.code, verifier: v.verifier, revised: t.revised, fallbacks: t.fallbacks },
           provenance: { rulePack: calc.rulePack, roles: t.roles },
         };
@@ -313,7 +319,8 @@ export function recalculate(screen: DecisionScreen, facts: Fact[], change: { ans
     if (!l || v < l.min || v > l.max) throw new Error(`Lever ${id} out of range`);
   }
   const calc = calculate(family, facts, answers, levers);
-  return { answers, levers, calc, numbers: screenNumbers(family, calc, facts), copyStale: true as const };
+  const numbers = screenNumbers(family, calc, facts);
+  return { answers, levers, calc, numbers, visual: visualFor(family, calc, numbers), copyStale: true as const };
 }
 
 /** Re-write and re-check the copy after a recalculation. */
@@ -333,6 +340,7 @@ export async function reexplain(deps: PipelineDeps, screen: DecisionScreen, reca
           levers: recalc.levers,
           calc: recalc.calc,
           numbers: recalc.numbers,
+          visual: recalc.visual,
           layout: { ...screen.layout, highlightConstraint: highlight },
           copy,
           checks: { ...screen.checks, code: v.code, verifier: v.verifier, revised: [...screen.checks.revised, ...t.revised] },

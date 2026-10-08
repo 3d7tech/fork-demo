@@ -65,5 +65,23 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
     constraintOrder: ['min_wage', 'mortgage_12m', 'parental_leave_12m'],
     highlightConstraint: null,
   },
+  visual(calc, display) {
+    const before = calc.outputs.take_home_before!.value;
+    const after = calc.outputs.take_home_after!.value;
+    const floor = Math.floor((Math.min(before, after) * 0.97) / 100) * 100;
+    return {
+      type: 'bars',
+      title: 'Your take-home pay a year',
+      rows: [
+        { label: 'Today', total: { value: before, display: display('take_home_before') }, segments: [{ value: before, tone: 'a', label: 'Take-home today' }] },
+        { label: 'On salary sacrifice', total: { value: after, display: display('take_home_after') }, segments: [{ value: after, tone: 'b', label: 'Take-home on salary sacrifice' }] },
+      ],
+      keys: [
+        { tone: 'a', label: 'Today' },
+        { tone: 'b', label: 'On salary sacrifice' },
+      ],
+      floor: { value: floor, display: `£${floor.toLocaleString('en-GB')}` },
+    };
+  },
   steps: { facts: 'Read your pay and pension', checks: 'Checked the catches: mortgage applications, parental pay, minimum wage' },
 };

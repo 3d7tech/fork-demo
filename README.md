@@ -17,6 +17,8 @@ Fork gives guidance, not regulated financial or tax advice.
 | `packages/spec` | Decision spec, fact, calculation result, screen layout and copy schemas |
 | `packages/models` | Model registry (`config/models.yaml`), role runner, versioned prompts, call logging |
 | `packages/pipeline` | `askFork`: question → checked decision screen or honest message; decision families; number checks |
+| `packages/ui` | Screen grammar components, visuals and the `fork.css` design tokens |
+| `apps/web` | Next.js app: ask page, streaming building steps, live levers, `/preview` of every screen state |
 
 ## Working on it
 
@@ -25,6 +27,13 @@ pnpm install
 pnpm test       # unit and golden tests
 pnpm typecheck
 ANTHROPIC_API_KEY=… pnpm smoke:models   # live: the whole pipeline on four questions, with timing
+```
+
+Run the app (demo mode without a key, real models with one):
+
+```sh
+pnpm --filter web dev        # http://localhost:3000, and /preview for every screen state
+pnpm e2e                     # build, then browser tests with accessibility checks at 360px
 ```
 
 Nothing merges with a failing golden test.
