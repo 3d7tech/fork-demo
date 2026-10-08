@@ -73,6 +73,8 @@ const HANDLERS: Record<RoleId, (input: any) => unknown> = {
   }),
   explainer: (i) => explainSsSwitch(i),
   verifier: () => ({ pass: true, issues: [] }),
+  // Demo mode matches columns by header words alone (packages/setup), so the model adds nothing.
+  column_matcher: () => ({ mapping: [], unsure: [] }),
 };
 
 export class DemoModels implements ModelProvider {

@@ -66,6 +66,7 @@ export const good = {
     actionLabel: 'Switch me to salary sacrifice',
   }),
   verifier: () => ({ pass: true, issues: [] }),
+  column_matcher: () => ({ mapping: [], unsure: [] }),
 };
 
 export function deps(handlers: Partial<Record<RoleId, Handler>>, extra: Partial<PipelineDeps> = {}) {

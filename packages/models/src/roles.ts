@@ -96,6 +96,22 @@ export const VerifierOutput = z.strictObject({
   ),
 });
 
+// ---------- Column matcher (document interpreter, payroll exports) ----------
+
+/** Headers and value shapes only: no names, pay or any other cell value reaches the model. */
+export const ColumnMatcherInput = z.strictObject({
+  columns: z
+    .array(z.strictObject({ header: z.string().max(200), shape: z.string(), filled: z.number().min(0).max(1) }))
+    .min(1)
+    .max(200),
+  fields: z.array(z.strictObject({ id: z.string(), label: z.string(), description: z.string(), required: z.boolean() })).min(1),
+});
+export const ColumnMatcherOutput = z.strictObject({
+  mapping: z.array(z.strictObject({ field: z.string(), header: z.string().nullable() })),
+  /** Field ids the owner should look at closely. */
+  unsure: z.array(z.string()),
+});
+
 // ---------- Role table ----------
 
 export interface RoleDef<I extends z.ZodType = z.ZodType, O extends z.ZodType = z.ZodType> {
@@ -118,6 +134,7 @@ export const ROLES = {
   screen_composer: def('screen_composer', 'v1', ScreenComposerInput, ScreenComposerOutput),
   explainer: def('explainer', 'v2', ExplainerInput, ExplainerOutput),
   verifier: def('verifier', 'v2', VerifierInput, VerifierOutput),
+  column_matcher: def('column_matcher', 'v1', ColumnMatcherInput, ColumnMatcherOutput),
 } satisfies Record<RoleId, RoleDef>;
 
 export type Roles = typeof ROLES;
