@@ -69,50 +69,52 @@ export const Lever = z
   })
   .refine((l) => l.min < l.max, { message: 'Lever min must be below max' });
 
-export const DecisionSpec = z
-  .object({
-    specVersion: z.literal(SPEC_VERSION),
-    decisionType: DecisionType,
-    family: dotted,
-    audience: Audience,
-    question: z.string().min(1),
-    options: z.array(Option),
-    constraints: z.array(Constraint).max(8).default([]),
-    levers: z.array(Lever).max(3).default([]),
-    facts: z.array(Fact).default([]),
-    calculation: z.object({ module: dotted, rulePack: z.string().min(1) }).optional(),
-    tippingPoint: z
-      .object({ measure: slug, at: z.union([z.number(), z.string().regex(/^(rule|fact):[a-z0-9_.]+$/)]), from: isoDate.optional() })
-      .optional(),
-    visual: Visual,
-    action: z
-      .object({
-        type: z.enum(['payroll.request', 'plan.send', 'save', 'link', 'none']),
-        to: z.enum(['accountant', 'owner', 'payroll', 'self']).optional(),
-        label: z.string().min(1),
-      })
-      .optional(),
-    watch: z.array(z.string()).default([]),
-  })
-  .superRefine((s, ctx) => {
-    const factIds = new Set(s.facts.map((f) => f.id));
-    s.levers.forEach((l, i) => {
-      if (typeof l.default === 'string' && !factIds.has(l.default.slice(5))) {
-        ctx.addIssue({ code: 'custom', path: ['levers', i, 'default'], message: `Lever default refers to missing fact ${l.default}` });
-      }
-    });
-    if (s.decisionType === 'lookup') {
-      if (s.calculation) ctx.addIssue({ code: 'custom', path: ['calculation'], message: 'A lookup has no calculation' });
-    } else {
-      if (!s.calculation) ctx.addIssue({ code: 'custom', path: ['calculation'], message: 'A decision needs a calculation module' });
-      if (s.options.length < 1) ctx.addIssue({ code: 'custom', path: ['options'], message: 'A decision needs at least one option' });
-    }
-    const ids = new Set<string>();
-    for (const f of s.facts) {
-      if (ids.has(f.id)) ctx.addIssue({ code: 'custom', path: ['facts'], message: `Duplicate fact ${f.id}` });
-      ids.add(f.id);
+/** The spec's shape without cross-checks: what the spec writer returns before code fills in the facts. */
+export const DecisionSpecDraft = z.object({
+  specVersion: z.literal(SPEC_VERSION),
+  decisionType: DecisionType,
+  family: dotted,
+  audience: Audience,
+  question: z.string().min(1),
+  options: z.array(Option),
+  constraints: z.array(Constraint).max(8).default([]),
+  levers: z.array(Lever).max(3).default([]),
+  facts: z.array(Fact).default([]),
+  calculation: z.object({ module: dotted, rulePack: z.string().min(1) }).optional(),
+  tippingPoint: z
+    .object({ measure: slug, at: z.union([z.number(), z.string().regex(/^(rule|fact):[a-z0-9_.]+$/)]), from: isoDate.optional() })
+    .optional(),
+  visual: Visual,
+  action: z
+    .object({
+      type: z.enum(['payroll.request', 'plan.send', 'save', 'link', 'none']),
+      to: z.enum(['accountant', 'owner', 'payroll', 'self']).optional(),
+      label: z.string().min(1),
+    })
+    .optional(),
+  watch: z.array(z.string()).default([]),
+});
+export type DecisionSpecDraft = z.infer<typeof DecisionSpecDraft>;
+
+export const DecisionSpec = DecisionSpecDraft.superRefine((s, ctx) => {
+  const factIds = new Set(s.facts.map((f) => f.id));
+  s.levers.forEach((l, i) => {
+    if (typeof l.default === 'string' && !factIds.has(l.default.slice(5))) {
+      ctx.addIssue({ code: 'custom', path: ['levers', i, 'default'], message: `Lever default refers to missing fact ${l.default}` });
     }
   });
+  if (s.decisionType === 'lookup') {
+    if (s.calculation) ctx.addIssue({ code: 'custom', path: ['calculation'], message: 'A lookup has no calculation' });
+  } else {
+    if (!s.calculation) ctx.addIssue({ code: 'custom', path: ['calculation'], message: 'A decision needs a calculation module' });
+    if (s.options.length < 1) ctx.addIssue({ code: 'custom', path: ['options'], message: 'A decision needs at least one option' });
+  }
+  const ids = new Set<string>();
+  for (const f of s.facts) {
+    if (ids.has(f.id)) ctx.addIssue({ code: 'custom', path: ['facts'], message: `Duplicate fact ${f.id}` });
+    ids.add(f.id);
+  }
+});
 export type DecisionSpec = z.infer<typeof DecisionSpec>;
 
 // ---------- Calculation result ----------
@@ -130,6 +132,8 @@ export type Quantity = z.infer<typeof Quantity>;
 
 export const RuleUse = z.object({
   id: z.string(),
+  description: z.string(),
+  unit: z.enum(['GBP', 'rate', 'GBP_per_hour', 'count']),
   on: isoDate,
   value: z.number().nullable(),
   status: z.enum(['in_force', 'legislated', 'announced', 'proposed']),
@@ -169,6 +173,8 @@ export const ScreenLayout = z.object({
 export type ScreenLayout = z.infer<typeof ScreenLayout>;
 
 export const ScreenCopy = z.object({
+  /** The screen's title, phrased as the decision ("Should you switch to salary sacrifice?"). */
+  title: z.string().min(1).max(80),
   /** One sentence with the number that matters. */
   verdict: z.string().min(1).max(220),
   /** One sentence of why. */

@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@fork/models": "workspace:*",
-    "@fork/calc": "workspace:*"
+    "@fork/calc": "workspace:*",
+    "@fork/pipeline": "workspace:*",
+    "@fork/spec": "workspace:*"
   }
 }

@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { CalcResult, DecisionSpec, Fact, ScreenCopy, ScreenLayout } from '@fork/spec';
+import { CalcResult, DecisionSpec, DecisionSpecDraft, Fact, ScreenCopy, ScreenLayout } from '@fork/spec';
 import { z } from 'zod';
 import type { RoleId } from './registry';
 
@@ -37,8 +37,11 @@ export const SpecWriterInput = z.strictObject({
   template: z.record(z.string(), z.unknown()),
   /** Facts the data gatherer found, each with its source. Missing facts become questions. */
   facts: z.array(Fact),
+  /** Problems with a previous attempt, from Fork's checks. Fix every one. */
+  feedback: z.array(z.string()).optional(),
 });
-export const SpecWriterOutput = DecisionSpec;
+/** Facts are filled in by code afterwards, so cross-checks that need them run then, on the full DecisionSpec. */
+export const SpecWriterOutput = DecisionSpecDraft;
 
 // ---------- Screen composer ----------
 
@@ -48,6 +51,8 @@ export const ScreenComposerInput = z.strictObject({
   levers: z.array(z.strictObject({ id: z.string(), label: z.string() })),
   constraints: z.array(z.strictObject({ id: z.string(), outcome: z.string() })),
   outputs: z.array(z.strictObject({ key: z.string(), label: z.string() })),
+  /** Problems with a previous attempt, from Fork's checks. Fix every one. */
+  feedback: z.array(z.string()).optional(),
 });
 export const ScreenComposerOutput = ScreenLayout;
 
@@ -63,6 +68,8 @@ export const ExplainerInput = z.strictObject({
   constraints: CalcResult.shape.constraints,
   assumptions: CalcResult.shape.assumptions,
   actionLabel: z.string().nullable(),
+  /** Problems with a previous attempt, from Fork's checks. Fix every one. */
+  feedback: z.array(z.string()).optional(),
 });
 export const ExplainerOutput = ScreenCopy;
 

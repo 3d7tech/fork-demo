@@ -16,6 +16,7 @@ Fork gives guidance, not regulated financial or tax advice.
 | `packages/calc` | Pure calculation modules and the golden test cases |
 | `packages/spec` | Decision spec, fact, calculation result, screen layout and copy schemas |
 | `packages/models` | Model registry (`config/models.yaml`), role runner, versioned prompts, call logging |
+| `packages/pipeline` | `askFork`: question → checked decision screen or honest message; decision families; number checks |
 
 ## Working on it
 
@@ -23,7 +24,7 @@ Fork gives guidance, not regulated financial or tax advice.
 pnpm install
 pnpm test       # unit and golden tests
 pnpm typecheck
-ANTHROPIC_API_KEY=… pnpm smoke:models   # live: every role once, on the salary sacrifice case
+ANTHROPIC_API_KEY=… pnpm smoke:models   # live: the whole pipeline on four questions, with timing
 ```
 
 Nothing merges with a failing golden test.

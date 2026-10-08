@@ -1,51 +1,31 @@
-// Live check: every role runs once against the real API, chained on the salary sacrifice golden case.
-// Proves the API accepts each role's output schema and the prompts produce valid output.
+// Live check of the whole pipeline against the real API, on the demo's Larkfield data.
+// Proves every role's schema is accepted, the prompts produce valid output, and shows timing.
 // Needs ANTHROPIC_API_KEY. Costs a few pence. Run: pnpm smoke:models
-import { readFileSync } from 'node:fs';
-import { roundPounds, runModule } from '@fork/calc';
-import { AnthropicProvider, JsonLinesLogger, loadRegistry, runRole } from '@fork/models';
+import { AnthropicProvider, JsonLinesLogger, loadRegistry } from '@fork/models';
+import { askFork, InMemoryFactStore, type Subject } from '@fork/pipeline';
+import type { Fact } from '@fork/spec';
 
-const ctx = { registry: loadRegistry(), providers: { anthropic: new AnthropicProvider() }, log: new JsonLinesLogger() };
-const families = [
-  { family: 'pension.salary_sacrifice_switch', description: 'Employee: switch pension contributions to salary sacrifice' },
-  { family: 'pay.threshold_100k', description: 'Employee: pay near or over £100,000, pension to stay under it' },
-  { family: 'benefits.ev_scheme', description: 'Employee: electric car salary sacrifice scheme or own car' },
-];
-const show = (label: string, v: unknown) => console.log(`\n== ${label}\n${JSON.stringify(v, null, 2)}`);
-
-for (const question of ['where is my p60 lol', 'which index fund should i put my pension in', 'cant afford rent this month, can i take money out of my pension']) {
-  show(`router: ${question}`, (await runRole(ctx, 'router', { question, audience: 'employee', families })).output);
-}
-
-const question = 'maya says we can switch the pension to salary sacrifice?? I’m on 32k, is it worth it or is there a catch';
-const route = await runRole(ctx, 'router', { question, audience: 'employee', families });
-show('router', route.output);
-
-const template = JSON.parse(readFileSync(new URL('../packages/spec/examples/pension.ss_switch.json', import.meta.url), 'utf8'));
-const spec = (await runRole(ctx, 'spec_writer', { question, audience: 'employee', family: 'pension.salary_sacrifice_switch', template, facts: template.facts })).output;
-show('spec_writer', spec);
-
-const calc = runModule('pension.ss_switch', 'uk-2026-27', {
-  salary: 32000, contributionPct: 5, reliefMethod: 'relief_at_source', employerSharePct: 50, employerContributionPct: 3, hoursPerWeek: 37.5,
-  mortgageIn12Months: false, parentalLeaveIn12Months: false,
+const f = (id: string, value: Fact['value'], source: Fact['source']): Fact => ({ id, value, source, asOf: '2026-10-01', confidence: 'confirmed' });
+const facts = new InMemoryFactStore({
+  company: { larkfield: [f('employer_share_pct', 50, 'company_setting'), f('employer_contribution_pct', 3, 'pension_scheme'), f('relief_method', 'relief_at_source', 'pension_scheme')] },
+  employee: { 'larkfield/ella': [f('salary', 32000, 'payroll_export'), f('contribution_pct', 5, 'pension_scheme'), f('hours_per_week', 37.5, 'payroll_export')] },
 });
-const fmt = (v: number, unit: string) => (unit === 'GBP' ? `£${roundPounds(v).toLocaleString('en-GB')}` : unit === 'pct' ? `${Number(v.toFixed(2))}%` : `${v}`);
-const numbers = Object.entries(calc.outputs).map(([key, o]) => ({ key, label: o.label, display: fmt(o.value, o.unit), estimate: o.estimate }));
+const ella: Subject = { audience: 'employee', companyId: 'larkfield', employeeId: 'ella' };
+const deps = { roles: { registry: loadRegistry(), providers: { anthropic: new AnthropicProvider() }, log: new JsonLinesLogger((l) => process.stderr.write(l + '\n')) }, facts };
 
-const layout = (await runRole(ctx, 'screen_composer', {
-  decisionType: spec.decisionType,
-  defaultVisual: spec.visual,
-  levers: spec.levers.map((l) => ({ id: l.id, label: l.label })),
-  constraints: calc.constraints.map((c) => ({ id: c.id, outcome: c.outcome })),
-  outputs: numbers.map(({ key, label }) => ({ key, label })),
-})).output;
-show('screen_composer', layout);
-
-const copy = (await runRole(ctx, 'explainer', {
-  audience: 'employee', question, verdict: calc.verdict, numbers,
-  tippingPoint: calc.tippingPoint?.description ?? null, constraints: calc.constraints, assumptions: calc.assumptions, actionLabel: spec.action?.label ?? null,
-})).output;
-show('explainer', copy);
-
-const verdict = (await runRole(ctx, 'verifier', { question, audience: 'employee', spec, numbers, copy, codeFindings: [] })).output;
-show('verifier', verdict);
+for (const question of [
+  'maya says we can switch the pension to salary sacrifice?? I’m on 32k, is it worth it or is there a catch',
+  'where is my p60 lol',
+  'which index fund should i put my pension in',
+  'cant afford rent this month, can i take money out of my pension',
+]) {
+  const started = performance.now();
+  const answer = await askFork(deps, { question, subject: ella, onStep: (s) => console.log(`  … ${s.label}${s.detail ? `: ${s.detail}` : ''}`) });
+  const seconds = ((performance.now() - started) / 1000).toFixed(1);
+  console.log(`\n“${question}” (${seconds}s)`);
+  if (answer.kind === 'decision') {
+    console.log(JSON.stringify({ copy: answer.copy, layout: answer.layout, checks: answer.checks, roles: answer.provenance.roles }, null, 2));
+  } else {
+    console.log(`${answer.reason}: ${answer.title}. ${answer.body}`);
+  }
+}

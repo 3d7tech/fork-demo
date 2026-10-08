@@ -39,6 +39,8 @@ export interface RulePackData {
 /** What a calculation used: recorded on every DecisionRun so results can be traced and re-run. */
 export interface RuleUse {
   id: string;
+  description: string;
+  unit: RuleUnit;
   on: string;
   value: number | null;
   status: RuleStatus;
@@ -93,7 +95,8 @@ export class RulePack {
 
   use(id: string, on: string = this.today): RuleUse {
     const e = this.entry(id, on);
-    return { id, on, value: e.value, status: e.status, source: e.source };
+    const r = this.rule(id);
+    return { id, description: r.description, unit: r.unit, on, value: e.value, status: e.status, source: e.source };
   }
 }
 
