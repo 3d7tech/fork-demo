@@ -119,6 +119,28 @@ function withFacts(spec: unknown, question: string, facts: Fact[]) {
   return DecisionSpec.safeParse({ ...(spec as object), question, facts });
 }
 
+/**
+ * Fix in code what code can fix safely, so the spec writer isn't asked again for it: keep the
+ * family, module and rule pack; drop levers and questions the module can't use; restore hard
+ * constraints from the reviewed template. Each change is recorded.
+ */
+function tidySpec(t: Trace, family: FamilyDef, spec: RoleOutput<'spec_writer'>): RoleOutput<'spec_writer'> {
+  const levers = spec.levers.filter((l) => family.levers.includes(l.id));
+  const constraints = spec.constraints.filter((c) => c.kind !== 'ask' || c.id in family.answers);
+  for (const c of family.template.constraints ?? []) {
+    if (c.kind === 'hard' && !constraints.some((x) => x.id === c.id)) constraints.unshift(c as (typeof constraints)[number]);
+  }
+  const dropped = [...spec.levers.filter((l) => !levers.includes(l)).map((l) => `lever ${l.id}`), ...spec.constraints.filter((c) => !constraints.includes(c)).map((c) => `question ${c.id}`)];
+  if (dropped.length) t.fallbacks.push(`spec: dropped ${dropped.join(', ')} (not used by ${family.module})`);
+  return {
+    ...spec,
+    family: family.id,
+    calculation: { ...spec.calculation, module: family.module, rulePack: family.rulePack },
+    levers: levers.length ? levers : (family.template.levers as typeof levers),
+    constraints,
+  };
+}
+
 function specProblems(family: FamilyDef, spec: DecisionSpec): string[] {
   const p: string[] = [];
   if (spec.family !== family.id) p.push(`family must be ${family.id}`);
@@ -139,7 +161,7 @@ async function writeSpec(t: Trace, family: FamilyDef, question: string, facts: F
   let fb = feedback;
   for (let attempt = 0; attempt < 2; attempt++) {
     const out = await t.run('spec_writer', { question, audience: family.audience, family: family.id, template, facts, ...(fb ? { feedback: fb } : {}) });
-    const parsed = withFacts(out, question, facts);
+    const parsed = withFacts(tidySpec(t, family, out), question, facts);
     const problems = parsed.success ? specProblems(family, parsed.data) : parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`);
     if (!problems.length && parsed.success) return parsed.data;
     fb = problems;

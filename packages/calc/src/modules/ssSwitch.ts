@@ -70,8 +70,8 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
       employer_share: q(now.share, 'GBP', 'Extra into your pension from the employer’s saving'),
       pension_total: q(now.con.plus(employerPension).plus(now.share), 'GBP', 'Into your pension a year'),
       total_gain: q(now.gain.plus(now.share), 'GBP', 'Total gain a year'),
-      take_home_gain_2029: q(later.gain, 'GBP', 'Extra take-home a year from April 2029'),
-      employer_share_2029: q(later.share, 'GBP', 'Employer share from April 2029'),
+      take_home_gain_2029: q(later.gain, 'GBP', 'Extra take-home a year from April 2029', true),
+      employer_share_2029: q(later.share, 'GBP', 'Employer share from April 2029', true),
       parental_pay_reduction: q(parentalPayReduction, 'GBP', 'Less statutory parental pay over the first six weeks'),
       ...(cap ? { cap_pct_of_pay: q(cap.div(now.salary).times(100), 'pct', 'Contribution where the 2029 cap starts to bite') } : {}),
     },
@@ -85,7 +85,8 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
     constraints,
     rulesUsed: r.rulesUsed(),
     assumptions: [
-      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year, contributing ${i.contributionPct}% today`, source: 'payroll_export', estimate: false },
+      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false },
+      { text: `Contributing ${i.contributionPct}% of pay today`, source: 'pension_scheme', estimate: false },
       {
         text: i.reliefMethod === 'relief_at_source' ? 'Pension uses relief at source: the provider adds basic-rate relief' : 'Pension uses a net pay arrangement',
         source: 'pension_scheme',

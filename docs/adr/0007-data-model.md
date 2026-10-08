@@ -1,13 +1,13 @@
 # 7. Data model and PostgreSQL for company setup
 
-Date: 2026-10-08 · Status: **proposed**, waiting for Richard's go-ahead
+Date: 2026-10-08 · Status: accepted (Richard, 2026-10-08)
 
 ## Setup
 
 - New package `packages/db`: Drizzle schema, committed SQL migrations, and a small typed query layer. Nothing else talks to the database directly.
 - PostgreSQL 16. Locally and in tests: a throwaway cluster started by `pnpm db:up` in `.data/` (no Docker needed; Postgres 16 is in the cloud container). Each test file gets a fresh database cloned from a migrated template, so tests stay fast and independent.
-- Production later: AWS RDS in London (eu-west-2), encrypted at rest, TLS only.
-- Uploaded files live outside the database (local folder now, S3 London later). The database keeps the file key, size and SHA-256.
+- Production: not AWS for now. 3d7 uses cPanel hosting; whether it offers PostgreSQL 16 and Node.js is an open question. Wherever it runs: UK region, encrypted at rest, TLS only.
+- Uploaded files live outside the database (a local folder, outside the web root). The database keeps the file key, size and SHA-256.
 - Money is `numeric(12,2)`, read into `decimal.js`. Hours and percentages are `numeric`. Never floats.
 
 ## Privacy enforced in the database
@@ -28,7 +28,7 @@ Date: 2026-10-08 · Status: **proposed**, waiting for Richard's go-ahead
 | `membership` | User ↔ company, role, and the linked `employee` for employees |
 | `invite` | Company, email, role, employee, hashed token, expiry, accepted date |
 | `login_token` / `session` | Email sign-in link (hashed, 15 minutes, single use) and session (hashed id, expiry) |
-| `employee` | Company, payroll reference, name, work email, contracted hours, start date |
+| `employee` | Company, payroll reference, name, work email, date of birth (if the export has it, for minimum wage age bands), contracted hours, start date |
 | `payroll_upload` | File, who uploaded it, pay period, suggested and confirmed column mapping, status |
 | `pay_record` | Employee, upload, pay period, salary, hours, pension contribution: each value keeps its source upload |
 | `pension_scheme` | Provider, relief method, basis (full salary or qualifying earnings), employer %, default employee %, share of NI saving passed on, source document |
@@ -47,8 +47,8 @@ Step 8 adds `decision_run`, `saved_decision` and `action`; step 7 adds `benefit`
 3. Owner confirms or corrects the mapping. Code validates every row and shows problems before anything is saved.
 4. Rows become `employee` and `pay_record`. Re-uploading a later period adds records and keeps history.
 
-## Questions before building
+## Answers (2026-10-08)
 
-1. Store employees' **date of birth** if the export has it? Needed later for minimum wage age bands; otherwise only name, work email, hours and pay.
-2. **Email sending**: a development outbox now (links shown in the console and a `/dev/outbox` page), and a real provider (AWS SES London?) before the pilot?
-3. **Accountant accounts** in step 6, or wait for step 8 when requests are sent to them?
+1. Date of birth: store it when the payroll export has it. Optional.
+2. Email: a development outbox now (sign-in and invite links appear in the server log and on `/dev/outbox`, which only exists outside production). Later, send through 3d7's cPanel mail server over SMTP. No AWS.
+3. Accountant accounts wait for step 8.

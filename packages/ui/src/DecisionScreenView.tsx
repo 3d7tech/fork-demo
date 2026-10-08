@@ -239,7 +239,7 @@ export function DecisionScreenView(props: DecisionScreenViewProps) {
       <Visual v={screen.visual} />
       <Method screen={screen} />
       <Action screen={screen} actionDone={props.actionDone} onAction={props.onAction} copyStale={props.copyStale} />
-      <p className="fk-guidance">Fork gives guidance, not regulated financial advice. It uses your own numbers to show what happens either way.</p>
+      <p className="fk-guidance">Fork gives guidance, not regulated financial advice. It uses your own numbers to show what happens either way. For your own situation, talk to an adviser, mortgage broker or accountant.</p>
     </article>
   );
 }

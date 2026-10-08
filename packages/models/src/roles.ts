@@ -116,8 +116,8 @@ export const ROLES = {
   router: def('router', 'v1', RouterInput, RouterOutput),
   spec_writer: def('spec_writer', 'v1', SpecWriterInput, SpecWriterOutput),
   screen_composer: def('screen_composer', 'v1', ScreenComposerInput, ScreenComposerOutput),
-  explainer: def('explainer', 'v1', ExplainerInput, ExplainerOutput),
-  verifier: def('verifier', 'v1', VerifierInput, VerifierOutput),
+  explainer: def('explainer', 'v2', ExplainerInput, ExplainerOutput),
+  verifier: def('verifier', 'v2', VerifierInput, VerifierOutput),
 } satisfies Record<RoleId, RoleDef>;
 
 export type Roles = typeof ROLES;

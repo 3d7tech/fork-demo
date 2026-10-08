@@ -15,13 +15,13 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 3 | Model registry, role interfaces, prompts, logging | Done |
 | 4 | Pipeline end to end for "switch to salary sacrifice" | Done |
 | 5 | Component library and screen grammar, web app | Done |
-| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **Next.** Data model proposed in ADR 0007, waiting for go-ahead |
+| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **In progress.** Data model agreed in ADR 0007 |
 | 7 | Remaining owner and employee decisions, lookups, "not yet" | To do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | To do |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
 | 10 | "How to add a decision family" guide, tested by adding one | To do |
 
-**First thing to do in a new session:** the live model check (open question 6). The Anthropic key goes in the Default environment as **`FORK_ANTHROPIC_API_KEY`**. The cloud environment reserves `ANTHROPIC_API_KEY` for Claude Code and doesn't pass it into the session; the code reads `FORK_ANTHROPIC_API_KEY` first, then `ANTHROPIC_API_KEY` (`anthropicApiKey()` in `packages/models`). Check it is present without printing it (for example `test -n "$FORK_ANTHROPIC_API_KEY" && echo set`, and that it starts `sk-ant-`), make one tiny request to confirm the API accepts it, then run `pnpm smoke:models`. Report each question's timing against the 10-second target and any role schema the API rejects, and fix what fails. With the key set, `apps/web` leaves demo mode automatically. Never print, log or commit the key.
+**Model key:** `FORK_ANTHROPIC_API_KEY` in the Default environment (`ANTHROPIC_API_KEY` is reserved for Claude Code). The live check passed on 2026-10-08; `pnpm smoke:models` re-runs it. Never print, log or commit the key. Live screenshots are in `docs/screens/`.
 
 ## Layout
 
