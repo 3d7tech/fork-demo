@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -158,10 +159,21 @@ describe('output JSON schemas for constrained decoding', () => {
       if (!n || typeof n !== 'object') return;
       const o = n as Record<string, unknown>;
       if (o.type === 'object') expect(o.additionalProperties).toBe(false);
-      for (const k of ['$schema', 'minimum', 'maximum', 'pattern', 'minLength', 'maxLength']) expect(o).not.toHaveProperty(k);
+      for (const k of ['$schema', 'oneOf', 'minimum', 'maximum', 'pattern', 'minLength', 'maxLength']) expect(o).not.toHaveProperty(k);
       Object.values(o).forEach(walk);
     };
     walk(schema);
+  });
+
+  it('keeps fields whose names match a dropped keyword', () => {
+    const schema = outputJsonSchema(z.object({ default: z.number(), format: z.string().min(1) }));
+    expect(Object.keys(schema.properties as object)).toEqual(['default', 'format']);
+    expect(schema.required).toEqual(['default', 'format']);
+  });
+
+  it('spec_writer keeps the lever default the API needs to see', () => {
+    const levers = (outputJsonSchema(ROLES.spec_writer.output).properties as Record<string, any>).levers;
+    expect(Object.keys(levers.items.properties)).toContain('default');
   });
 });
 

@@ -145,9 +145,15 @@ export function outputJsonSchema(schema: z.ZodType): Record<string, unknown> {
     if (!node || typeof node !== 'object') return node;
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(node)) {
+      // Keys under `properties` are field names, not keywords: a field may be called "default" or "format".
+      if (k === 'properties' && v && typeof v === 'object') {
+        out[k] = Object.fromEntries(Object.entries(v).map(([name, sub]) => [name, strip(sub)]));
+        continue;
+      }
       if (UNSUPPORTED.has(k)) continue;
       if (k === 'minItems' && typeof v === 'number' && v > 1) continue;
-      out[k] = strip(v);
+      // Constrained decoding rejects oneOf; anyOf keeps the same branches, and Zod still checks exclusivity.
+      out[k === 'oneOf' ? 'anyOf' : k] = strip(v);
     }
     if (out.type === 'object' && out.additionalProperties === undefined) out.additionalProperties = false;
     return out;
