@@ -1,0 +1,8 @@
+{
+  "name": "@fork/calc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@fork/rules": "workspace:*", "@fork/spec": "workspace:*", "decimal.js": "10.6.0" }
+}

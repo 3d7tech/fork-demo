@@ -1,0 +1,187 @@
+{
+  "id": "uk-2026-27",
+  "version": "0.1.0",
+  "jurisdiction": "UK-rUK",
+  "taxYear": { "start": "2026-04-06", "end": "2027-04-05" },
+  "status": "draft",
+  "review": {
+    "note": "Draft built from the brief and the demo. Every value needs a person to check it against its source, fill in lastChecked and checkedBy, and then set status to published.",
+    "checkedBy": null,
+    "publishedAt": null
+  },
+  "rules": [
+    {
+      "id": "income_tax.personal_allowance",
+      "description": "Standard personal allowance a year",
+      "unit": "GBP",
+      "values": [{ "value": 12570, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.allowance_taper_threshold",
+      "description": "Adjusted net income above which the personal allowance is reduced",
+      "unit": "GBP",
+      "values": [{ "value": 100000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.allowance_taper_rate",
+      "description": "Personal allowance lost for each £1 of income above the taper threshold (£1 for every £2)",
+      "unit": "rate",
+      "values": [{ "value": 0.5, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.basic_band",
+      "description": "Width of the basic rate band in taxable income (£12,571 to £50,270 of pay with a full allowance)",
+      "unit": "GBP",
+      "values": [{ "value": 37700, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.additional_threshold",
+      "description": "Taxable income above which the additional rate applies",
+      "unit": "GBP",
+      "values": [{ "value": 125140, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.basic_rate",
+      "description": "Basic rate of income tax",
+      "unit": "rate",
+      "values": [{ "value": 0.2, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.higher_rate",
+      "description": "Higher rate of income tax",
+      "unit": "rate",
+      "values": [{ "value": 0.4, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "income_tax.additional_rate",
+      "description": "Additional rate of income tax",
+      "unit": "rate",
+      "values": [{ "value": 0.45, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "ee_ni.primary_threshold",
+      "description": "Employee Class 1 National Insurance primary threshold a year",
+      "unit": "GBP",
+      "values": [{ "value": 12570, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "ee_ni.upper_earnings_limit",
+      "description": "Employee Class 1 National Insurance upper earnings limit a year",
+      "unit": "GBP",
+      "values": [{ "value": 50270, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "ee_ni.main_rate",
+      "description": "Employee National Insurance between the primary threshold and the upper earnings limit",
+      "unit": "rate",
+      "values": [{ "value": 0.08, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "ee_ni.upper_rate",
+      "description": "Employee National Insurance above the upper earnings limit",
+      "unit": "rate",
+      "values": [{ "value": 0.02, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "er_ni.secondary_threshold",
+      "description": "Employer Class 1 National Insurance secondary threshold a year",
+      "unit": "GBP",
+      "values": [{ "value": 5000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "er_ni.rate",
+      "description": "Employer Class 1 National Insurance rate above the secondary threshold",
+      "unit": "rate",
+      "values": [{ "value": 0.15, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "er_ni.class_1a_rate",
+      "description": "Class 1A employer National Insurance on benefits in kind, such as a company car",
+      "unit": "rate",
+      "values": [{ "value": 0.15, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+    },
+    {
+      "id": "er_ni.employment_allowance",
+      "description": "Employment Allowance: reduction in an eligible employer's yearly National Insurance bill",
+      "unit": "GBP",
+      "values": [{ "value": 10500, "from": "2026-04-06", "status": "in_force", "source": { "title": "Employment Allowance", "url": "https://www.gov.uk/claim-employment-allowance" }, "lastChecked": null }]
+    },
+    {
+      "id": "min_wage.nlw_21_plus",
+      "description": "National Living Wage an hour, workers aged 21 and over",
+      "unit": "GBP_per_hour",
+      "values": [{ "value": 12.71, "from": "2026-04-01", "status": "in_force", "source": { "title": "National Minimum Wage and National Living Wage rates", "url": "https://www.gov.uk/national-minimum-wage-rates" }, "lastChecked": null }]
+    },
+    {
+      "id": "salary_sacrifice.pension_ni_cap",
+      "description": "Salary-sacrificed pension contributions free of employee and employer Class 1 National Insurance, a year per employee. Sacrifice above this is charged both.",
+      "unit": "GBP",
+      "values": [
+        {
+          "value": null,
+          "from": "2026-04-06",
+          "to": "2029-04-05",
+          "status": "in_force",
+          "note": "No cap before 6 April 2029.",
+          "source": { "title": "National Insurance Contributions (Employer Pensions Contributions) Act 2026", "url": "https://www.legislation.gov.uk/ukpga/2026/15/contents/enacted" },
+          "lastChecked": null
+        },
+        {
+          "value": 2000,
+          "from": "2029-04-06",
+          "status": "legislated",
+          "note": "The Act (Royal Assent 29 April 2026) sets the framework; the £2,000 limit for 2029-30 is to be set by regulations. Treat as confirmed in principle, amount pending regulations.",
+          "source": { "title": "Changes to salary sacrifice for pensions from April 2029 (HM Treasury)", "url": "https://www.gov.uk/government/publications/changes-to-salary-sacrifice-for-pensions-from-april-2029/changes-to-salary-sacrifice-for-pensions-from-april-2029" },
+          "lastChecked": null
+        }
+      ]
+    },
+    {
+      "id": "tax_free_childcare.top_up_rate",
+      "description": "Government top-up as a share of what the parent pays in (£2 for every £8)",
+      "unit": "rate",
+      "values": [{ "value": 0.25, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }]
+    },
+    {
+      "id": "tax_free_childcare.max_per_child",
+      "description": "Maximum government top-up a year per child (not disabled)",
+      "unit": "GBP",
+      "values": [{ "value": 2000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }]
+    },
+    {
+      "id": "tax_free_childcare.income_limit",
+      "description": "Adjusted net income above which a parent loses Tax-Free Childcare",
+      "unit": "GBP",
+      "values": [{ "value": 100000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare: eligibility", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }]
+    },
+    {
+      "id": "pension.relief_at_source_rate",
+      "description": "Tax relief the provider adds to a relief-at-source contribution paid from take-home pay (basic rate)",
+      "unit": "rate",
+      "values": [{ "value": 0.2, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax on your private pension contributions: tax relief", "url": "https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief" }, "lastChecked": null }]
+    },
+    {
+      "id": "pension.qualifying_earnings_lower",
+      "description": "Auto-enrolment qualifying earnings lower limit a year",
+      "unit": "GBP",
+      "values": [{ "value": 6240, "from": "2026-04-06", "status": "in_force", "source": { "title": "Automatic enrolment earnings thresholds (The Pensions Regulator)", "url": "https://www.thepensionsregulator.gov.uk/" }, "lastChecked": null }]
+    },
+    {
+      "id": "pension.qualifying_earnings_upper",
+      "description": "Auto-enrolment qualifying earnings upper limit a year",
+      "unit": "GBP",
+      "values": [{ "value": 50270, "from": "2026-04-06", "status": "in_force", "source": { "title": "Automatic enrolment earnings thresholds (The Pensions Regulator)", "url": "https://www.thepensionsregulator.gov.uk/" }, "lastChecked": null }]
+    },
+    {
+      "id": "company_car.appropriate_pct_zero_emission",
+      "description": "Company car benefit-in-kind appropriate percentage for zero-emission (0g/km) cars",
+      "unit": "rate",
+      "values": [
+        { "value": 0.04, "from": "2026-04-06", "to": "2027-04-05", "status": "in_force", "source": { "title": "Work out the appropriate percentage for company car benefits (480: Appendix 2)", "url": "https://www.gov.uk/guidance/company-car-benefit-the-appropriate-percentage-480-appendix-2" }, "lastChecked": null },
+        { "value": 0.05, "from": "2027-04-06", "to": "2028-04-05", "status": "legislated", "source": { "title": "Work out the appropriate percentage for company car benefits (480: Appendix 2)", "url": "https://www.gov.uk/guidance/company-car-benefit-the-appropriate-percentage-480-appendix-2" }, "lastChecked": null },
+        { "value": 0.07, "from": "2028-04-06", "to": "2029-04-05", "status": "legislated", "source": { "title": "Income Tax: Company car tax rates 2028 to 2030", "url": "https://www.gov.uk/government/publications/income-tax-company-car-tax-rates-2028-to-2030" }, "lastChecked": null },
+        { "value": 0.09, "from": "2029-04-06", "to": "2030-04-05", "status": "legislated", "source": { "title": "Income Tax: Company car tax rates 2028 to 2030", "url": "https://www.gov.uk/government/publications/income-tax-company-car-tax-rates-2028-to-2030" }, "lastChecked": null }
+      ]
+    }
+  ]
+}

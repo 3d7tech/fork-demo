@@ -1,0 +1,29 @@
+{
+  "specVersion": "1.0",
+  "decisionType": "comparison",
+  "family": "pension.salary_sacrifice_switch",
+  "audience": "employee",
+  "question": "is salary sacrifice worth it or is there a catch",
+  "options": [
+    { "id": "stay", "label": "Keep paying from take-home pay" },
+    { "id": "switch", "label": "Switch to salary sacrifice" }
+  ],
+  "constraints": [
+    { "id": "min_wage", "kind": "hard", "source": "rules", "autoCheck": true },
+    { "id": "mortgage_12m", "kind": "ask", "question": "Applying for a mortgage in the next 12 months?", "effect": "caution" },
+    { "id": "parental_leave_12m", "kind": "ask", "question": "Expecting parental leave in the next 12 months?", "effect": "caution" }
+  ],
+  "levers": [
+    { "id": "contribution_pct", "label": "Your pension contribution", "min": 3, "max": 10, "step": 1, "default": "fact:contribution_pct" }
+  ],
+  "facts": [
+    { "id": "salary", "value": 32000, "source": "payroll_export", "asOf": "2026-10-01" },
+    { "id": "contribution_pct", "value": 5, "source": "pension_scheme", "asOf": "2026-10-01" },
+    { "id": "employer_share_pct", "value": 50, "source": "company_setting" }
+  ],
+  "calculation": { "module": "pension.ss_switch", "rulePack": "uk-2026-27" },
+  "tippingPoint": { "measure": "annual_sacrifice", "at": "rule:salary_sacrifice.pension_ni_cap", "from": "2029-04-06" },
+  "visual": "before_after",
+  "action": { "type": "payroll.request", "to": "accountant", "label": "Switch me to salary sacrifice" },
+  "watch": ["salary", "contribution_pct", "rulePack"]
+}
