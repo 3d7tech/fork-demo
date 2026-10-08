@@ -21,6 +21,6 @@ Still open:
 3. **2029 salary sacrifice cap regulations.** The Act sets the framework; the £2,000 amount is set by regulations. Watch for them and update the value's status.
 4. **Auto-enrolment thresholds source.** The pack links to The Pensions Regulator's home page; needs the exact 2026-27 thresholds page.
 5. **Verifier independence.** With Anthropic models only, use a different model tier and prompt for the verifier than for the spec writer, and measure its catch rate on seeded faults.
-6. **Live model check.** No API key in the build environment, so the prompts, schemas and the 10-second target have only been tested against scripted models. Run `pnpm smoke:models` with a key.
+6. **Live model check.** The key has been added as a network secret (proxy adds `x-api-key` for `api.anthropic.com`), so it isn't visible as an environment variable. Next session: confirm requests get through, add a live-mode setting, run `pnpm smoke:models`, and measure against the 10-second target.
 7. **Data gatherer as code.** ADR 0004 proposes deterministic code for Phase 1 instead of a model role with tools. Needs agreement.
 8. **Distress wording.** The fixed reply points to MoneyHelper and Samaritans (116 123). Needs your review, and ideally a charity's, before any pilot.
