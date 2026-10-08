@@ -153,6 +153,33 @@ export const CalcResult = z.object({
 });
 export type CalcResult = z.infer<typeof CalcResult>;
 
+// ---------- Screen layout and copy (model outputs, validated before use) ----------
+
+export const ScreenLayout = z.object({
+  visual: Visual,
+  /** Lever ids from the spec, most useful first. */
+  leverOrder: z.array(slug).max(3),
+  /** Exactly three output keys from the CalcResult for the outcome tiles. */
+  outcomeTiles: z.array(z.string()).length(3),
+  /** Constraint ids to show in the panel, in order; at most two questions. */
+  constraintOrder: z.array(slug).max(4),
+  /** Constraint id to highlight because its answer changed the verdict. */
+  highlightConstraint: slug.nullable(),
+});
+export type ScreenLayout = z.infer<typeof ScreenLayout>;
+
+export const ScreenCopy = z.object({
+  /** One sentence with the number that matters. */
+  verdict: z.string().min(1).max(220),
+  /** One sentence of why. */
+  why: z.string().min(1).max(400),
+  tippingPoint: z.string().max(260).nullable(),
+  /** Plain-English assumptions, each tied to a source. */
+  assumptions: z.array(z.object({ text: z.string().min(1), source: z.string().min(1) })).max(8),
+  actionLabel: z.string().max(60).nullable(),
+});
+export type ScreenCopy = z.infer<typeof ScreenCopy>;
+
 export function toJsonSchemas() {
   return {
     DecisionSpec: z.toJSONSchema(DecisionSpec, { io: 'input', unrepresentable: 'any' }),

@@ -14,7 +14,8 @@ Fork gives guidance, not regulated financial or tax advice.
 |---|---|
 | `packages/rules` | Versioned UK rule packs as dated data with official sources (`uk-2026-27`, draft) |
 | `packages/calc` | Pure calculation modules and the golden test cases |
-| `packages/spec` | Decision spec, fact and calculation result schemas |
+| `packages/spec` | Decision spec, fact, calculation result, screen layout and copy schemas |
+| `packages/models` | Model registry (`config/models.yaml`), role runner, versioned prompts, call logging |
 
 ## Working on it
 
@@ -22,6 +23,7 @@ Fork gives guidance, not regulated financial or tax advice.
 pnpm install
 pnpm test       # unit and golden tests
 pnpm typecheck
+ANTHROPIC_API_KEY=… pnpm smoke:models   # live: every role once, on the salary sacrifice case
 ```
 
 Nothing merges with a failing golden test.

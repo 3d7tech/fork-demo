@@ -6,11 +6,17 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "check": "pnpm typecheck && pnpm test"
+    "check": "pnpm typecheck && pnpm test",
+    "smoke:models": "tsx scripts/smoke-models.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
     "typescript": "5.9.3",
-    "vitest": "3.2.7"
+    "vitest": "3.2.7",
+    "tsx": "4.23.15"
+  },
+  "dependencies": {
+    "@fork/models": "workspace:*",
+    "@fork/calc": "workspace:*"
   }
 }
