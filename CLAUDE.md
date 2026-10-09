@@ -1,12 +1,12 @@
 # Fork: project memory
 
-Read this first in every session. Last updated 2026-10-08.
+Read this first in every session. Last updated 2026-10-09.
 
 Fork (3d7 Technologies) helps employees of small UK companies (20 to 100 people) decide about pay, pensions and benefits, and saves the employer National Insurance through salary sacrifice. The full brief is [`BUILD_PROMPT.md`](BUILD_PROMPT.md); its principles are non-negotiable. Product owner: Richard Awe (richard.awe@3d7tech.com).
 
 ## Where things stand
 
-Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The brief's Phase 1 build order:
+Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). Phase 1 is built; see [`docs/phase-1-report.md`](docs/phase-1-report.md) for what's done, the acceptance criteria and what's deferred. The brief's Phase 1 build order:
 
 | Step | What | Status |
 |---|---|---|
