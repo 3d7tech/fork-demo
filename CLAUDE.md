@@ -15,7 +15,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 3 | Model registry, role interfaces, prompts, logging | Done |
 | 4 | Pipeline end to end for "switch to salary sacrifice" | Done |
 | 5 | Component library and screen grammar, web app | Done |
-| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **In progress.** Data model agreed in ADR 0007 |
+| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **In progress.** Done: database with RLS, sign-in, invites, settings, scheme, payroll import. Left: document upload and the document interpreter |
 | 7 | Remaining owner and employee decisions, lookups, "not yet" | To do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | To do |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
@@ -33,6 +33,8 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | `packages/spec` | Zod schemas: `DecisionSpec`/`DecisionSpecDraft`, `Fact`, `CalcResult`, `ScreenLayout`, `ScreenCopy`, `VisualData` |
 | `packages/models` | `config/models.yaml` registry, `runRole`, prompts in `prompts/<role>/v1.md` |
 | `packages/pipeline` | `askFork`, `recalculate`, `reexplain`, families, code checks, fixed messages, demo mode |
+| `packages/db` | PostgreSQL schema, migrations (RLS in `migrations/0001_rls.sql`), sign-in, sessions, invites |
+| `packages/setup` | Payroll reading, column matching, import, company and scheme settings, `DbFactStore` |
 | `packages/ui` | React screen components and `fork.css` |
 | `apps/web` | Next.js 15 app; `/preview` shows every screen state |
 | `docs/adr/` | Decision records 0001 to 0006: read before changing architecture |
@@ -46,6 +48,9 @@ pnpm test            # unit and golden tests (110)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev
+pnpm db up            # local PostgreSQL in .data/ (port 5433), migrated
+pnpm fork seed-demo   # Larkfield with owner maya@larkfield.test
+pnpm --filter web e2e:db   # setup flow end to end with the database
 pnpm smoke:models    # live pipeline on four questions, needs a working Anthropic key
 ```
 
@@ -79,7 +84,8 @@ Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`
 
 ## Known placeholders
 
-- Every request is "Ella Brooks at Larkfield" (`currentSubject()` in `apps/web/lib/server.ts`) until sign-in exists.
+- Without `FORK_DATABASE_APP_URL` and `FORK_DATABASE_AUTH_URL` the web app runs as the Larkfield demo (Ella). With them, people sign in; set `FORK_DEV_OUTBOX=1` to see emails at `/dev/outbox` (no real email sending yet).
+- New companies are created by the operator: `pnpm fork create-company "<name>" <owner email>`.
 - Screens are kept in server memory until the DecisionRun table exists (step 8).
 - The action button confirms the next step but sends nothing (step 8).
 - Only one decision family exists: `pension.salary_sacrifice_switch`. The calc modules for the other five golden cases exist but have no family yet (step 7).

@@ -1,6 +1,9 @@
 import 'server-only';
 import { AnthropicProvider, anthropicApiKey, JsonLinesLogger, loadRegistry } from '@fork/models';
-import { DEMO_FACTS, DEMO_SUBJECT, DemoModels, FAMILIES, type DecisionScreen, type PipelineDeps, type Subject } from '@fork/pipeline';
+import { DEMO_FACTS, DemoModels, FAMILIES, type DecisionScreen, type FactStore, type PipelineDeps, type Subject } from '@fork/pipeline';
+import { DbFactStore } from '@fork/setup';
+import { database } from './db';
+import { getViewer } from './viewer';
 
 /** Demo mode when no API key is set: real engine and checks, templated wording. */
 export const DEMO = !anthropicApiKey();
@@ -19,11 +22,15 @@ export function pipelineDeps(): PipelineDeps {
 }
 
 /**
- * Who is asking. Until sign-in exists (step 6) every request is Ella at Larkfield, the
- * fictional demo employee. Never ship this past a pilot.
+ * Who is asking, and the pipeline set up to read their facts. In demo mode that is Ella at
+ * Larkfield; with a database it is the signed-in person, reading through row-level security.
  */
-export function currentSubject(): Subject {
-  return DEMO_SUBJECT;
+export async function asker(): Promise<{ subject: Subject; deps: PipelineDeps } | null> {
+  const viewer = await getViewer();
+  if (!viewer) return null;
+  if (viewer.mode === 'demo') return { subject: viewer.subject, deps: pipelineDeps() };
+  const facts: FactStore = new DbFactStore(database(), viewer.ctx);
+  return { subject: viewer.subject, deps: { ...pipelineDeps(), facts } };
 }
 
 /**
@@ -44,7 +51,7 @@ export function loadScreen(subject: Subject, runId: string): DecisionScreen | nu
   return same ? hit.screen : null;
 }
 
-export async function factsFor(subject: Subject, screen: DecisionScreen) {
+export async function factsFor(deps: PipelineDeps, subject: Subject, screen: DecisionScreen) {
   const family = FAMILIES[screen.family]!;
-  return pipelineDeps().facts.get(subject, family.facts.map((f) => f.id));
+  return deps.facts.get(subject, family.facts.map((f) => f.id));
 }

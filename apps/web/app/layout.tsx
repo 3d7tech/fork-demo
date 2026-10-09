@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import '@fork/ui/fork.css';
 import './app.css';
+import { getViewer } from '@/lib/viewer';
 
 export const metadata: Metadata = {
   title: 'Fork',
@@ -19,7 +20,8 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const viewer = await getViewer();
   return (
     <html lang="en-GB">
       <head>
@@ -34,9 +36,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="app-bar">
           <div className="app-bar-in">
             <span className="brand">
-              <strong>Fork</strong> <span className="co">Larkfield</span>
+              <strong>Fork</strong> {viewer && <span className="co">{viewer.companyName}</span>}
             </span>
-            <span className="who">Ella Brooks</span>
+            {viewer?.mode === 'db' ? (
+              <nav aria-label="Account">
+                {viewer.role === 'employee' && <span className="who">{viewer.personName}</span>}
+                {viewer.role === 'owner' && <a href="/setup">Setup</a>}
+                {viewer.canSwitch && <a href="/switch">Switch</a>}
+                <form action="/signout" method="post">
+                  <button type="submit" className="linkish">
+                    Sign out
+                  </button>
+                </form>
+              </nav>
+            ) : (
+              viewer && <span className="who">{viewer.personName}</span>
+            )}
           </div>
         </header>
         <main id="main" className="app-main">

@@ -129,3 +129,41 @@ export async function listPeople(db: ForkDatabase, ctx: RequestContext) {
     return people.map((p) => ({ ...p, status: joined.has(p.id) ? ('joined' as const) : invited.has(p.id) ? ('invited' as const) : ('not_invited' as const) }));
   });
 }
+
+/** One upload, for the mapping screen. */
+export async function readUpload(db: ForkDatabase, ctx: RequestContext, uploadId: string) {
+  return db.asMember(ctx, async (tx) => {
+    const [u] = await tx
+      .select({
+        id: s.payrollUpload.id,
+        fileName: s.payrollUpload.fileName,
+        headers: s.payrollUpload.headers,
+        suggestedMapping: s.payrollUpload.suggestedMapping,
+        mapping: s.payrollUpload.mapping,
+        status: s.payrollUpload.status,
+        rowCount: s.payrollUpload.rowCount,
+        problems: s.payrollUpload.problems,
+        payPeriodEnd: s.payrollUpload.payPeriodEnd,
+      })
+      .from(s.payrollUpload)
+      .where(eq(s.payrollUpload.id, uploadId));
+    return u ?? null;
+  });
+}
+
+/** Where the owner is with setup, for the checklist. Counts only. */
+export async function setupProgress(db: ForkDatabase, ctx: RequestContext) {
+  return db.asMember(ctx, async (tx) => {
+    const count = async (q: Promise<Array<{ n: number }>>) => (await q)[0]?.n ?? 0;
+    const n = sql<number>`count(*)::int`;
+    const [company] = await tx.select({ share: s.company.employerNiSharePct, settings: sql<boolean>`exists (select 1 from audit_event a where a.company_id = ${ctx.companyId}::uuid and a.action = 'company.settings_saved')` }).from(s.company).where(eq(s.company.id, ctx.companyId));
+    return {
+      settings: company?.settings ?? false,
+      scheme: (await count(tx.select({ n }).from(s.pensionScheme))) > 0,
+      payrollImports: await count(tx.select({ n }).from(s.payrollUpload).where(eq(s.payrollUpload.status, 'imported'))),
+      people: await count(tx.select({ n }).from(s.employee)),
+      invited: await count(tx.select({ n }).from(s.invite).where(sql`${s.invite.role} = 'employee'`)),
+      joined: await count(tx.select({ n }).from(s.membership).where(sql`${s.membership.role} = 'employee'`)),
+    };
+  });
+}

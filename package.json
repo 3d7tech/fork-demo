@@ -8,8 +8,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check": "pnpm typecheck && pnpm test",
     "smoke:models": "tsx scripts/smoke-models.ts",
-    "e2e": "pnpm --filter web build && pnpm --filter web e2e",
-    "db": "tsx scripts/db.ts"
+    "e2e": "pnpm --filter web build && pnpm --filter web e2e && pnpm --filter web e2e:db",
+    "db": "tsx scripts/db.ts",
+    "fork": "tsx scripts/fork.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
@@ -24,6 +25,7 @@
     "@fork/calc": "workspace:*",
     "@fork/pipeline": "workspace:*",
     "@fork/spec": "workspace:*",
-    "@fork/db": "workspace:*"
+    "@fork/db": "workspace:*",
+    "drizzle-orm": "0.45.3"
   }
 }

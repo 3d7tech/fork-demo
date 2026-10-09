@@ -52,3 +52,11 @@ Step 8 adds `decision_run`, `saved_decision` and `action`; step 7 adds `benefit`
 1. Date of birth: store it when the payroll export has it. Optional.
 2. Email: a development outbox now (sign-in and invite links appear in the server log and on `/dev/outbox`, which only exists outside production). Later, send through 3d7's cPanel mail server over SMTP. No AWS.
 3. Accountant accounts wait for step 8.
+
+## Built (2026-10-09)
+
+- Two login roles that own nothing: `fork_app` (signed-in requests, context checked against membership by security-definer functions) and `fork_auth` (sign-in, sessions, invites only). 12 database tests try to cross companies, claim the owner role and reach tables across roles.
+- Sign-in links go to a page with a "Sign in" button rather than signing in on a plain visit, because email scanners open links and would use up the single-use token.
+- Payroll: the column matcher model (`column_matcher`) sees headers and value shapes only, never values. Header-word matching runs first and is the fallback. Every row is checked before anything is saved; problems are stored as row, field and code, never values.
+- The audit log is readable only by the person who acted, for now. A company-wide view comes with step 8, once employee events can be kept out of it.
+- Owners see every employee's pay record (it is their payroll). Employees see only their own.

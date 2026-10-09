@@ -1,5 +1,5 @@
 import { askFork } from '@fork/pipeline';
-import { currentSubject, DEMO, pipelineDeps, saveScreen } from '@/lib/server';
+import { asker, DEMO, saveScreen } from '@/lib/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,13 +10,15 @@ export async function POST(req: Request) {
   const question = typeof body?.question === 'string' ? body.question.trim().slice(0, 2000) : '';
   if (!question) return Response.json({ error: 'Ask a question first.' }, { status: 400 });
 
-  const subject = currentSubject();
+  const who = await asker();
+  if (!who) return Response.json({ error: 'Sign in first.' }, { status: 401 });
+  const { subject, deps } = who;
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       const send = (o: unknown) => controller.enqueue(encoder.encode(JSON.stringify(o) + '\n'));
       try {
-        const answer = await askFork(pipelineDeps(), { question, subject, onStep: (step) => send({ type: 'step', step }) });
+        const answer = await askFork(deps, { question, subject, onStep: (step) => send({ type: 'step', step }) });
         if (answer.kind === 'decision') saveScreen(subject, answer);
         send({ type: 'answer', answer, demo: DEMO });
       } catch (error) {

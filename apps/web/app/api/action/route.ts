@@ -1,4 +1,4 @@
-import { currentSubject, DEMO, loadScreen } from '@/lib/server';
+import { asker, DEMO, loadScreen } from '@/lib/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => null)) as { runId?: string } | null;
-  const screen = body?.runId ? loadScreen(currentSubject(), body.runId) : null;
+  const who = await asker();
+  if (!who) return Response.json({ error: 'Sign in first.' }, { status: 401 });
+  const screen = body?.runId ? loadScreen(who.subject, body.runId) : null;
   if (!screen) return Response.json({ error: 'That answer has expired. Ask again.' }, { status: 404 });
   const next =
     screen.spec.action?.type === 'payroll.request'
