@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import '@fork/ui/fork.css';
 import './app.css';
 import { getViewer } from '@/lib/viewer';
+import { THEME_SCRIPT, ThemeToggle } from './ThemeToggle';
 
 export const metadata: Metadata = {
   title: 'Fork',
@@ -23,8 +24,9 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const viewer = await getViewer();
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" />
@@ -35,18 +37,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </a>
         <header className="app-bar">
           <div className="app-bar-in">
-            <span className="brand">
+            {/* A full page load, so going home also clears an answer on screen. */}
+            <a href="/" className="brand">
               <span className="brand-mark" aria-hidden="true" />
               <strong>Fork</strong> {viewer && <span className="co">{viewer.companyName}</span>}
-            </span>
+            </a>
             {viewer?.mode === 'db' ? (
               <nav aria-label="Account">
                 {viewer.role === 'employee' && <span className="who">{viewer.personName}</span>}
+                {viewer.role !== 'accountant' && <a href="/">Home</a>}
                 {viewer.role === 'owner' && <a href="/dashboard">Dashboard</a>}
                 {viewer.role === 'owner' && <a href="/setup">Setup</a>}
                 {viewer.role !== 'accountant' && <a href="/decisions">My decisions</a>}
                 {viewer.role === 'accountant' && <a href="/accountant">Requests</a>}
                 {viewer.canSwitch && <a href="/switch">Switch</a>}
+                <ThemeToggle />
                 <form action="/signout" method="post">
                   <button type="submit" className="linkish">
                     Sign out
@@ -54,7 +59,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </form>
               </nav>
             ) : (
-              viewer && <span className="who">{viewer.personName}</span>
+              <nav aria-label="Account">
+                {viewer && <span className="who">{viewer.personName}</span>}
+                <ThemeToggle />
+              </nav>
             )}
           </div>
         </header>

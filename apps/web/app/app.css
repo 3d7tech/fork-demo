@@ -532,3 +532,58 @@ fieldset.field {
   font-family: var(--fk-mono);
   font-size: 20px;
 }
+
+/* ---------- Home link and colour switch ---------- */
+a.brand {
+  color: var(--fk-ink);
+  text-decoration: none;
+  border-radius: 8px;
+}
+a.brand:focus-visible {
+  outline: 2px solid var(--fk-accent);
+  outline-offset: 4px;
+}
+.app-bar-in nav {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  row-gap: 6px;
+}
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 10px;
+  border: 1px solid var(--fk-line);
+  border-radius: 999px;
+  background: var(--fk-surface);
+  color: var(--fk-ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--fk-accent);
+  outline-offset: 2px;
+}
+.theme-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+}
+.theme-icon.theme-system {
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+.theme-icon.theme-dark {
+  background: currentColor;
+}
+@media (max-width: 380px) {
+  .theme-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+}
