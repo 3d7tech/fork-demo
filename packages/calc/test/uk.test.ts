@@ -107,3 +107,128 @@ describe('modules are pure', () => {
     expect(ids).toContain('income_tax.allowance_taper_rate');
   });
 });
+
+// ---------- A person's tax profile (ADR 0010). Every figure worked by hand from the 2026-27 sources. ----------
+
+const P = (over: Partial<uk.TaxProfile> = {}): uk.TaxProfile => ({ ...uk.DEFAULT_PROFILE, ...over });
+
+describe('Scottish income tax 2026-27, known answers', () => {
+  it.each([
+    [12570, 0],
+    // taxable 17,430: 3,967 × 19% + 12,989 × 20% + 474 × 21%
+    [30000, 3451.07],
+    // taxable 47,430: 753.73 + 2,597.80 + 14,136 × 21% + 16,338 × 42%
+    [60000, 13182.05],
+    // taxable 87,430: … + 31,338 × 42% + 25,000 × 45%
+    [100000, 30732.05],
+    // no allowance: … + 62,710 × 45% + 24,860 × 48%
+    [150000, 59634.35],
+  ])('£%i → £%d', (pay, tax) => expect(n(uk.incomeTax(r, pay, 'scotland'))).toBeCloseTo(tax, 6));
+
+  it('rest of UK is unchanged when no region is given', () => {
+    expect(n(uk.incomeTax(r, 30000))).toBe(n(uk.incomeTax(r, 30000, 'rest_of_uk')));
+  });
+});
+
+describe('the allowance taper follows adjusted net income', () => {
+  it('£110,000 with £10,000 gross relief-at-source keeps the full allowance', () => {
+    // taxable 97,430: 37,700 × 20% + 59,730 × 40%
+    expect(n(uk.incomeTax(r, 110000, 'rest_of_uk', 100000))).toBeCloseTo(31432, 6);
+    expect(n(uk.incomeTax(r, 110000))).toBeCloseTo(33432, 6);
+  });
+});
+
+describe('student loans 2026-27, known answers', () => {
+  it.each([
+    [40000, ['plan_2'], 955.35], // 10,615 × 9%
+    [30000, ['plan_1', 'plan_2'], 279], // lowest threshold 26,900: 3,100 × 9%
+    [30000, ['postgraduate'], 540], // 9,000 × 6%
+    [30000, ['plan_5', 'postgraduate'], 990], // 5,000 × 9% + 540
+    [33000, ['plan_4'], 0],
+    [30000, [], 0],
+  ] as Array<[number, uk.StudentLoanPlan[], number]>)('£%i on %j → £%d', (pay, plans, due) => expect(n(uk.studentLoan(r, pay, plans))).toBeCloseTo(due, 6));
+});
+
+describe('Child Benefit and the High Income Child Benefit Charge', () => {
+  const two = { childBenefitChildren: 2, higherEarner: true };
+  it('two children get (£27.05 + £17.90) × 52 a year', () => expect(n(uk.childBenefit(r, 2))).toBeCloseTo(2337.4, 6));
+  it.each([
+    [60000, 0],
+    [60199, 0], // under one whole £200
+    [70000, 1168.7], // 50%
+    [70150, 1168.7], // still 50%: part of £200 is ignored
+    [80000, 2337.4], // all of it
+    [95000, 2337.4],
+  ])('adjusted net income £%i → charge £%d', (ani, charge) => expect(n(uk.childBenefitCharge(r, ani, two))).toBeCloseTo(charge, 6));
+  it('falls only on the higher earner, and only with children', () => {
+    expect(n(uk.childBenefitCharge(r, 75000, { childBenefitChildren: 2, higherEarner: false }))).toBe(0);
+    expect(n(uk.childBenefitCharge(r, 75000, { childBenefitChildren: 0, higherEarner: true }))).toBe(0);
+  });
+});
+
+describe('pension annual allowance', () => {
+  it.each([
+    [150000, 300000, false, 60000], // threshold income too low to taper
+    [210000, 300000, false, 40000], // 40,000 over: lose 20,000
+    [210000, 400000, false, 10000], // never below the minimum
+    [50000, 50000, true, 10000], // money purchase allowance after flexible access
+  ])('threshold £%i, adjusted £%i, accessed %s → £%i', (thresholdIncome, adjustedIncome, flexiblyAccessed, aa) =>
+    expect(n(uk.annualAllowance(r, { thresholdIncome, adjustedIncome, flexiblyAccessed }))).toBe(aa),
+  );
+});
+
+describe('minimum wage by age, from 1 April 2026', () => {
+  it.each([
+    [null, 12.71],
+    [21, 12.71],
+    [20, 10.85],
+    [18, 10.85],
+    [17, 8],
+  ])('age %s → £%d an hour', (age, rate) => expect(n(uk.minimumWage(r, age))).toBe(rate));
+});
+
+describe('take-home from a job, with the whole profile', () => {
+  it('the default profile matches the original take-home', () => {
+    for (const [salary, sacrifice] of [[32000, 1600], [60000, 6000], [110000, 10000]] as const) {
+      expect(n(uk.jobPay(r, { salary, sacrifice, profile: P() }).takeHome)).toBeCloseTo(n(uk.takeHome(r, salary, sacrifice)), 6);
+    }
+  });
+
+  it('a Plan 2 loan is cut by salary sacrifice but not by relief at source', () => {
+    // £40,000, 5% (£2,000). Sacrifice: loan on 38,000. Relief at source: loan on 40,000.
+    const ss = uk.jobPay(r, { salary: 40000, sacrifice: 2000, profile: P({ studentLoans: ['plan_2'] }) });
+    const ras = uk.jobPay(r, { salary: 40000, reliefAtSource: 2000, profile: P({ studentLoans: ['plan_2'] }) });
+    expect(n(ss.studentLoan)).toBeCloseTo(775.35, 6);
+    expect(n(ras.studentLoan)).toBeCloseTo(955.35, 6);
+    expect(n(ras.pensionFromPay)).toBe(1600);
+  });
+
+  it('other income moves the rate this job pays, but is not counted as take-home', () => {
+    // £45,000 job plus £10,000 rental. Each extra £1,000 of pay costs 20% alone, 40% with the rent.
+    const extra = (profile: uk.TaxProfile) => n(uk.jobPay(r, { salary: 46000, profile }).incomeTax.minus(uk.jobPay(r, { salary: 45000, profile }).incomeTax));
+    expect(extra(P())).toBeCloseTo(200, 6);
+    expect(extra(P({ otherIncome: 10000 }))).toBeCloseTo(400, 6);
+    // The job carries all tax beyond what the rent would pay on its own (nothing, inside the allowance):
+    // 7,540 + 4,730 × 40% on £55,000. The difference between options is the same whichever way it's split.
+    const withRent = uk.jobPay(r, { salary: 45000, profile: P({ otherIncome: 10000 }) });
+    expect(n(withRent.incomeTax)).toBeCloseTo(9432, 6);
+    expect(n(withRent.adjustedNetIncome)).toBe(55000);
+  });
+
+  it('variable pay is taxed and NI’d with salary', () => {
+    expect(n(uk.jobPay(r, { salary: 30000, profile: P({ variablePay: 5000 }) }).takeHome)).toBeCloseTo(n(uk.takeHome(r, 35000)), 6);
+  });
+
+  it('the Child Benefit charge follows adjusted net income after the pension', () => {
+    // £70,000, two children: ANI 70,000 → 50%. Sacrificing £10,000 → ANI 60,000 → nothing.
+    const two = P({ childBenefitChildren: 2 });
+    expect(n(uk.jobPay(r, { salary: 70000, profile: two }).childBenefitCharge)).toBeCloseTo(1168.7, 6);
+    expect(n(uk.jobPay(r, { salary: 70000, sacrifice: 10000, profile: two }).childBenefitCharge)).toBe(0);
+    // Relief at source also lowers ANI, grossed up.
+    expect(n(uk.jobPay(r, { salary: 70000, reliefAtSource: 10000, profile: two }).childBenefitCharge)).toBe(0);
+  });
+
+  it('a Scottish taxpayer on £30,000 pays the Scottish figure', () => {
+    expect(n(uk.jobPay(r, { salary: 30000, profile: P({ region: 'scotland' }) }).incomeTax)).toBeCloseTo(3451.07, 6);
+  });
+});
