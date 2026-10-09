@@ -15,7 +15,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 3 | Model registry, role interfaces, prompts, logging | Done |
 | 4 | Pipeline end to end for "switch to salary sacrifice" | Done |
 | 5 | Component library and screen grammar, web app | Done |
-| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | **In progress.** Done: database with RLS, sign-in, invites, settings, scheme, payroll import. Left: document upload and the document interpreter |
+| 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | Done |
 | 7 | Remaining owner and employee decisions, lookups, "not yet" | To do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | To do |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
@@ -52,6 +52,7 @@ pnpm db up            # local PostgreSQL in .data/ (port 5433), migrated
 pnpm fork seed-demo   # Larkfield with owner maya@larkfield.test
 pnpm --filter web e2e:db   # setup flow end to end with the database
 pnpm smoke:models    # live pipeline on four questions, needs a working Anthropic key
+pnpm smoke:documents # live document interpreter on the fixtures, including a hidden-instruction test
 ```
 
 Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`@playwright/test` pinned to 1.56.1). Don't run `playwright install`.

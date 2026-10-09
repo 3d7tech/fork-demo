@@ -39,7 +39,7 @@ test('an owner sets up Larkfield and an employee asks their first question', asy
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page).toHaveURL(/\/setup$/);
   await expect(page.getByRole('heading', { name: 'Set up Fork for Larkfield' })).toBeVisible();
-  await expect(page.getByText('4 of 4 steps to go')).toBeVisible();
+  await expect(page.getByText('5 of 5 steps to go')).toBeVisible();
   await check(page, 'setup-2-checklist');
 
   // Company settings.
@@ -77,6 +77,21 @@ test('an owner sets up Larkfield and an employee asks their first question', asy
   await page.getByRole('button', { name: 'Invite Ella Brooks' }).click();
   await expect(page.getByText('Invite sent.')).toBeVisible();
   await expect(page.getByRole('listitem').filter({ hasText: 'Ella Brooks' }).getByText('Invited')).toBeVisible();
+
+  // Documents: Fork reads them (in demo mode there's no model, so the owner types details in).
+  await page.goto('/setup/documents');
+  await page.getByLabel('What is it?').selectOption('pension_scheme');
+  await page.getByLabel('Document (PDF or Word)').setInputFiles(join(import.meta.dirname, '../../../packages/setup/fixtures/larkfield-pension-scheme.pdf'));
+  await check(page);
+  await page.getByRole('button', { name: 'Upload and read' }).click();
+  await expect(page.getByRole('heading', { name: 'larkfield-pension-scheme.pdf' })).toBeVisible();
+  await check(page, process.env.FORK_E2E_LIVE ? 'setup-6b-document-facts' : undefined);
+  if (process.env.FORK_E2E_LIVE) {
+    await expect(page.getByRole('heading', { name: /Employer contribution/ })).toBeVisible();
+    const all = page.getByRole('button', { name: /Confirm all/ });
+    if (await all.count()) await all.click();
+    else await page.getByRole('button', { name: 'Confirm' }).first().click();
+  }
 
   await page.goto('/setup');
   await expect(page.getByText('Setup is done.')).toBeVisible();

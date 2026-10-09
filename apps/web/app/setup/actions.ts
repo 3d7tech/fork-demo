@@ -2,7 +2,23 @@
 
 import { createInvite, type RequestContext } from '@fork/db';
 import { runRole } from '@fork/models';
-import { importPayroll, listPeople, saveCompanySettings, saveScheme, UploadError, uploadPayroll, FIELD_IDS, type ColumnMatcher, type Mapping } from '@fork/setup';
+import {
+  confirmAllFacts,
+  confirmFact,
+  importPayroll,
+  listPeople,
+  removeFact,
+  saveCompanySettings,
+  saveScheme,
+  UploadError,
+  uploadDocument,
+  uploadPayroll,
+  FIELD_IDS,
+  type ColumnMatcher,
+  type DocumentInterpreter,
+  type DocumentKind,
+  type Mapping,
+} from '@fork/setup';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { database, fileStore } from '@/lib/db';
@@ -102,4 +118,46 @@ export async function inviteOwnerAction(form: FormData) {
     redirect('/setup/team?error=' + encodeURIComponent(e instanceof Error ? e.message : 'That invite didn’t work.'));
   }
   redirect('/setup/team?invited=1');
+}
+
+function interpreter(): DocumentInterpreter | undefined {
+  if (DEMO) return undefined;
+  return async (input, document) => (await runRole(pipelineDeps().roles, 'document_interpreter', input, { document })).output;
+}
+
+const KINDS: DocumentKind[] = ['handbook', 'pension_scheme', 'benefit_terms', 'other'];
+
+export async function uploadDocumentAction(form: FormData) {
+  const { ctx } = await requireOwner();
+  const file = form.get('file');
+  const kind = KINDS.find((k) => k === form.get('kind'));
+  if (!(file instanceof File) || file.size === 0 || !kind) redirect('/setup/documents?error=' + encodeURIComponent('Choose what the document is and a file to upload.'));
+  let id: string;
+  try {
+    const r = await uploadDocument({ db: database(), files: fileStore(), interpreter: interpreter() }, ctx, { name: file.name, bytes: new Uint8Array(await file.arrayBuffer()), kind });
+    id = r.documentId;
+  } catch (e) {
+    if (e instanceof UploadError) redirect('/setup/documents?error=' + encodeURIComponent(e.message));
+    throw e;
+  }
+  redirect(`/setup/documents/${id}`);
+}
+
+export async function factAction(form: FormData) {
+  const { ctx } = await requireOwner();
+  const doc = String(form.get('documentId'));
+  const fact = String(form.get('factId') ?? '');
+  const op = form.get('op');
+  try {
+    if (op === 'confirm_all') await confirmAllFacts(database(), ctx, doc);
+    else if (op === 'remove') await removeFact(database(), ctx, fact);
+    else if (op === 'confirm') {
+      const corrected = form.get('value');
+      await confirmFact(database(), ctx, fact, typeof corrected === 'string' && corrected.trim() !== '' && form.get('changed') === '1' ? corrected : undefined);
+    }
+  } catch (e) {
+    if (e instanceof UploadError) redirect(`/setup/documents/${doc}?error=${encodeURIComponent(e.message)}`);
+    throw e;
+  }
+  redirect(`/setup/documents/${doc}`);
 }

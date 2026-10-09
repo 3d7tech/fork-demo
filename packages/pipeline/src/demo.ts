@@ -75,6 +75,8 @@ const HANDLERS: Record<RoleId, (input: any) => unknown> = {
   verifier: () => ({ pass: true, issues: [] }),
   // Demo mode matches columns by header words alone (packages/setup), so the model adds nothing.
   column_matcher: () => ({ mapping: [], unsure: [] }),
+  // Without a model, the owner types the scheme details in themselves.
+  document_interpreter: () => ({ facts: [], instructionsFound: false }),
 };
 
 export class DemoModels implements ModelProvider {

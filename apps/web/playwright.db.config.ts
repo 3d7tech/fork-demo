@@ -9,7 +9,9 @@ const db = (user: string, pw: string) => `postgres://${user}:${pw}@127.0.0.1:543
 export default defineConfig({
   ...base,
   testDir: './e2e-db',
-  timeout: 60_000,
+  // Live runs call the real models (FORK_E2E_LIVE=1), which takes longer.
+  timeout: process.env.FORK_E2E_LIVE ? 240_000 : 60_000,
+  expect: { timeout: process.env.FORK_E2E_LIVE ? 90_000 : 5_000 },
   workers: 1,
   globalSetup: './e2e-db/global-setup.ts',
   use: { ...base.use, baseURL: `http://localhost:${PORT}`, locale: 'en-GB' },

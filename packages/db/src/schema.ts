@@ -192,6 +192,8 @@ export const policyDocument = pgTable('policy_document', {
   sizeBytes: integer('size_bytes').notNull(),
   mimeType: text('mime_type').notNull(),
   status: documentStatus('status').notNull().default('uploaded'),
+  /** The interpreter found text trying to instruct it. Shown to the owner; the text is never obeyed. */
+  instructionsFound: boolean('instructions_found').notNull().default(false),
   uploadedBy: uuid('uploaded_by').references(() => appUser.id, { onDelete: 'set null' }),
   createdAt: createdAt(),
 });
@@ -219,6 +221,8 @@ export const policyFact = pgTable('policy_fact', {
   key: text('key').notNull(),
   value: jsonb('value').notNull(),
   page: integer('page'),
+  /** The document's own words supporting the value, shown to the owner when they confirm. */
+  quote: text('quote'),
   confidence: factConfidence('confidence').notNull().default('extracted'),
   confirmedBy: uuid('confirmed_by').references(() => appUser.id, { onDelete: 'set null' }),
   confirmedAt: timestamp('confirmed_at', { withTimezone: true }),

@@ -112,6 +112,29 @@ export const ColumnMatcherOutput = z.strictObject({
   unsure: z.array(z.string()),
 });
 
+// ---------- Document interpreter ----------
+
+/** The document itself travels as an attachment (runRole's `document`), not in the input. */
+export const DocumentInterpreterInput = z.strictObject({
+  kind: z.enum(['handbook', 'pension_scheme', 'benefit_terms', 'other']),
+  /** The facts Fork can use, and the type of value each takes. Nothing else is extracted. */
+  keys: z.array(z.strictObject({ key: z.string(), description: z.string(), type: z.string() })).min(1),
+});
+export const DocumentInterpreterOutput = z.strictObject({
+  facts: z.array(
+    z.strictObject({
+      key: z.string(),
+      value: z.union([z.string().max(500), z.number(), z.boolean()]),
+      /** Page number in the document, or null when it has no pages (a Word file). */
+      page: z.number().int().nullable(),
+      /** The words in the document that support the value, copied exactly. */
+      quote: z.string().max(400),
+    }),
+  ),
+  /** True if the document contains text that tries to instruct an AI or change how Fork behaves. */
+  instructionsFound: z.boolean(),
+});
+
 // ---------- Role table ----------
 
 export interface RoleDef<I extends z.ZodType = z.ZodType, O extends z.ZodType = z.ZodType> {
@@ -135,6 +158,7 @@ export const ROLES = {
   explainer: def('explainer', 'v2', ExplainerInput, ExplainerOutput),
   verifier: def('verifier', 'v2', VerifierInput, VerifierOutput),
   column_matcher: def('column_matcher', 'v1', ColumnMatcherInput, ColumnMatcherOutput),
+  document_interpreter: def('document_interpreter', 'v1', DocumentInterpreterInput, DocumentInterpreterOutput),
 } satisfies Record<RoleId, RoleDef>;
 
 export type Roles = typeof ROLES;

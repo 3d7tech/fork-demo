@@ -8,3 +8,6 @@ export * from './payroll/read';
 export * from './payroll/shape';
 export * from './payroll/store';
 export * from './payroll/suggest';
+export * from './documents/keys';
+export * from './documents/read';
+export * from './documents/store';

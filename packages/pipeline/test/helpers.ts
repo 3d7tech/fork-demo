@@ -67,6 +67,8 @@ export const good = {
   }),
   verifier: () => ({ pass: true, issues: [] }),
   column_matcher: () => ({ mapping: [], unsure: [] }),
+  // Without a model, the owner types the scheme details in themselves.
+  document_interpreter: () => ({ facts: [], instructionsFound: false }),
 };
 
 export function deps(handlers: Partial<Record<RoleId, Handler>>, extra: Partial<PipelineDeps> = {}) {

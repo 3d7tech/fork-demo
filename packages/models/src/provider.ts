@@ -6,10 +6,15 @@ export interface ProviderMessage {
   content: string;
 }
 
+/** A document sent alongside the input, for roles that read uploads. Always data, never instructions. */
+export type ProviderDocument = { mediaType: 'application/pdf'; base64: string } | { mediaType: 'text/plain'; text: string };
+
 export interface ProviderRequest {
   ref: ModelRef;
   system: string;
   messages: ProviderMessage[];
+  /** Attached to the first user message, before its text. */
+  document?: ProviderDocument;
   /** JSON Schema the provider constrains its output to. Our own Zod schema still validates the result. */
   jsonSchema: Record<string, unknown>;
   maxTokens: number;
@@ -42,6 +47,16 @@ export function anthropicApiKey(env: Record<string, string | undefined> = proces
   return env.FORK_ANTHROPIC_API_KEY || env.ANTHROPIC_API_KEY || undefined;
 }
 
+function withDocument(messages: ProviderMessage[], doc: ProviderDocument): Anthropic.Beta.BetaMessageParam[] {
+  const source =
+    doc.mediaType === 'application/pdf'
+      ? ({ type: 'base64', media_type: 'application/pdf', data: doc.base64 } as const)
+      : ({ type: 'text', media_type: 'text/plain', data: doc.text } as const);
+  return messages.map((m, i) =>
+    i === 0 && m.role === 'user' ? { role: 'user', content: [{ type: 'document', source }, { type: 'text', text: m.content }] } : m,
+  );
+}
+
 export class AnthropicProvider implements ModelProvider {
   readonly id = 'anthropic';
   private readonly client: Anthropic;
@@ -59,7 +74,7 @@ export class AnthropicProvider implements ModelProvider {
           max_tokens: req.maxTokens,
           // The system prompt is stable per role and prompt version, so it caches across calls.
           system: [{ type: 'text', text: req.system, cache_control: { type: 'ephemeral' } }],
-          messages: req.messages,
+          messages: req.document ? withDocument(req.messages, req.document) : req.messages,
           output_config: {
             format: { type: 'json_schema', schema: req.jsonSchema },
             ...(req.ref.effort ? { effort: req.ref.effort } : {}),

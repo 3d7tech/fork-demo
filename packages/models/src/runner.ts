@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { z } from 'zod';
 import type { CallLog, CallLogger } from './log';
-import type { ModelProvider, ProviderMessage } from './provider';
+import type { ModelProvider, ProviderDocument, ProviderMessage } from './provider';
 import type { ModelRef, Registry, RoleId } from './registry';
 import { loadPrompt, outputJsonSchema, ROLES, type RoleInput, type RoleOutput } from './roles';
 
@@ -55,7 +55,7 @@ function inputMessage(input: unknown): ProviderMessage {
  * retry once with the validation errors, then move to the fallback model, then fail safely.
  * Every call is logged without personal data.
  */
-export async function runRole<R extends RoleId>(ctx: RoleContext, roleId: R, rawInput: RoleInput<R>): Promise<RoleRun<RoleOutput<R>>> {
+export async function runRole<R extends RoleId>(ctx: RoleContext, roleId: R, rawInput: RoleInput<R>, opts: { document?: ProviderDocument } = {}): Promise<RoleRun<RoleOutput<R>>> {
   const role = ROLES[roleId];
   const parsedInput = role.input.safeParse(rawInput);
   if (!parsedInput.success) throw new RoleInputError(`Input not allowed for role ${roleId}: ${issuesOf(parsedInput.error).join(', ')}`);
@@ -79,7 +79,7 @@ export async function runRole<R extends RoleId>(ctx: RoleContext, roleId: R, raw
     for (let tryOnModel = 0; tryOnModel < 2; tryOnModel++) {
       attempts++;
       const started = performance.now();
-      const res = await provider.complete({ ref, system, messages, jsonSchema, maxTokens: cfg.maxTokens, signal: ctx.signal });
+      const res = await provider.complete({ ref, system, messages, jsonSchema, maxTokens: cfg.maxTokens, signal: ctx.signal, ...(opts.document ? { document: opts.document } : {}) });
       const entry: Omit<CallLog, 'outcome'> = {
         at: new Date().toISOString(),
         runId,

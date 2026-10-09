@@ -10,7 +10,8 @@
     "smoke:models": "tsx scripts/smoke-models.ts",
     "e2e": "pnpm --filter web build && pnpm --filter web e2e && pnpm --filter web e2e:db",
     "db": "tsx scripts/db.ts",
-    "fork": "tsx scripts/fork.ts"
+    "fork": "tsx scripts/fork.ts",
+    "smoke:documents": "tsx scripts/smoke-documents.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
@@ -26,6 +27,7 @@
     "@fork/pipeline": "workspace:*",
     "@fork/spec": "workspace:*",
     "@fork/db": "workspace:*",
-    "drizzle-orm": "0.45.3"
+    "drizzle-orm": "0.45.3",
+    "@fork/setup": "workspace:*"
   }
 }

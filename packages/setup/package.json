@@ -14,7 +14,8 @@
     "drizzle-orm": "0.45.3",
     "papaparse": "5.7.0",
     "read-excel-file": "9.3.10",
-    "zod": "4.6.5"
+    "zod": "4.6.5",
+    "mammoth": "1.12.3"
   },
   "devDependencies": {
     "@types/papaparse": "5.5.2"

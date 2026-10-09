@@ -347,3 +347,36 @@ fieldset.field {
   font-size: 14px;
   color: var(--fk-accent);
 }
+.fact {
+  border-top: 1px solid var(--fk-line-soft);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.fact h2 {
+  font-size: 16px;
+}
+.fact-value {
+  font-size: 20px;
+  font-weight: 600;
+}
+.fact blockquote {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--fk-line);
+  color: var(--fk-ink-2);
+  font-size: 15px;
+}
+.fact-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fact-actions summary {
+  cursor: pointer;
+  color: var(--fk-accent);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}

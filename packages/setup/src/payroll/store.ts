@@ -164,6 +164,8 @@ export async function setupProgress(db: ForkDatabase, ctx: RequestContext) {
       people: await count(tx.select({ n }).from(s.employee)),
       invited: await count(tx.select({ n }).from(s.invite).where(sql`${s.invite.role} = 'employee'`)),
       joined: await count(tx.select({ n }).from(s.membership).where(sql`${s.membership.role} = 'employee'`)),
+      documents: await count(tx.select({ n }).from(s.policyDocument)),
+      factsToCheck: await count(tx.select({ n }).from(s.policyFact).where(sql`${s.policyFact.confidence} <> 'confirmed'`)),
     };
   });
 }

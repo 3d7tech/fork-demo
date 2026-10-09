@@ -15,6 +15,12 @@ export default async function Setup({ searchParams }: { searchParams: Promise<{ 
     { href: '/setup/scheme', done: p.scheme, title: 'Pension scheme', detail: p.scheme ? 'Saved' : 'Contribution rates and how tax relief is given' },
     { href: '/setup/payroll', done: p.payrollImports > 0, title: 'Payroll export', detail: p.payrollImports ? `${p.people} people imported` : 'CSV or Excel from your payroll software' },
     {
+      href: '/setup/documents',
+      done: p.documents > 0 && p.factsToCheck === 0,
+      title: 'Company documents',
+      detail: p.documents ? (p.factsToCheck ? `${p.factsToCheck} facts to check` : `${p.documents} uploaded and checked`) : 'Staff handbook, pension booklet, benefit terms',
+    },
+    {
       href: '/setup/team',
       done: p.invited > 0,
       title: 'Invite your team',
@@ -26,7 +32,7 @@ export default async function Setup({ searchParams }: { searchParams: Promise<{ 
     <>
       <section className="card" aria-labelledby="setup-title">
         <h1 id="setup-title">Set up Fork for {companyName}</h1>
-        <p className="lead">{left === 0 ? 'Setup is done. Your team can start asking.' : `${left} of 4 steps to go. Most companies finish in under an hour.`}</p>
+        <p className="lead">{left === 0 ? 'Setup is done. Your team can start asking.' : `${left} of ${steps.length} steps to go. Most companies finish in under an hour.`}</p>
         {saved && SAVED[saved] && (
           <p className="notice" role="status">
             {SAVED[saved]}
@@ -54,7 +60,6 @@ export default async function Setup({ searchParams }: { searchParams: Promise<{ 
           ))}
         </ol>
       </section>
-      <p className="small">Documents (staff handbook, scheme booklet) come next. Fork will read them and ask you to confirm what it found.</p>
     </>
   );
 }
