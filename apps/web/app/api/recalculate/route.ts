@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const who = await asker();
   if (!who) return Response.json({ error: 'Sign in first.' }, { status: 401 });
   const { subject, deps } = who;
-  const screen = body?.runId ? loadScreen(subject, body.runId) : null;
+  const screen = body?.runId ? await loadScreen(who, body.runId) : null;
   if (!screen) return Response.json({ error: 'That answer has expired. Ask again.' }, { status: 404 });
   try {
     const { facts, data } = await factsFor(deps, subject, screen);

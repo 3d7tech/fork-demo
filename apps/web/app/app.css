@@ -380,3 +380,24 @@ fieldset.field {
   display: flex;
   align-items: center;
 }
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.tile {
+  border: 1px solid var(--fk-line);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tile span {
+  font-size: 13px;
+  color: var(--fk-muted);
+}
+.tile strong {
+  font-family: var(--fk-mono);
+  font-size: 20px;
+}

@@ -1,3 +1,4 @@
+import { rmSync } from 'node:fs';
 import pg from 'pg';
 import { asAdmin, migrate, schema as s } from '../../../packages/db/src';
 import { ensureLocalCluster, localUrl } from '../../../packages/db/src/local';
@@ -5,6 +6,7 @@ import { enableLocalLogins } from '../../../packages/db/src/testing';
 
 /** A fresh fork_e2e database with Larkfield and its owner, Maya. */
 export default async function setup() {
+  rmSync(new URL('../../../.data/e2e-outbox.jsonl', import.meta.url), { force: true });
   ensureLocalCluster();
   const c = new pg.Client({ connectionString: localUrl('postgres') });
   await c.connect();

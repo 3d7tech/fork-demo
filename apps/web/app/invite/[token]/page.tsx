@@ -32,6 +32,8 @@ export default async function Invite({ params }: { params: Promise<{ token: stri
           <p className="lead">Fork shows you what your pay, pension and benefit choices mean for you, with your own numbers.</p>
           <p className="notice">Private to you. {invite.companyName} never sees your questions, answers or decisions.</p>
         </>
+      ) : invite.role === 'accountant' ? (
+        <p className="lead">{invite.companyName} would like you to handle the payroll requests their staff send through Fork. You’ll see each request and update its status; you won’t see anyone’s questions.</p>
       ) : (
         <p className="lead">You’ve been invited to help set up Fork for {invite.companyName}.</p>
       )}

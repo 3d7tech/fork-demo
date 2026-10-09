@@ -17,13 +17,24 @@ export default async function Switch() {
   return (
     <section className="card" aria-labelledby="sw-title">
       <h1 id="sw-title">Use Fork as</h1>
-      <form action={choose} className="form">
+      <div className="form">
+        {viewer.who.accountantFor.length > 0 && (
+          <form action={choose}>
+            <input type="hidden" name="as" value="accountant" />
+            <button type="submit" className="fk-btn fk-secondary">
+              Accountant for {viewer.who.accountantFor.map((c) => c.companyName).join(', ')}
+            </button>
+          </form>
+        )}
         {viewer.who.memberships.map((m) => (
-          <button key={`${m.companyId}.${m.role}`} type="submit" name="as" value={`${m.companyId}.${m.role}`} className="fk-btn fk-secondary">
-            {m.companyName}: {m.role === 'owner' ? 'owner' : 'employee'}
-          </button>
+          <form key={`${m.companyId}.${m.role}`} action={choose}>
+            <input type="hidden" name="as" value={`${m.companyId}.${m.role}`} />
+            <button type="submit" className="fk-btn fk-secondary">
+              {m.companyName}: {m.role === 'owner' ? 'owner' : 'employee'}
+            </button>
+          </form>
         ))}
-      </form>
+      </div>
     </section>
   );
 }

@@ -11,7 +11,8 @@ export default async function Home() {
   if (viewer.role === 'owner') {
     // Until payroll is in, an owner's first stop is setup.
     if (viewer.mode === 'db' && !(await setupProgress(database(), viewer.ctx)).payrollImports) redirect('/setup');
-    return <AskApp suggestions={OWNER_SUGGESTIONS} />;
+    return <AskApp suggestions={OWNER_SUGGESTIONS} canSave />;
   }
-  return <AskApp />;
+  if (viewer.role === 'accountant') redirect('/accountant');
+  return <AskApp canSave={viewer.mode === 'db'} />;
 }

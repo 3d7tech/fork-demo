@@ -13,3 +13,4 @@ export * from './documents/read';
 export * from './documents/store';
 export * from './lookup';
 export * from './decisions';
+export * from './mail';

@@ -17,7 +17,7 @@ const SETTLE_MS = 700;
 
 type Recalc = Pick<DecisionScreen, 'answers' | 'levers' | 'calc' | 'numbers' | 'visual'>;
 
-export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS }: { suggestions?: string[] }) {
+export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS, canSave = false }: { suggestions?: string[]; canSave?: boolean }) {
   const [question, setQuestion] = useState('');
   const [steps, setSteps] = useState<BuildStep[]>([]);
   const [busy, setBusy] = useState(false);
@@ -26,6 +26,7 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS }: { suggestions?: s
   const [error, setError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
   const [actionDone, setActionDone] = useState<string | null>(null);
+  const [saveDone, setSaveDone] = useState<string | null>(null);
   const settle = useRef<ReturnType<typeof setTimeout> | null>(null);
   const seq = useRef(0);
 
@@ -38,6 +39,7 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS }: { suggestions?: s
     setAnswer(null);
     setError(null);
     setActionDone(null);
+    setSaveDone(null);
     setStale(false);
     try {
       const res = await fetch('/api/ask', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ question: text }) });
@@ -91,11 +93,12 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS }: { suggestions?: s
     }, SETTLE_MS);
   }
 
-  async function act(screen: DecisionScreen) {
-    const res = await fetch('/api/action', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ runId: screen.runId }) });
+  async function act(screen: DecisionScreen, save = false) {
+    const res = await fetch('/api/action', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ runId: screen.runId, save }) });
     const body = await res.json();
     if (!res.ok) return setError(body.error);
-    setActionDone(body.message);
+    if (save) setSaveDone(body.message);
+    else setActionDone(body.message);
   }
 
   return (
@@ -143,6 +146,16 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS }: { suggestions?: s
           onLever={(id, v) => void change(answer, { levers: { [id]: v } })}
           onAction={() => void act(answer)}
         />
+      )}
+      {canSave && answer?.kind === 'decision' && answer.spec.action?.type !== 'save' && (
+        <div className="fk-action">
+          <button type="button" className="fk-btn fk-secondary" onClick={() => void act(answer, true)} disabled={stale || !!saveDone}>
+            Save and tell me if this changes
+          </button>
+          <p role="status" className="fk-done">
+            {saveDone ?? ''}
+          </p>
+        </div>
       )}
       {answer?.kind === 'message' && <MessageCard message={answer} />}
     </>

@@ -1,10 +1,10 @@
 import 'server-only';
 import { AnthropicProvider, anthropicApiKey, JsonLinesLogger, loadRegistry } from '@fork/models';
-import { DEMO_FACTS, DemoModels, FAMILIES, gatherData, type DecisionScreen, type FactStore, type PipelineDeps, type Subject } from '@fork/pipeline';
-import { answerLookup, DbFactStore } from '@fork/setup';
+import { DEMO_FACTS, DemoModels, FAMILIES, gatherData, type DecisionScreen, type FactStore, type ForkAnswer, type PipelineDeps, type Subject } from '@fork/pipeline';
+import { answerLookup, DbFactStore, loadRun, recordRun, updateRun } from '@fork/setup';
 import { runRole } from '@fork/models';
 import { database } from './db';
-import { getViewer } from './viewer';
+import { getViewer, type Viewer } from './viewer';
 
 /** Demo mode when no API key is set: real engine and checks, templated wording. */
 export const DEMO = !anthropicApiKey();
@@ -26,32 +26,47 @@ export function pipelineDeps(): PipelineDeps {
  * Who is asking, and the pipeline set up to read their facts. In demo mode that is Ella at
  * Larkfield; with a database it is the signed-in person, reading through row-level security.
  */
-export async function asker(): Promise<{ subject: Subject; deps: PipelineDeps } | null> {
+export async function asker(): Promise<{ subject: Subject; deps: PipelineDeps; viewer: Viewer } | null> {
   const viewer = await getViewer();
-  if (!viewer) return null;
-  if (viewer.mode === 'demo') return { subject: viewer.subject, deps: pipelineDeps() };
+  if (!viewer || viewer.role === 'accountant') return null;
+  if (viewer.mode === 'demo') return { subject: viewer.subject, deps: pipelineDeps(), viewer };
   const facts: FactStore = new DbFactStore(database(), viewer.ctx);
   const base = pipelineDeps();
   const matcher = DEMO ? undefined : async (input: Parameters<typeof runRole<'lookup_matcher'>>[2]) => (await runRole(base.roles, 'lookup_matcher', input)).output;
   const lookup = (question: string) => answerLookup(database(), viewer.ctx, matcher, question);
-  return { subject: viewer.subject, deps: { ...base, facts, lookup } };
+  return { subject: viewer.subject, deps: { ...base, facts, lookup }, viewer };
 }
 
+type Asker = NonNullable<Awaited<ReturnType<typeof asker>>>;
+
 /**
- * Screens built in this server process, by run id, with the subject that asked. Stands in for
- * the DecisionRun table (step 8). A screen is only ever returned to the person who asked.
+ * Demo mode keeps screens in this server's memory. With a database every answer is a
+ * decision_run row, readable by the person who asked (and, for company decisions, by owners).
  */
 const g = globalThis as unknown as { forkScreens?: Map<string, { subject: Subject; screen: DecisionScreen }> };
 const screens = (g.forkScreens ??= new Map());
 
-export function saveScreen(subject: Subject, screen: DecisionScreen) {
-  screens.set(screen.runId, { subject, screen });
+export async function saveAnswer(who: Asker, question: string, answer: ForkAnswer): Promise<void> {
+  if (who.viewer.mode === 'demo') {
+    if (answer.kind === 'decision') screens.set(answer.runId, { subject: who.subject, screen: answer });
+    return;
+  }
+  await recordRun(database(), who.viewer.ctx, { question, answer, employeeId: who.subject.employeeId ?? null });
 }
 
-export function loadScreen(subject: Subject, runId: string): DecisionScreen | null {
+export async function updateScreen(who: Asker, screen: DecisionScreen): Promise<void> {
+  if (who.viewer.mode === 'demo') return void screens.set(screen.runId, { subject: who.subject, screen });
+  await updateRun(database(), who.viewer.ctx, screen.runId, screen);
+}
+
+export async function loadScreen(who: Asker, runId: string): Promise<DecisionScreen | null> {
+  if (who.viewer.mode === 'db') {
+    const a = await loadRun<ForkAnswer>(database(), who.viewer.ctx, runId);
+    return a?.kind === 'decision' ? a : null;
+  }
   const hit = screens.get(runId);
   if (!hit) return null;
-  const same = hit.subject.companyId === subject.companyId && hit.subject.employeeId === subject.employeeId && hit.subject.audience === subject.audience;
+  const same = hit.subject.companyId === who.subject.companyId && hit.subject.employeeId === who.subject.employeeId && hit.subject.audience === who.subject.audience;
   return same ? hit.screen : null;
 }
 

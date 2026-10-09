@@ -1,5 +1,5 @@
 import { askFork } from '@fork/pipeline';
-import { asker, DEMO, saveScreen } from '@/lib/server';
+import { asker, DEMO, saveAnswer } from '@/lib/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       const send = (o: unknown) => controller.enqueue(encoder.encode(JSON.stringify(o) + '\n'));
       try {
         const answer = await askFork(deps, { question, subject, onStep: (step) => send({ type: 'step', step }) });
-        if (answer.kind === 'decision') saveScreen(subject, answer);
+        await saveAnswer(who, question, answer);
         send({ type: 'answer', answer, demo: DEMO });
       } catch (error) {
         console.error(error);

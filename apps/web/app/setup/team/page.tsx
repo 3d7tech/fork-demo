@@ -73,6 +73,20 @@ export default async function Team({ searchParams }: { searchParams: Promise<{ i
           </p>
         )}
       </section>
+      <section className="card" aria-labelledby="acct-title">
+        <h2 id="acct-title">Add your accountant or payroll bureau</h2>
+        <p className="small">When someone decides to change their pay or pension, Fork sends your accountant a request to make the change. They see the request, not the person’s questions.</p>
+        <form action={inviteOwnerAction} className="form">
+          <input type="hidden" name="role" value="accountant" />
+          <div className="field">
+            <label htmlFor="acct-email">Accountant’s email</label>
+            <input id="acct-email" name="email" type="email" required />
+          </div>
+          <button type="submit" className="fk-btn fk-secondary">
+            Send accountant invite
+          </button>
+        </form>
+      </section>
       <section className="card" aria-labelledby="owner-title">
         <h2 id="owner-title">Add another owner</h2>
         <p className="small">Owners can change settings, upload payroll and invite people. They can’t see anyone’s questions or decisions either.</p>

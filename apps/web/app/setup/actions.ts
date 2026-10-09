@@ -90,16 +90,18 @@ export async function importPayrollAction(form: FormData) {
   redirect(`/setup/payroll/${id}?check=1`);
 }
 
-async function invite(ctx: RequestContext, companyName: string, email: string, role: 'owner' | 'employee', employeeId?: string) {
+async function invite(ctx: RequestContext, companyName: string, email: string, role: 'owner' | 'employee' | 'accountant', employeeId?: string) {
   const token = await createInvite(database(), ctx, { email, role, ...(employeeId ? { employeeId } : {}) });
   const link = `${await baseUrl()}/invite/${token}`;
   await sendMail({
     to: email,
-    subject: role === 'employee' ? `${companyName} has set you up on Fork` : `Help set up Fork for ${companyName}`,
+    subject: role === 'employee' ? `${companyName} has set you up on Fork` : role === 'accountant' ? `${companyName} would like you to handle their Fork requests` : `Help set up Fork for ${companyName}`,
     text:
       role === 'employee'
         ? `${companyName} uses Fork to help you make decisions about your pay, pension and benefits, with your own numbers.\n\nWhat you ask Fork is private to you. ${companyName} never sees your questions, answers or decisions.\n\nJoin here (the link lasts 14 days):\n${link}`
-        : `You’ve been invited to help set up Fork for ${companyName}.\n\nJoin here (the link lasts 14 days):\n${link}`,
+        : role === 'accountant'
+          ? `${companyName} uses Fork to help staff with pay, pension and benefit decisions. When someone decides to change something, such as switching to salary sacrifice, Fork sends you a clear request and you update its status. Fork never changes payroll itself.\n\nJoin here (the link lasts 14 days):\n${link}`
+          : `You’ve been invited to help set up Fork for ${companyName}.\n\nJoin here (the link lasts 14 days):\n${link}`,
   });
 }
 
@@ -114,7 +116,7 @@ export async function inviteEmployeesAction(form: FormData) {
 export async function inviteOwnerAction(form: FormData) {
   const { ctx, companyName } = await requireOwner();
   try {
-    await invite(ctx, companyName, String(form.get('email') ?? ''), 'owner');
+    await invite(ctx, companyName, String(form.get('email') ?? ''), form.get('role') === 'accountant' ? 'accountant' : 'owner');
   } catch (e) {
     redirect('/setup/team?error=' + encodeURIComponent(e instanceof Error ? e.message : 'That invite didn’t work.'));
   }

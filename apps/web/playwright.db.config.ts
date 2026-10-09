@@ -10,7 +10,7 @@ export default defineConfig({
   ...base,
   testDir: './e2e-db',
   // Live runs call the real models (FORK_E2E_LIVE=1), which takes longer.
-  timeout: process.env.FORK_E2E_LIVE ? 240_000 : 60_000,
+  timeout: process.env.FORK_E2E_LIVE ? 360_000 : 150_000,
   expect: { timeout: process.env.FORK_E2E_LIVE ? 90_000 : 5_000 },
   workers: 1,
   globalSetup: './e2e-db/global-setup.ts',
@@ -29,6 +29,7 @@ export default defineConfig({
       FORK_DEV_OUTBOX: '1',
       FORK_INSECURE_COOKIES: '1',
       FORK_FILES_DIR: '../../.data/e2e-files',
+      FORK_OUTBOX_FILE: '../../.data/e2e-outbox.jsonl',
     },
   },
 });

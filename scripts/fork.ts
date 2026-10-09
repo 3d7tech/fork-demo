@@ -1,9 +1,13 @@
 // Operator commands, run by 3d7 (not reachable from the web app).
 //   pnpm fork create-company "Larkfield Analytics" maya@larkfield.test
 //   pnpm fork seed-demo       Larkfield with Maya as owner, on the local database
+//   pnpm fork monthly         "Your pay, explained", owner reports, and saved-decision re-checks
+//   pnpm fork recheck         Re-check saved decisions (after a payroll import or a rule pack update)
 import { sql } from 'drizzle-orm';
 import { schema as s, asAdmin } from '../packages/db/src';
-import { localUrl } from '../packages/db/src/local';
+import { connect } from '../packages/db/src/client';
+import { DEV_PASSWORDS, localUrl } from '../packages/db/src/local';
+import { runMonthly, runRecheck } from '../packages/jobs/src';
 
 const adminUrl = process.env.FORK_DATABASE_ADMIN_URL ?? localUrl('fork');
 const [command, ...args] = process.argv.slice(2);
@@ -29,7 +33,17 @@ if (command === 'create-company') {
 } else if (command === 'seed-demo') {
   const c = await createCompany('Larkfield Analytics', 'maya@larkfield.test');
   console.log(`Created ${c.name}. Sign in as maya@larkfield.test; upload packages/setup/fixtures/larkfield-payroll.csv.`);
+} else if (command === 'monthly' || command === 'recheck') {
+  process.env.FORK_OUTBOX_FILE ??= '.data/outbox.jsonl';
+  const db = connect({
+    appUrl: process.env.FORK_DATABASE_APP_URL ?? localUrl('fork', 'fork_app', DEV_PASSWORDS.fork_app),
+    authUrl: process.env.FORK_DATABASE_AUTH_URL ?? localUrl('fork', 'fork_auth', DEV_PASSWORDS.fork_auth),
+  });
+  const deps = { db, adminUrl, baseUrl: process.env.FORK_BASE_URL ?? 'http://localhost:3000' };
+  const r = command === 'monthly' ? await runMonthly(deps) : await runRecheck(deps);
+  console.log(JSON.stringify(r));
+  await db.close();
 } else {
-  console.error('Usage: pnpm fork create-company "<name>" <owner email> | seed-demo');
+  console.error('Usage: pnpm fork create-company "<name>" <owner email> | seed-demo | monthly | recheck');
   process.exit(1);
 }

@@ -1,5 +1,5 @@
 import { recalculate, reexplain } from '@fork/pipeline';
-import { asker, factsFor, loadScreen, saveScreen } from '@/lib/server';
+import { asker, factsFor, loadScreen, updateScreen } from '@/lib/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,13 +10,13 @@ export async function POST(req: Request) {
   const who = await asker();
   if (!who) return Response.json({ error: 'Sign in first.' }, { status: 401 });
   const { subject, deps } = who;
-  const screen = body?.runId ? loadScreen(subject, body.runId) : null;
+  const screen = body?.runId ? await loadScreen(who, body.runId) : null;
   if (!screen) return Response.json({ error: 'That answer has expired. Ask again.' }, { status: 404 });
   try {
     const { facts, data } = await factsFor(deps, subject, screen);
     const r = recalculate(screen, facts, { answers: body?.answers, levers: body?.levers }, data);
     const answer = await reexplain(deps, screen, r);
-    if (answer.kind === 'decision') saveScreen(subject, answer);
+    if (answer.kind === 'decision') await updateScreen(who, answer);
     return Response.json({ answer });
   } catch {
     return Response.json({ error: 'Those values are out of range.' }, { status: 400 });

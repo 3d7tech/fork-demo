@@ -41,7 +41,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {viewer?.mode === 'db' ? (
               <nav aria-label="Account">
                 {viewer.role === 'employee' && <span className="who">{viewer.personName}</span>}
+                {viewer.role === 'owner' && <a href="/dashboard">Dashboard</a>}
                 {viewer.role === 'owner' && <a href="/setup">Setup</a>}
+                {viewer.role !== 'accountant' && <a href="/decisions">My decisions</a>}
+                {viewer.role === 'accountant' && <a href="/accountant">Requests</a>}
                 {viewer.canSwitch && <a href="/switch">Switch</a>}
                 <form action="/signout" method="post">
                   <button type="submit" className="linkish">

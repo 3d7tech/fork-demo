@@ -97,6 +97,19 @@ test('an owner sets up Larkfield and an employee asks their first question', asy
   await expect(page.getByText('Setup is done.')).toBeVisible();
   await check(page, 'setup-7-done');
 
+  // The owner adds their accountant, who joins from the emailed invite.
+  await page.goto('/setup/team');
+  await page.getByLabel('Accountant’s email').fill('books@bureau.test');
+  await page.getByRole('button', { name: 'Send accountant invite' }).click();
+  await expect(page.getByText('Invite sent.')).toBeVisible();
+  const accountantInvite = await linkFromOutbox(page, 'books@bureau.test');
+  const accContext = await browser.newContext({ viewport: { width: 360, height: 740 }, deviceScaleFactor: 2, locale: 'en-GB' });
+  const acc = await accContext.newPage();
+  await acc.goto(accountantInvite);
+  await acc.getByRole('button', { name: 'Join Larkfield' }).click();
+  await expect(acc).toHaveURL(/\/accountant$/);
+  await expect(acc.getByText('Nothing open.')).toBeVisible();
+
   // With payroll in, the owner's home is asking Fork. Company decisions use every salary.
   await page.goto('/');
   await page.getByRole('button', { name: 'Should we introduce salary sacrifice for pensions?' }).click();
@@ -140,5 +153,43 @@ test('an owner sets up Larkfield and an employee asks their first question', asy
   await expect(ella.locator('figure').getByRole('heading', { name: 'Into your pension a year' })).toBeVisible();
   await expect(ella.getByText('80p').first()).toBeVisible();
   await check(ella, 'step7-ella-contribution');
+
+  // Ella sends her salary sacrifice request to the accountant and saves the decision.
+  await ella.getByRole('textbox', { name: 'What do you want to work out?' }).fill('should I switch my pension to salary sacrifice?');
+  await ella.getByRole('button', { name: 'Ask Fork' }).click();
+  await expect(ella.locator('figure').getByRole('heading', { name: 'Your take-home pay a year' })).toBeVisible();
+  await ella.getByRole('button', { name: 'Save and tell me if this changes' }).click();
+  await expect(ella.getByRole('status').filter({ hasText: 'Saved.' })).toBeVisible();
+  await ella.locator('.fk-action button.fk-primary').click();
+  await expect(ella.getByRole('status').filter({ hasText: 'Sent to your accountant' })).toBeVisible();
+  await ella.goto('/decisions');
+  await expect(ella.getByText('Private to you. Larkfield never sees these.')).toBeVisible();
+  await expect(ella.getByText('Sent to your accountant')).toBeVisible();
+  await check(ella, 'step8-ella-decisions');
+
+  // The accountant sees what to change, and marks it done; Ella is told.
+  await acc.goto('/accountant');
+  await expect(acc.getByText(/Please switch Ella Brooks \(payroll LA104\)/)).toBeVisible();
+  await check(acc, 'step8-accountant');
+  await acc.getByLabel('Note for them (optional)').fill('Done from the October payroll.');
+  await acc.getByLabel('Done').check();
+  await acc.getByRole('button', { name: 'Update' }).click();
+  await expect(acc.getByText('Nothing open.')).toBeVisible();
+  await ella.reload();
+  await expect(ella.getByText('Accountant: Done from the October payroll.')).toBeVisible();
+  await accContext.close();
+
+  // Ella's own data: download and delete.
+  await ella.goto('/me');
+  await check(ella);
+  const download = await Promise.all([ella.waitForEvent('download'), ella.getByRole('link', { name: 'Download my data' }).click()]);
+  expect(download[0].suggestedFilename()).toBe('my-fork-data.json');
   await ellaContext.close();
+
+  // The owner's dashboard: counts only, and nothing about Ella.
+  await page.goto('/dashboard');
+  await expect(page.getByText('Fewer than 5')).toBeVisible();
+  await expect(page.getByText('No topic has reached 5 people yet.')).toBeVisible();
+  await expect(page.locator('main')).not.toContainText('Ella');
+  await check(page, 'step8-owner-dashboard');
 });

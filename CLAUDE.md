@@ -17,7 +17,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 5 | Component library and screen grammar, web app | Done |
 | 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | Done |
 | 7 | Remaining owner and employee decisions, lookups, "not yet" | Done: 7 families (3 owner, 4 employee), lookups from confirmed documents, "not yet" with what Fork can do |
-| 8 | Saved decisions, accountant requests, owner dashboard, monthly email | To do |
+| 8 | Saved decisions, accountant requests, owner dashboard, monthly email | Done (ADR 0008) |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
 | 10 | "How to add a decision family" guide, tested by adding one | To do |
 
@@ -37,20 +37,22 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | `packages/setup` | Payroll reading, column matching, import, company and scheme settings, `DbFactStore` |
 | `packages/ui` | React screen components and `fork.css` |
 | `apps/web` | Next.js 15 app; `/preview` shows every screen state |
-| `docs/adr/` | Decision records 0001 to 0006: read before changing architecture |
+| `packages/jobs` | Monthly emails and saved-decision re-checks |
+| `docs/adr/` | Decision records 0001 to 0008: read before changing architecture |
 | `docs/open-questions.md` | Answers given and questions still open |
 
 ## Commands
 
 ```sh
 pnpm install
-pnpm test            # unit and golden tests (110)
+pnpm test            # unit, golden and database tests (193)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev
 pnpm db up            # local PostgreSQL in .data/ (port 5433), migrated
 pnpm fork seed-demo   # Larkfield with owner maya@larkfield.test
 pnpm --filter web e2e:db   # setup flow end to end with the database
+pnpm fork monthly     # pay explained, owner reports, saved-decision re-checks (FORK_DEV_OUTBOX=1)
 pnpm smoke:models    # live pipeline on four questions, needs a working Anthropic key
 pnpm smoke:documents # live document interpreter on the fixtures, including a hidden-instruction test
 ```
@@ -87,5 +89,5 @@ Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`
 
 - Without `FORK_DATABASE_APP_URL` and `FORK_DATABASE_AUTH_URL` the web app runs as the Larkfield demo (Ella). With them, people sign in; set `FORK_DEV_OUTBOX=1` to see emails at `/dev/outbox` (no real email sending yet).
 - New companies are created by the operator: `pnpm fork create-company "<name>" <owner email>`.
-- Screens are kept in server memory until the DecisionRun table exists (step 8).
-- The action button confirms the next step but sends nothing (step 8).
+- Email goes to the development outbox only; SMTP through the cPanel mail server is still to do.
+- `pnpm fork monthly` and `pnpm fork recheck` need a scheduler in production (cron).

@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation';
-import { OUTBOX_ENABLED, outbox } from '@/lib/mail';
+import { OUTBOX_ENABLED, readOutbox } from '@/lib/mail';
 
 export const dynamic = 'force-dynamic';
 
 /** Development only: emails Fork would have sent. Missing unless FORK_DEV_OUTBOX=1. */
 export default function Outbox() {
   if (!OUTBOX_ENABLED) notFound();
-  const mails = outbox();
+  const mails = readOutbox();
   return (
     <section className="card" aria-labelledby="ob-title">
       <h1 id="ob-title">Development outbox</h1>

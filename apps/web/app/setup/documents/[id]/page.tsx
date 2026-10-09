@@ -54,26 +54,32 @@ export default async function DocumentFacts({ params, searchParams }: { params: 
               </blockquote>
             )}
             {!confirmed && (
-              <form action={factAction} className="fact-actions">
-                <input type="hidden" name="documentId" value={doc.id} />
-                <input type="hidden" name="factId" value={f.id} />
-                <details>
-                  <summary>Correct it</summary>
-                  <div className="field">
-                    <label htmlFor={`v-${f.id}`}>Correct value</label>
-                    <input id={`v-${f.id}`} name="value" type="text" defaultValue={String(f.value)} />
-                    <input type="hidden" name="changed" value="1" />
-                  </div>
-                </details>
-                <div className="ask-row">
-                  <button type="submit" name="op" value="confirm" className="fk-btn fk-primary">
+              <div className="fact-actions">
+                <form action={factAction} className="fact-actions">
+                  <input type="hidden" name="documentId" value={doc.id} />
+                  <input type="hidden" name="factId" value={f.id} />
+                  <input type="hidden" name="op" value="confirm" />
+                  <details>
+                    <summary>Correct it</summary>
+                    <div className="field">
+                      <label htmlFor={`v-${f.id}`}>Correct value</label>
+                      <input id={`v-${f.id}`} name="value" type="text" defaultValue={String(f.value)} />
+                      <input type="hidden" name="changed" value="1" />
+                    </div>
+                  </details>
+                  <button type="submit" className="fk-btn fk-primary">
                     Confirm
                   </button>
-                  <button type="submit" name="op" value="remove" className="fk-btn fk-secondary">
+                </form>
+                <form action={factAction}>
+                  <input type="hidden" name="documentId" value={doc.id} />
+                  <input type="hidden" name="factId" value={f.id} />
+                  <input type="hidden" name="op" value="remove" />
+                  <button type="submit" className="fk-btn fk-secondary">
                     Remove
                   </button>
-                </div>
-              </form>
+                </form>
+              </div>
             )}
           </article>
         );
@@ -81,7 +87,8 @@ export default async function DocumentFacts({ params, searchParams }: { params: 
       {unconfirmed > 1 && (
         <form action={factAction}>
           <input type="hidden" name="documentId" value={doc.id} />
-          <button type="submit" name="op" value="confirm_all" className="fk-btn fk-secondary">
+          <input type="hidden" name="op" value="confirm_all" />
+          <button type="submit" className="fk-btn fk-secondary">
             Confirm all {unconfirmed} as shown
           </button>
         </form>

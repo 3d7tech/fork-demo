@@ -1,5 +1,5 @@
 import 'server-only';
-import { contextFor, readSession, schema, type RequestContext, type SignedIn } from '@fork/db';
+import { accountantContext, contextFor, readSession, schema, type RequestContext, type SignedIn } from '@fork/db';
 import { DEMO_SUBJECT, type Subject } from '@fork/pipeline';
 import { eq } from 'drizzle-orm';
 import { cookies, headers } from 'next/headers';
@@ -18,7 +18,7 @@ export type Viewer =
       subject: Subject;
       companyName: string;
       personName: string;
-      role: 'owner' | 'employee';
+      role: 'owner' | 'employee' | 'accountant';
       canSwitch: boolean;
     };
 
@@ -29,8 +29,24 @@ export async function getViewer(): Promise<Viewer | null> {
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   const who = await readSession(database(), token);
-  if (!who || !who.memberships.length) return null;
-  const [cid, r] = (jar.get(ACTING_COOKIE)?.value ?? '').split('.');
+  if (!who || (!who.memberships.length && !who.accountantFor.length)) return null;
+  const acting = jar.get(ACTING_COOKIE)?.value ?? '';
+  const canSwitch = who.memberships.length + (who.accountantFor.length ? 1 : 0) > 1;
+  // An accountant works across the companies they look after, not inside one.
+  if (!who.memberships.length || (acting === 'accountant' && who.accountantFor.length)) {
+    const names = who.accountantFor.map((c) => c.companyName);
+    return {
+      mode: 'db',
+      who,
+      ctx: accountantContext(who)!,
+      subject: { audience: 'owner', companyId: '' },
+      companyName: names.length === 1 ? names[0]! : `${names.length} companies`,
+      personName: who.email,
+      role: 'accountant',
+      canSwitch,
+    };
+  }
+  const [cid, r] = acting.split('.');
   const pick =
     who.memberships.find((m) => m.companyId === cid && m.role === r) ?? who.memberships.find((m) => m.role === 'owner') ?? who.memberships[0]!;
   const ctx = contextFor(who, pick.companyId, pick.role)!;
@@ -47,7 +63,7 @@ export async function getViewer(): Promise<Viewer | null> {
     companyName: pick.companyName,
     personName,
     role: pick.role,
-    canSwitch: who.memberships.length > 1,
+    canSwitch,
   };
 }
 
@@ -61,6 +77,19 @@ export async function requireOwner() {
   const v = await requireViewer();
   if (v.mode !== 'db' || v.role !== 'owner') redirect('/');
   return v;
+}
+
+export async function requireAccountant() {
+  const v = await requireViewer();
+  if (v.mode !== 'db' || v.role !== 'accountant') redirect('/');
+  return v;
+}
+
+/** A signed-in owner or employee, with a database. */
+export async function requireMember() {
+  const v = await requireViewer();
+  if (v.mode !== 'db' || v.role === 'accountant') redirect('/');
+  return v as Extract<Viewer, { mode: 'db' }> & { role: 'owner' | 'employee' };
 }
 
 /** The address people should use in emailed links. */

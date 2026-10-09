@@ -199,3 +199,24 @@ export async function ownerDashboard(db: ForkDatabase, ctx: RequestContext, ssFa
     };
   });
 }
+
+// ---------- A person's own data ----------
+
+/** Everything Fork holds that is this person's own: questions, answers, saved decisions, requests. */
+export async function exportMyData(db: ForkDatabase, ctx: RequestContext) {
+  return db.asMember(ctx, async (tx) => ({
+    exportedAt: new Date().toISOString(),
+    questionsAndAnswers: await tx.select().from(s.decisionRun).where(eq(s.decisionRun.userId, ctx.userId)),
+    savedDecisions: await tx.select().from(s.savedDecision).where(eq(s.savedDecision.userId, ctx.userId)),
+    requests: await tx.select().from(s.actionRequest).where(eq(s.actionRequest.createdBy, ctx.userId)),
+  }));
+}
+
+/** Delete this person's questions and answers (and the saved decisions built on them). Requests stay with the accountant. */
+export async function deleteMyQuestions(db: ForkDatabase, ctx: RequestContext): Promise<number> {
+  return db.asMember(ctx, async (tx) => {
+    const gone = await tx.delete(s.decisionRun).where(eq(s.decisionRun.userId, ctx.userId)).returning({ id: s.decisionRun.id });
+    await tx.insert(s.auditEvent).values({ companyId: ctx.companyId, actorUserId: ctx.userId, action: 'data.questions_deleted', detail: { count: gone.length } });
+    return gone.length;
+  });
+}
