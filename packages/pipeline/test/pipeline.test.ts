@@ -157,7 +157,8 @@ describe('knowing when not to build a screen', () => {
 
   it('distress gets a supportive reply and no decision screen, even mid-decision', async () => {
     const { deps: d, models } = deps({ ...good, router: route({ family: 'pension.salary_sacrifice_switch', distress: true }) });
-    const a = await askFork(d, { question: 'can’t pay rent, should i stop my pension', subject: ELLA });
+    // Subtler than the code guard catches, so this is the router's call.
+    const a = await askFork(d, { question: 'everything is falling apart with money at the moment, should i stop my pension', subject: ELLA });
     expect(a).toMatchObject({ kind: 'message', reason: 'distress', routeTo: 'support' });
     expect(models.rolesCalled()).toEqual(['router']);
   });

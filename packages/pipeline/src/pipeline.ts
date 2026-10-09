@@ -2,6 +2,7 @@ import { runModule, type ModuleId } from '@fork/calc';
 import { RoleFailedError, runRole, type RoleContext, type RoleId, type RoleOutput } from '@fork/models';
 import { CalcResult, DecisionSpec, ScreenLayout, type Fact, type ScreenCopy, type VisualData } from '@fork/spec';
 import { checkCopy } from './checks';
+import { guard } from './guards';
 import { FAMILIES, familiesFor, type FamilyData, type FamilyDef } from './families';
 import type { FactStore, Subject } from './facts';
 import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
@@ -308,6 +309,10 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
   const audience = input.subject.audience;
 
   try {
+    // Crisis and investment picks get fixed, human-written replies before any model is asked.
+    const guarded = guard(question);
+    if (guarded === 'distress') return DISTRESS;
+    if (guarded === 'investment') return HUMAN;
     const families = familiesFor(audience);
     const route = await t.run('router', { question, audience, families: families.map((f) => ({ family: f.id, description: f.description })) });
 

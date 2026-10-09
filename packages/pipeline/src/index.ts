@@ -5,3 +5,4 @@ export { FAMILIES, familiesFor, type FamilyDef, type FactDef } from './families'
 export { InMemoryFactStore, type FactStore, type Subject } from './facts';
 export type { ForkMessage, MessageReason } from './messages';
 export { DemoModels, DEMO_FACTS, DEMO_SUBJECT } from './demo';
+export { guard, type GuardResult } from './guards';
