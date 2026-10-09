@@ -1,8 +1,9 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, leverRanges, q, type Rules } from '../core';
-import { employeeNI, incomeTax, meetsNLW } from '../uk';
+import { profileAssumptions, profileOf, type Profiled } from '../profile';
+import { jobPay, minimumWage, yearlyHours } from '../uk';
 
-export interface CycleToWorkInput {
+export interface CycleToWorkInput extends Profiled {
   salary: number;
   hoursPerWeek: number;
   /** Price of the bike and safety kit (the lever). */
@@ -14,20 +15,23 @@ export interface CycleToWorkInput {
 }
 
 /**
- * Take-home with a non-pension salary sacrifice. Unlike a pension sacrifice, the 2029 pension NI
- * cap doesn't apply, so NI is charged on pay after the sacrifice.
+ * What a year's bike sacrifice costs the person: the take-home it removes, less any Child Benefit
+ * charge it saves. Unlike a pension sacrifice, the 2029 pension NI cap doesn't apply.
  */
-function takeHomeAfter(r: Rules, salary: Decimal, sacrifice: Decimal): Decimal {
-  const pay = salary.minus(sacrifice);
-  return pay.minus(incomeTax(r, pay)).minus(employeeNI(r, pay));
+function yearCost(r: Rules, i: CycleToWorkInput, perYear: Decimal): Decimal {
+  const profile = profileOf(i);
+  const without = jobPay(r, { salary: i.salary, profile });
+  const withBike = jobPay(r, { salary: i.salary, otherSacrifice: perYear, profile });
+  return without.takeHome.minus(without.childBenefitCharge).minus(withBike.takeHome.minus(withBike.childBenefitCharge));
 }
 
 function at(r: Rules, i: CycleToWorkInput, price: number) {
   const salary = D(i.salary);
   // A yearly figure: the sacrifice taken in the first year.
   const perYear = D(price).times(Math.min(12, i.termMonths)).div(i.termMonths);
-  const cost = takeHomeAfter(r, salary, D(0)).minus(takeHomeAfter(r, salary, perYear)).times(D(i.termMonths).div(Math.min(12, i.termMonths)));
-  return { perYear, cost, saving: D(price).minus(cost), minWageOk: meetsNLW(r, salary.minus(perYear), i.hoursPerWeek) };
+  const cost = yearCost(r, i, perYear).times(D(i.termMonths).div(Math.min(12, i.termMonths)));
+  const minWageOk = salary.minus(perYear).div(yearlyHours(i.hoursPerWeek)).gte(minimumWage(r, profileOf(i).age));
+  return { perYear, cost, saving: D(price).minus(cost), minWageOk };
 }
 
 /** "Bike through the cycle to work scheme, or buy it outright?" */
@@ -61,6 +65,7 @@ export function cycleToWork(r: Rules, i: CycleToWorkInput): CalcResult {
       { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false, fact: 'salary' },
       { text: `Paid over ${i.termMonths} months by salary sacrifice`, source: 'policy_document', estimate: false },
       { text: 'No fee to own the bike at the end of the hire; some schemes charge one', source: 'estimate', estimate: true },
+      ...profileAssumptions(r, i, { adjustedNetIncome: jobPay(r, { salary: i.salary, profile: profileOf(i) }).adjustedNetIncome, minimumWage: true }),
     ],
   };
 }

@@ -7,6 +7,7 @@ import { freshDatabase, type TestDatabase } from '@fork/db/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   columnShapes,
+  ageOn,
   answerLookup,
   DbFactStore,
   importPayroll,
@@ -218,6 +219,11 @@ describe('importing into the database', () => {
     expect(await asOwner.payrollRows({ companyId: ctx.companyId })).toHaveLength(34);
     expect(await asElla.payrollRows({ companyId: ctx.companyId })).toEqual([]);
     expect(await asElla.get({ companyId: ctx.companyId, employeeId: ella.id }, ['headcount', 'median_salary'])).toEqual([]);
+
+    // Her age, for the minimum wage band, comes from the date of birth in the payroll export.
+    expect((await asElla.get({ companyId: ctx.companyId, employeeId: ella.id }, ['age']))[0]).toMatchObject({ id: 'age', value: ageOn(new Date('2000-07-02'), new Date()), source: 'payroll_export' });
+    expect(ageOn(new Date('2000-07-02'), new Date('2026-07-01'))).toBe(25);
+    expect(ageOn(new Date('2000-07-02'), new Date('2026-07-02'))).toBe(26);
 
     // Ella asking about someone else's record gets nothing.
     const tom = (await listPeople(t.db, ctx)).find((p) => p.name === 'Tom Hale')!;

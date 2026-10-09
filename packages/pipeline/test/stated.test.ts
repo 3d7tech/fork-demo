@@ -60,3 +60,34 @@ describe('assumption sources come from the facts', () => {
     expect(r.calc.assumptions.find((a) => a.fact === 'contribution_pct')).toMatchObject({ source: 'user_answer' });
   });
 });
+
+describe('the person’s tax profile reaches the sums (ADR 0010)', () => {
+  const ellaScot = new InMemoryFactStore({
+    company: { larkfield: [f('employer_share_pct', 50, 'company_setting'), f('employer_contribution_pct', 3, 'pension_scheme'), f('relief_method', 'relief_at_source', 'pension_scheme')] },
+    employee: {
+      'larkfield/ella': [
+        f('salary', 32000, 'payroll_export'),
+        f('contribution_pct', 5, 'pension_scheme'),
+        f('hours_per_week', 37.5, 'payroll_export'),
+        f('tax_region', 'scotland', 'payroll_export'),
+        f('student_loans', 'plan_2', 'user_answer'),
+      ],
+    },
+  });
+
+  it('known profile facts change the numbers and are credited to their sources', async () => {
+    const { deps: d } = deps({ ...good, explainer: () => ({ ...good.explainer(), verdict: 'Switch.', why: 'It saves you money.', tippingPoint: null }) }, { facts: ellaScot });
+    const s = (await askFork(d, { question: QUESTION, subject: ELLA })) as DecisionScreen;
+    expect(s.calc.outputs.take_home_gain!.value).toBeCloseTo(288, 6);
+    const by = (fact: string) => s.calc.assumptions.find((a) => a.fact === fact);
+    expect(by('tax_region')).toMatchObject({ text: 'Scottish income tax rates', source: 'payroll_export', estimate: false });
+    expect(by('student_loans')).toMatchObject({ text: 'Repaying Plan 2 through payroll', source: 'user_answer' });
+  });
+
+  it('unknown profile facts are listed as estimates', async () => {
+    const { deps: d } = deps(good);
+    const s = (await askFork(d, { question: QUESTION, subject: ELLA })) as DecisionScreen;
+    expect(s.calc.outputs.take_home_gain!.value).toBeCloseTo(128, 6);
+    expect(s.calc.assumptions.filter((a) => a.source === 'estimate').map((a) => a.text)).toContain('No student loan to repay');
+  });
+});

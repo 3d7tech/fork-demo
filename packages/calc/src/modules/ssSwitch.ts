@@ -1,8 +1,9 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, leverRanges, q, type Rules } from '../core';
-import { employeeNI, employerNISaving, incomeTax, meetsNLW, takeHome } from '../uk';
+import { annualAllowanceCheck, profileAssumptions, profileOf, type Profiled } from '../profile';
+import { employerNISaving, jobPay, minimumWage, yearlyHours } from '../uk';
 
-export interface SsSwitchInput {
+export interface SsSwitchInput extends Profiled {
   salary: number;
   contributionPct: number;
   /** How the pension takes contributions today, from the scheme facts. */
@@ -18,35 +19,34 @@ export interface SsSwitchInput {
 /** Date the salary sacrifice NI cap starts. The value itself is read from the rule pack. */
 export const SS_CAP_FROM = '2029-04-06';
 
-/** Take-home today, paying the contribution the way the scheme works now. */
-function takeHomeToday(r: Rules, salary: Decimal, con: Decimal, method: SsSwitchInput['reliefMethod']): Decimal {
-  if (method === 'relief_at_source') {
-    // Paid from take-home pay; the provider adds basic-rate relief, so the employee pays the net amount.
-    return takeHome(r, salary).minus(con.times(D(1).minus(r.num('pension.relief_at_source_rate'))));
-  }
-  // Net pay arrangement: income tax relief through payroll, but NI is charged on full salary.
-  const taxable = salary.minus(con);
-  return taxable.minus(incomeTax(r, taxable)).minus(employeeNI(r, salary));
-}
-
 function at(r: Rules, i: SsSwitchInput) {
+  const profile = profileOf(i);
   const salary = D(i.salary);
   const con = salary.times(i.contributionPct).div(100);
-  const before = takeHomeToday(r, salary, con, i.reliefMethod);
-  const after = takeHome(r, salary, con);
-  const erSaving = employerNISaving(r, salary, con);
+  // Today: relief at source is paid from take-home pay with basic-rate relief added; a net pay
+  // arrangement is taken before income tax but not before NI or student loan.
+  const before = jobPay(r, { salary, profile, ...(i.reliefMethod === 'relief_at_source' ? { reliefAtSource: con } : { netPay: con }) });
+  const after = jobPay(r, { salary, sacrifice: con, profile });
+  const gain = after.takeHome.minus(before.takeHome);
+  const erSaving = employerNISaving(r, salary.plus(profile.variablePay), con);
   const share = erSaving.times(i.employerSharePct).div(100);
-  return { salary, con, before, after, gain: after.minus(before), erSaving, share };
+  const chargeSaved = before.childBenefitCharge.minus(after.childBenefitCharge);
+  return { salary, con, before, after, gain, erSaving, share, chargeSaved, loanSaved: before.studentLoan.minus(after.studentLoan) };
 }
+
+/** Basic pay after sacrifice against the minimum wage for the person's age. Variable pay isn't counted on. */
+const meetsMinimumWage = (r: Rules, i: SsSwitchInput, payAfter: Decimal) => payAfter.div(yearlyHours(i.hoursPerWeek)).gte(minimumWage(r, profileOf(i).age));
 
 export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
   const now = at(r, i);
   const r29 = r.at(SS_CAP_FROM);
   const later = at(r29, i);
   const cap = r29.limit('salary_sacrifice.pension_ni_cap');
-  const minWageOk = meetsNLW(r, now.salary.minus(now.con), i.hoursPerWeek);
+  const minWageOk = meetsMinimumWage(r, i, now.salary.minus(now.con));
+  const employerPension = now.salary.times(i.employerContributionPct).div(100);
+  const allowance = annualAllowanceCheck(r, { ...i, personal: now.con, employer: employerPension.plus(now.share) });
 
-  const constraints: CalcResult['constraints'] = [{ id: 'min_wage', outcome: minWageOk ? 'pass' : 'excluded' }];
+  const constraints: CalcResult['constraints'] = [{ id: 'min_wage', outcome: minWageOk ? 'pass' : 'excluded' }, allowance.constraint];
   if (i.mortgageIn12Months !== undefined) constraints.push({ id: 'mortgage_12m', outcome: i.mortgageIn12Months ? 'caution' : 'pass' });
   if (i.parentalLeaveIn12Months !== undefined) constraints.push({ id: 'parental_leave_12m', outcome: i.parentalLeaveIn12Months ? 'caution' : 'pass' });
   const caution = constraints.some((c) => c.outcome === 'caution');
@@ -55,7 +55,6 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
 
   // Statutory parental pay for the first six weeks is 90% of average weekly earnings, which sacrifice lowers.
   const parentalPayReduction = now.con.times(0.9).div(52).times(6);
-  const employerPension = now.salary.times(i.employerContributionPct).div(100);
 
   return {
     module: 'pension.ss_switch',
@@ -63,13 +62,16 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
     verdict: verdictFor(now.gain, minWageOk),
     outputs: {
       contribution: q(now.con, 'GBP', 'Your contribution a year'),
-      take_home_before: q(now.before, 'GBP', 'Take-home a year today'),
-      take_home_after: q(now.after, 'GBP', 'Take-home a year on salary sacrifice'),
+      take_home_before: q(now.before.takeHome, 'GBP', 'Take-home a year today'),
+      take_home_after: q(now.after.takeHome, 'GBP', 'Take-home a year on salary sacrifice'),
       take_home_gain: q(now.gain, 'GBP', 'Extra take-home a year'),
       employer_ni_saving: q(now.erSaving, 'GBP', 'Employer NI saved a year'),
       employer_share: q(now.share, 'GBP', 'Extra into your pension from the employer’s saving'),
       pension_total: q(now.con.plus(employerPension).plus(now.share), 'GBP', 'Into your pension a year'),
-      total_gain: q(now.gain.plus(now.share), 'GBP', 'Total gain a year'),
+      total_gain: q(now.gain.plus(now.share).plus(now.chargeSaved), 'GBP', 'Total gain a year'),
+      ...(profileOf(i).studentLoans.length ? { student_loan_saving: q(now.loanSaved, 'GBP', 'Less student loan repaid a year') } : {}),
+      ...(now.chargeSaved.gt(0) ? { child_benefit_charge_saving: q(now.chargeSaved, 'GBP', 'Less Child Benefit charge a year') } : {}),
+      ...(allowance.constraint.outcome === 'caution' ? { annual_allowance: q(allowance.allowance, 'GBP', 'Your pension annual allowance') } : {}),
       take_home_gain_2029: q(later.gain, 'GBP', 'Extra take-home a year from April 2029', true),
       employer_share_2029: q(later.share, 'GBP', 'Employer share from April 2029', true),
       parental_pay_reduction: q(parentalPayReduction, 'GBP', 'Less statutory parental pay over the first six weeks'),
@@ -80,7 +82,7 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
       : undefined,
     leverRanges: leverRanges('contribution_pct', { min: 3, max: 10, step: 1 }, (pct) => {
       const x = at(r, { ...i, contributionPct: pct });
-      return verdictFor(x.gain, meetsNLW(r, x.salary.minus(x.con), i.hoursPerWeek));
+      return verdictFor(x.gain, meetsMinimumWage(r, i, x.salary.minus(x.con)));
     }),
     constraints,
     rulesUsed: r.rulesUsed(),
@@ -95,6 +97,7 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
       },
       { text: `Employer shares ${i.employerSharePct}% of its NI saving`, source: 'company_setting', estimate: false, fact: 'employer_share_pct' },
       { text: 'Figures from April 2029 use today’s tax bands with the salary sacrifice cap applied', source: 'rules', estimate: true },
+      ...profileAssumptions(r, i, { adjustedNetIncome: now.after.adjustedNetIncome, minimumWage: true }),
     ],
   };
 }

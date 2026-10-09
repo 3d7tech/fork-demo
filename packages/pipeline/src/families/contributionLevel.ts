@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num, relief } from './shared';
+import { num, relief, profileFrom } from './shared';
 
 export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
   id: 'pension.how_much_to_contribute',
@@ -7,6 +7,7 @@ export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
   title: 'How much to pay into your pension',
   description: 'How much to pay into your own pension: what each level costs your take-home pay and what it builds. Not for pay near £100,000, which has its own decision',
   module: 'pension.contribution_level',
+  profile: true,
   rulePack: 'uk-2026-27',
   questionSetsLevers: true,
   template: {
@@ -20,6 +21,7 @@ export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
       { id: 'change', label: 'Change my contribution' },
     ],
     constraints: [
+      { id: 'annual_allowance', kind: 'hard', source: 'rules', autoCheck: true },
       {
         id: 'pay_method',
         kind: 'ask',
@@ -50,6 +52,7 @@ export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
   levers: ['chosen_pct'],
   buildInput(f, a, l) {
     return {
+      ...profileFrom(f),
       salary: num(f.salary),
       hoursPerWeek: num(f.hours_per_week),
       currentPct: num(f.contribution_pct),

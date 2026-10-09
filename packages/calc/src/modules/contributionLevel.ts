@@ -1,8 +1,9 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, q, type Rules } from '../core';
-import { employeeNI, incomeTax, meetsNLW, takeHome } from '../uk';
+import { annualAllowanceCheck, profileAssumptions, profileOf, type Profiled } from '../profile';
+import { jobPay, minimumWage, yearlyHours } from '../uk';
 
-export interface ContributionLevelInput {
+export interface ContributionLevelInput extends Profiled {
   salary: number;
   hoursPerWeek: number;
   /** The person's contribution today, % of salary. */
@@ -15,17 +16,15 @@ export interface ContributionLevelInput {
   bySacrifice: boolean;
 }
 
-/** Take-home given up to put `con` (gross) into the pension, for each way of paying. */
+/**
+ * What putting `con` (gross) into the pension costs the person a year, for each way of paying:
+ * the take-home it removes, less any Child Benefit charge it saves.
+ */
 function takeHomeCost(r: Rules, i: ContributionLevelInput, con: Decimal): Decimal {
-  const salary = D(i.salary);
-  if (i.bySacrifice) return takeHome(r, salary).minus(takeHome(r, salary, con));
-  if (i.reliefMethod === 'relief_at_source') {
-    // Paid from take-home pay; the provider adds basic-rate relief on top of what the person pays.
-    return con.times(D(1).minus(r.num('pension.relief_at_source_rate')));
-  }
-  // Net pay: taken before income tax, but National Insurance is still charged on full pay.
-  const taxable = salary.minus(con);
-  return takeHome(r, salary).minus(taxable.minus(incomeTax(r, taxable)).minus(employeeNI(r, salary)));
+  const profile = profileOf(i);
+  const way = i.bySacrifice ? { sacrifice: con } : i.reliefMethod === 'relief_at_source' ? { reliefAtSource: con } : { netPay: con };
+  const net = (x: { takeHome: Decimal; childBenefitCharge: Decimal }) => x.takeHome.minus(x.childBenefitCharge);
+  return net(jobPay(r, { salary: i.salary, profile })).minus(net(jobPay(r, { salary: i.salary, profile, ...way })));
 }
 
 function at(r: Rules, i: ContributionLevelInput, pct: number) {
@@ -43,7 +42,8 @@ export function contributionLevel(r: Rules, i: ContributionLevelInput): CalcResu
   const extraCost = chosen.cost.minus(now.cost);
   // What one more percentage point would do, so the screen answers "should I pay more?" even before the lever moves.
   const plusOne = at(r, i, i.chosenPct + 1);
-  const minWageOk = !i.bySacrifice || meetsNLW(r, D(i.salary).minus(chosen.con), i.hoursPerWeek);
+  const minWageOk = !i.bySacrifice || D(i.salary).minus(chosen.con).div(yearlyHours(i.hoursPerWeek)).gte(minimumWage(r, profileOf(i).age));
+  const allowance = annualAllowanceCheck(r, { ...i, personal: chosen.con, employer: chosen.employer });
 
   return {
     module: 'pension.contribution_level',
@@ -62,9 +62,10 @@ export function contributionLevel(r: Rules, i: ContributionLevelInput): CalcResu
       extra_take_home_cost_monthly: q(extraCost.div(12), 'GBP', 'Change in cost to your take-home a month'),
       one_more_pct_into_pension: q(plusOne.total.minus(chosen.total), 'GBP', 'Each extra 1% adds to your pension a year'),
       one_more_pct_cost_monthly: q(plusOne.cost.minus(chosen.cost).div(12), 'GBP', 'Each extra 1% costs your take-home a month'),
+      ...(allowance.constraint.outcome === 'caution' ? { annual_allowance: q(allowance.allowance, 'GBP', 'Your pension annual allowance') } : {}),
     },
     leverRanges: [],
-    constraints: i.bySacrifice ? [{ id: 'min_wage', outcome: minWageOk ? 'pass' : 'excluded' }] : [],
+    constraints: [...(i.bySacrifice ? [{ id: 'min_wage', outcome: minWageOk ? ('pass' as const) : ('excluded' as const) }] : []), allowance.constraint],
     rulesUsed: r.rulesUsed(),
     assumptions: [
       { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false, fact: 'salary' },
@@ -77,6 +78,7 @@ export function contributionLevel(r: Rules, i: ContributionLevelInput): CalcResu
       ...(i.reliefMethod === 'relief_at_source' && !i.bySacrifice
         ? [{ text: 'Higher-rate taxpayers can claim extra relief through Self Assessment; that is not included', source: 'rules' as const, estimate: false }]
         : []),
+      ...profileAssumptions(r, i, { adjustedNetIncome: jobPay(r, { salary: i.salary, profile: profileOf(i) }).adjustedNetIncome, minimumWage: i.bySacrifice }),
     ],
   };
 }

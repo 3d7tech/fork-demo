@@ -1,8 +1,9 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, leverRanges, q, ZERO, type Rules } from '../core';
-import { incomeTax, takeHome } from '../uk';
+import { profileAssumptions, profileOf, type Profiled } from '../profile';
+import { jobPay } from '../uk';
 
-export interface EvSchemeInput {
+export interface EvSchemeInput extends Profiled {
   salary: number;
   milesPerYear: number;
   homeCharging: boolean;
@@ -23,13 +24,18 @@ function averageBikRate(r: Rules, start: string, years: number): Decimal {
 }
 
 export function evScheme(r: Rules, i: EvSchemeInput): CalcResult {
-  const salary = D(i.salary);
+  const profile = profileOf(i);
   const sacrifice = D(i.scheme.monthlyGross).times(12);
-  // The lease comes out of gross pay, so its real cost is the take-home it removes.
-  const netLease = takeHome(r, salary).minus(takeHome(r, salary.minus(sacrifice)));
   const bikRate = averageBikRate(r, i.scheme.startDate, i.scheme.termYears);
   const bikValue = D(i.scheme.listPrice).times(bikRate);
-  const bikTax = incomeTax(r, salary.minus(sacrifice).plus(bikValue)).minus(incomeTax(r, salary.minus(sacrifice)));
+  // What each step costs the person, net of any change in the Child Benefit charge.
+  const net = (x: { takeHome: Decimal; childBenefitCharge: Decimal }) => x.takeHome.minus(x.childBenefitCharge);
+  const without = jobPay(r, { salary: i.salary, profile });
+  const sacrificed = jobPay(r, { salary: i.salary, otherSacrifice: sacrifice, profile });
+  const withCar = jobPay(r, { salary: i.salary, otherSacrifice: sacrifice, benefitInKind: bikValue, profile });
+  // The lease comes out of gross pay, so its real cost is the take-home it removes.
+  const netLease = net(without).minus(net(sacrificed));
+  const bikTax = net(sacrificed).minus(net(withCar));
 
   const perMilePetrol = D(1).div(i.ownCar.mpg).times(LITRES_PER_GALLON).times(i.ownCar.fuelPerLitre);
   const perMileHome = D(i.charging.homePerKwh).div(i.charging.milesPerKwh);
@@ -79,6 +85,7 @@ export function evScheme(r: Rules, i: EvSchemeInput): CalcResult {
       { text: `Company car tax averaged over ${i.scheme.termYears} tax years from ${i.scheme.startDate}`, source: 'rules', estimate: false },
       { text: `Own car: £${i.ownCar.leaseMonthly} a month lease, £${i.ownCar.insuranceServicing.toLocaleString('en-GB')} insurance and servicing, ${i.ownCar.mpg} mpg at £${i.ownCar.fuelPerLitre.toFixed(2)} a litre`, source: 'estimate', estimate: true },
       { text: `Charging ${Math.round(i.charging.homePerKwh * 100)}p a kWh at home, ${Math.round(i.charging.publicPerKwh * 100)}p public, ${i.charging.milesPerKwh} miles a kWh`, source: 'estimate', estimate: true },
+      ...profileAssumptions(r, i, { adjustedNetIncome: withCar.adjustedNetIncome }),
     ],
   };
 }

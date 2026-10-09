@@ -56,6 +56,9 @@ export class DbFactStore {
           if (pay.pensionPct !== null) add('contribution_pct', Number(pay.pensionPct), 'payroll_export', pay.periodEnd);
         }
         if (!out.some((f) => f.id === 'contribution_pct') && scheme) add('contribution_pct', Number(scheme.employeeDefaultPct), 'pension_scheme', day(scheme.updatedAt));
+        // Age today, for the minimum wage band. From the date of birth in the payroll export.
+        const [person] = await tx.select({ dob: s.employee.dateOfBirth }).from(s.employee).where(eq(s.employee.id, subject.employeeId));
+        if (person?.dob) add('age', ageOn(new Date(person.dob), new Date()), 'payroll_export', day(new Date()));
       }
       // Any fact an owner confirmed from a company document, with where it came from.
       const wanted = new Set(ids.filter((id) => !out.some((f) => f.id === id)));
@@ -92,4 +95,11 @@ function latestPay(tx: Db) {
     .selectDistinctOn([s.payRecord.employeeId], { annualSalary: s.payRecord.annualSalary, hoursPerWeek: s.payRecord.hoursPerWeek, periodEnd: s.payRecord.periodEnd })
     .from(s.payRecord)
     .orderBy(s.payRecord.employeeId, desc(s.payRecord.periodEnd), desc(s.payRecord.createdAt));
+}
+
+/** Whole years between a date of birth and a day. */
+export function ageOn(dob: Date, on: Date): number {
+  const years = on.getUTCFullYear() - dob.getUTCFullYear();
+  const beforeBirthday = on.getUTCMonth() < dob.getUTCMonth() || (on.getUTCMonth() === dob.getUTCMonth() && on.getUTCDate() < dob.getUTCDate());
+  return beforeBirthday ? years - 1 : years;
 }

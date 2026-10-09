@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num, taxYearStart } from './shared';
+import { num, taxYearStart, profileFrom } from './shared';
 
 /**
  * Starting estimates for the person's own car and charging, shown as estimates and changeable.
@@ -14,6 +14,7 @@ export const evScheme: FamilyDef<'benefits.ev_scheme'> = {
   title: 'An electric car through work, or your own car',
   description: 'Whether to get an electric car through the company salary sacrifice scheme or keep running your own car',
   module: 'benefits.ev_scheme',
+  profile: true,
   rulePack: 'uk-2026-27',
   questionSetsLevers: true,
   template: {
@@ -43,6 +44,7 @@ export const evScheme: FamilyDef<'benefits.ev_scheme'> = {
   levers: ['monthly_cost', 'list_price', 'miles_per_year'],
   buildInput(f, a, l) {
     return {
+      ...profileFrom(f),
       salary: num(f.salary),
       milesPerYear: l.miles_per_year ?? 9000,
       homeCharging: a.home_charging !== 'no',

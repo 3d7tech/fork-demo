@@ -1,3 +1,4 @@
+import { profileFrom } from './shared';
 import type { FamilyDef } from './types';
 
 const num = (v: unknown) => {
@@ -11,6 +12,7 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
   title: 'Switching your pension to salary sacrifice',
   description: 'Whether to switch your own pension contributions to salary sacrifice, and what the catches are',
   module: 'pension.ss_switch',
+  profile: true,
   rulePack: 'uk-2026-27',
   template: {
     specVersion: '1.0',
@@ -23,6 +25,7 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
       { id: 'switch', label: 'Switch to salary sacrifice' },
     ],
     constraints: [
+      { id: 'annual_allowance', kind: 'hard', source: 'rules', autoCheck: true },
       { id: 'min_wage', kind: 'hard', source: 'rules', autoCheck: true },
       { id: 'mortgage_12m', kind: 'ask', question: 'Applying for a mortgage in the next 12 months?', effect: 'caution', default: 'no' },
       { id: 'parental_leave_12m', kind: 'ask', question: 'Expecting parental leave in the next 12 months?', effect: 'caution', default: 'no' },
@@ -49,6 +52,7 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
     const method = f.relief_method;
     if (method !== 'relief_at_source' && method !== 'net_pay') throw new Error(`Unknown relief method ${String(method)}`);
     return {
+      ...profileFrom(f),
       salary: num(f.salary),
       contributionPct: l.contribution_pct ?? num(f.contribution_pct),
       reliefMethod: method,

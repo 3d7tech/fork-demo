@@ -1,4 +1,4 @@
-import { askFork, DEMO_FACTS, DEMO_SUBJECT, DemoModels, FAMILIES, recalculate, reexplain, type DecisionScreen } from '@fork/pipeline';
+import { askFork, DEMO_FACTS, DEMO_SUBJECT, DemoModels, FAMILIES, factIds, recalculate, reexplain, type DecisionScreen } from '@fork/pipeline';
 import { loadRegistry, MemoryLogger } from '@fork/models';
 import { BuildingSteps, DecisionScreenView, MessageCard } from '@fork/ui';
 
@@ -11,7 +11,7 @@ export default async function Preview() {
 
   const base = (await ask('is salary sacrifice worth it or is there a catch')) as DecisionScreen;
   const family = FAMILIES[base.family]!;
-  const facts = await DEMO_FACTS.get(DEMO_SUBJECT, family.facts.map((f) => f.id));
+  const facts = await DEMO_FACTS.get(DEMO_SUBJECT, factIds(family));
   const caution = await reexplain(deps, base, recalculate(base, facts, { answers: { mortgage_12m: 'yes' } }));
   const messages = await Promise.all(['where is my p60', 'which fund should I pick', 'can’t afford rent this month', 'should I buy extra holiday'].map(ask));
 

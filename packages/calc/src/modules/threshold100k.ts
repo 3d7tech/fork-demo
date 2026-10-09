@@ -1,8 +1,9 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, leverRanges, max, q, type Rules } from '../core';
-import { takeHome } from '../uk';
+import { annualAllowanceCheck, profileAssumptions, profileOf, type Profiled } from '../profile';
+import { jobPay } from '../uk';
 
-export interface Threshold100kInput {
+export interface Threshold100kInput extends Profiled {
   salary: number;
   /** Pension contribution already made by salary sacrifice, as a percentage of salary. */
   sacrificePct: number;
@@ -15,11 +16,12 @@ export interface Threshold100kInput {
 function at(r: Rules, i: Threshold100kInput, extra: Decimal | number) {
   const salary = D(i.salary);
   const sacrifice = salary.times(i.sacrificePct).div(100).plus(extra);
-  // Adjusted net income: salary less salary-sacrificed pension (no other income or relief assumed).
-  const ani = salary.minus(sacrifice);
+  // Adjusted net income includes variable pay and other income from the person's profile.
+  const job = jobPay(r, { salary, sacrifice, profile: profileOf(i) });
+  const ani = job.adjustedNetIncome;
   const limit = r.num('tax_free_childcare.income_limit');
   const childcare = ani.lte(limit) ? r.num('tax_free_childcare.max_per_child').times(i.childrenUsingTaxFreeChildcare) : D(0);
-  return { ani, takeHome: takeHome(r, salary, sacrifice), childcare, sacrifice };
+  return { ani, takeHome: job.takeHome, childcare, sacrifice };
 }
 
 export function threshold100k(r: Rules, i: Threshold100kInput): CalcResult {
@@ -52,12 +54,13 @@ export function threshold100k(r: Rules, i: Threshold100kInput): CalcResult {
     },
     tippingPoint: { description: 'Above this the personal allowance tapers and Tax-Free Childcare stops', measure: 'adjusted_net_income', at: limit.toNumber(), unit: 'GBP' },
     leverRanges: leverRanges('extra_sacrifice', { min: 0, max: 15000, step: 100 }, (x) => verdictFor(at(r, i, x).ani)),
-    constraints: [],
+    constraints: [annualAllowanceCheck(r, { ...i, personal: choice.sacrifice, employer: D(i.salary).times(i.employerContributionPct).div(100) }).constraint],
     rulesUsed: r.rulesUsed(),
     assumptions: [
       { text: `Pay £${i.salary.toLocaleString('en-GB')}, ${i.sacrificePct}% pension by salary sacrifice`, source: 'payroll_export', estimate: false },
-      { text: 'No other income, gift aid or pension contributions outside payroll', source: 'user_answer', estimate: true },
+      { text: 'No gift aid, and no pension contributions outside payroll', source: 'estimate', estimate: true },
       { text: `${i.childrenUsingTaxFreeChildcare} children using Tax-Free Childcare, each at the yearly maximum`, source: 'user_answer', estimate: false },
+      ...profileAssumptions(r, i, { adjustedNetIncome: choice.ani }),
     ],
   };
 }

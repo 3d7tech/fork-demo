@@ -4,7 +4,7 @@
 // The job lists who to act for with the owner connection (ids only), then reads and writes each
 // person's data as that person, so row-level security still decides what it can see.
 import { asAdmin, schema as s, type ForkDatabase, type RequestContext } from '@fork/db';
-import { FAMILIES, formatGBP, formatPct, recalculate, type DecisionScreen, type Subject } from '@fork/pipeline';
+import { FAMILIES, factIds, formatGBP, formatPct, recalculate, type DecisionScreen, type Subject } from '@fork/pipeline';
 import { DbFactStore, GROUP_SIZE, listSaved, loadRun, markChecked, ownerDashboard, sendMail, setupProgress } from '@fork/setup';
 import { desc, eq, sql } from 'drizzle-orm';
 
@@ -75,8 +75,8 @@ export async function recheckSaved(deps: JobDeps, m: Member): Promise<number> {
     const screen = await loadRun<DecisionScreen>(deps.db, ctx, saved.runId);
     const family = screen?.kind === 'decision' ? FAMILIES[screen.family] : undefined;
     if (!screen || !family) continue;
-    const facts = await store.get(subject, family.facts.map((f) => f.id));
-    if (facts.length < family.facts.length) {
+    const facts = await store.get(subject, factIds(family));
+    if (family.facts.some((d) => !facts.some((f) => f.id === d.id))) {
       await markChecked(deps.db, ctx, saved.id, null);
       continue;
     }

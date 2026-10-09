@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num } from './shared';
+import { num, profileFrom } from './shared';
 
 const CHILDREN: Record<string, number> = { none: 0, one: 1, two: 2, three: 3 };
 
@@ -9,6 +9,7 @@ export const threshold100k: FamilyDef<'pay.threshold_100k'> = {
   title: 'Earning around £100,000',
   description: 'For anyone earning around or over £100,000: whether to put more into the pension to keep the personal allowance and Tax-Free Childcare. Use this whenever pay near £100,000 is mentioned',
   module: 'pay.threshold_100k',
+  profile: true,
   rulePack: 'uk-2026-27',
   template: {
     specVersion: '1.0',
@@ -21,6 +22,7 @@ export const threshold100k: FamilyDef<'pay.threshold_100k'> = {
       { id: 'sacrifice_more', label: 'Put more into my pension' },
     ],
     constraints: [
+      { id: 'annual_allowance', kind: 'hard', source: 'rules', autoCheck: true },
       {
         id: 'children',
         kind: 'ask',
@@ -52,6 +54,7 @@ export const threshold100k: FamilyDef<'pay.threshold_100k'> = {
   levers: ['extra_sacrifice'],
   buildInput(f, a, l) {
     return {
+      ...profileFrom(f),
       salary: num(f.salary),
       sacrificePct: num(f.contribution_pct),
       extraSacrifice: l.extra_sacrifice ?? 0,

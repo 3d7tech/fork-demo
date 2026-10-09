@@ -184,7 +184,7 @@ export const ScreenCopy = z.object({
   why: z.string().min(1).max(400),
   tippingPoint: z.string().max(260).nullable(),
   /** Plain-English assumptions, each tied to a source. */
-  assumptions: z.array(z.object({ text: z.string().min(1), source: z.string().min(1) })).max(8),
+  assumptions: z.array(z.object({ text: z.string().min(1), source: z.string().min(1) })).max(10),
   actionLabel: z.string().max(60).nullable(),
 });
 export type ScreenCopy = z.infer<typeof ScreenCopy>;

@@ -1,6 +1,6 @@
 import 'server-only';
 import { AnthropicProvider, anthropicApiKey, JsonLinesLogger, loadRegistry } from '@fork/models';
-import { DEMO_FACTS, DemoModels, FAMILIES, gatherData, type DecisionScreen, type FactStore, type ForkAnswer, type PipelineDeps, type Subject } from '@fork/pipeline';
+import { DEMO_FACTS, DemoModels, FAMILIES, factIds, gatherData, type DecisionScreen, type FactStore, type ForkAnswer, type PipelineDeps, type Subject } from '@fork/pipeline';
 import { answerLookup, DbFactStore, loadRun, recordRun, updateRun } from '@fork/setup';
 import { runRole } from '@fork/models';
 import { database } from './db';
@@ -72,5 +72,5 @@ export async function loadScreen(who: Asker, runId: string): Promise<DecisionScr
 
 export async function factsFor(deps: PipelineDeps, subject: Subject, screen: DecisionScreen) {
   const family = FAMILIES[screen.family]!;
-  return { facts: await deps.facts.get(subject, family.facts.map((f) => f.id)), data: await gatherData(deps, family, subject) };
+  return { facts: await deps.facts.get(subject, factIds(family)), data: await gatherData(deps, family, subject) };
 }

@@ -129,7 +129,8 @@ describe('spec and layout safeguards', () => {
     const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
     expect(models.calls.filter((c) => c.role === 'spec_writer')).toHaveLength(1);
     expect(s.spec.levers.map((l) => l.id)).toEqual(['contribution_pct']);
-    expect(s.spec.constraints.map((c) => c.id)).toEqual(['min_wage', 'mortgage_12m', 'parental_leave_12m']);
+    // Every automatic check from the reviewed template is put back.
+    expect(s.spec.constraints.map((c) => c.id).sort()).toEqual(['annual_allowance', 'min_wage', 'mortgage_12m', 'parental_leave_12m']);
     expect(s.checks.fallbacks.join(' ')).toContain('dropped lever bonus_amount, question buying_a_car');
   });
 

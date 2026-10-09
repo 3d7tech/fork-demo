@@ -44,6 +44,8 @@ export interface FamilyDef<M extends ModuleId = ModuleId> {
   answers: Record<string, string>;
   /** Lever ids the module understands. */
   levers: string[];
+  /** Uses the person's tax profile (ADR 0010): its facts are fetched too, and are optional. */
+  profile?: boolean;
   /** Data beyond single facts that this family's module needs. */
   needs?: Array<keyof FamilyData>;
   /**

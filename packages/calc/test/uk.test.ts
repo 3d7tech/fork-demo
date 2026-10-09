@@ -232,3 +232,42 @@ describe('take-home from a job, with the whole profile', () => {
     expect(n(uk.jobPay(r, { salary: 30000, profile: P({ region: 'scotland' }) }).incomeTax)).toBeCloseTo(3451.07, 6);
   });
 });
+
+describe('switching to salary sacrifice with a tax profile', () => {
+  const ella = { salary: 32000, contributionPct: 5, reliefMethod: 'relief_at_source' as const, employerSharePct: 50, employerContributionPct: 3, hoursPerWeek: 37.5 };
+
+  it('a Scottish taxpayer repaying a Plan 2 loan gains £288, not £128', () => {
+    // Today (relief at source): Scottish tax on 19,430 taxable = 3,871.07; NI 1,554.40; loan 2,615 × 9% = 235.35;
+    // pays 1,280 net into the pension. Take-home 25,059.18.
+    // Sacrifice: pay 30,400. Tax 3,535.07; NI 1,426.40; loan 1,015 × 9% = 91.35. Take-home 25,347.18.
+    // Gain 288: 1,600 relieved at 21% not 20% (16), NI 128, loan 144.
+    const res = runModule('pension.ss_switch', 'uk-2026-27', { ...ella, profile: P({ region: 'scotland', studentLoans: ['plan_2'] }), assumed: [] });
+    expect(res.outputs.take_home_before!.value).toBeCloseTo(25059.18, 6);
+    expect(res.outputs.take_home_after!.value).toBeCloseTo(25347.18, 6);
+    expect(res.outputs.take_home_gain!.value).toBeCloseTo(288, 6);
+    expect(res.outputs.student_loan_saving!.value).toBeCloseTo(144, 6);
+    expect(res.assumptions.map((a) => a.text)).toEqual(expect.arrayContaining(['Scottish income tax rates', 'Repaying Plan 2 through payroll']));
+    expect(res.assumptions.find((a) => a.text === 'Scottish income tax rates')).toMatchObject({ fact: 'tax_region', estimate: false });
+  });
+
+  it('without a profile, the defaults are listed as estimates', () => {
+    const res = runModule('pension.ss_switch', 'uk-2026-27', ella);
+    expect(res.outputs.take_home_gain!.value).toBeCloseTo(128, 6);
+    expect(res.assumptions.filter((a) => a.source === 'estimate').map((a) => a.text)).toEqual(
+      expect.arrayContaining(['Income tax rates for England, Wales and Northern Ireland', 'No student loan to repay', 'No overtime, commission or income outside this job', 'Minimum wage checked at the rate for 21 and over']),
+    );
+  });
+
+  it('savings over the annual allowance make the switch a caution', () => {
+    const res = runModule('pension.ss_switch', 'uk-2026-27', { ...ella, salary: 150000, contributionPct: 10, profile: P({ otherPensionSavings: 40000 }), assumed: [] });
+    expect(res.constraints).toContainEqual({ id: 'annual_allowance', outcome: 'caution' });
+    expect(res.verdict).toBe('switch_with_caution');
+    expect(res.outputs.annual_allowance!.value).toBe(60000);
+  });
+
+  it('a 19-year-old is checked against the 18 to 20 rate', () => {
+    // £21,000 at 37.5 hours, 5% sacrificed: £19,950 / 1,950 hours = £10.23, under £10.85.
+    const young = { ...ella, salary: 21000, profile: P({ age: 19 }), assumed: [] };
+    expect(runModule('pension.ss_switch', 'uk-2026-27', young).constraints).toContainEqual({ id: 'min_wage', outcome: 'excluded' });
+  });
+});

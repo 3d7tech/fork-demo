@@ -29,6 +29,11 @@ const HARD_TEXT: Record<'employee' | 'owner', Record<string, Partial<Record<Hard
       pass: 'Checked automatically: your pay stays above the minimum wage.',
       excluded: 'Salary sacrifice would take your pay below the minimum wage, so it isn’t available to you.',
     },
+    // Shown only when it bites: most people are nowhere near the allowance.
+    annual_allowance: {
+      caution:
+        'This would take your pension savings this year over your annual allowance, which means a tax charge unless you have unused allowance from the last three years. Talk to a financial adviser before going ahead.',
+    },
   },
   owner: {
     min_wage: {

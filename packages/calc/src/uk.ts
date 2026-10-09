@@ -178,6 +178,10 @@ export interface JobPayInput {
   netPay?: Num;
   /** Pension paid by relief at source a year, gross: the person pays it less basic-rate relief, from take-home pay. */
   reliefAtSource?: Num;
+  /** A non-pension salary sacrifice a year (a bike, a car): free of tax, NI and student loan, with no 2029 cap. */
+  otherSacrifice?: Num;
+  /** A taxable benefit in kind a year, such as a company car: income tax, but no employee NI. */
+  benefitInKind?: Num;
   profile: TaxProfile;
 }
 
@@ -207,11 +211,12 @@ export function jobPay(r: Rules, i: JobPayInput): JobPay {
   const sacrifice = D(i.sacrifice ?? 0);
   const netPay = D(i.netPay ?? 0);
   const ras = D(i.reliefAtSource ?? 0);
-  const gross = D(i.salary).plus(p.variablePay);
+  const otherSacrifice = D(i.otherSacrifice ?? 0);
+  const gross = D(i.salary).plus(p.variablePay).minus(otherSacrifice);
   const pay = gross.minus(sacrifice);
   const niable = niablePay(r, gross, sacrifice);
   const other = D(p.otherIncome);
-  const taxable = pay.minus(netPay).plus(other);
+  const taxable = pay.minus(netPay).plus(other).plus(i.benefitInKind ?? 0);
   const ani = taxable.minus(ras);
   const tax = incomeTax(r, taxable, p.region, ani).minus(other.gt(0) ? incomeTax(r, other, p.region, other) : ZERO);
   const ni = employeeNI(r, niable);

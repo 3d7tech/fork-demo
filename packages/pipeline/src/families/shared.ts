@@ -1,3 +1,4 @@
+import { uk } from '@fork/calc';
 import type { Fact } from '@fork/spec';
 
 export const num = (v: unknown, what = 'value'): number => {
@@ -21,4 +22,49 @@ export function taxYearStart(today = new Date()): string {
   const y = today.getUTCFullYear();
   const april6 = Date.UTC(y, 3, 6);
   return `${today.getTime() >= april6 ? y : y - 1}-04-06`;
+}
+
+/**
+ * The person's tax profile facts (ADR 0010). Optional: any that are missing take the default,
+ * and the module lists each default as an assumption on screen.
+ */
+export const PROFILE_FACTS = [
+  'tax_region',
+  'student_loans',
+  'variable_pay',
+  'other_income',
+  'child_benefit_children',
+  'higher_earner',
+  'other_pension_savings',
+  'flexibly_accessed',
+  'age',
+] as const;
+
+const PLANS: uk.StudentLoanPlan[] = ['plan_1', 'plan_2', 'plan_4', 'plan_5', 'postgraduate'];
+
+/** Build the module's profile from whatever profile facts are known. */
+export function profileFrom(f: Record<string, Fact['value']>): { profile: uk.TaxProfile; assumed: Array<keyof uk.TaxProfile> } {
+  const d = uk.DEFAULT_PROFILE;
+  const assumed: Array<keyof uk.TaxProfile> = [];
+  const pick = <K extends keyof uk.TaxProfile>(key: K, fact: string, read: (v: Fact['value']) => uk.TaxProfile[K] | undefined): uk.TaxProfile[K] => {
+    const v = f[fact] === undefined ? undefined : read(f[fact]!);
+    if (v === undefined) assumed.push(key);
+    return v ?? d[key];
+  };
+  const number = (v: Fact['value']) => (typeof v === 'number' && v >= 0 ? v : undefined);
+  const yes = (v: Fact['value']) => (typeof v === 'boolean' ? v : v === 'yes' ? true : v === 'no' ? false : undefined);
+  const profile: uk.TaxProfile = {
+    region: pick('region', 'tax_region', (v) => (v === 'scotland' || v === 'rest_of_uk' ? v : undefined)),
+    studentLoans: pick('studentLoans', 'student_loans', (v) =>
+      typeof v === 'string' ? (v.split(',').map((x) => x.trim()).filter((x) => PLANS.includes(x as uk.StudentLoanPlan)) as uk.StudentLoanPlan[]) : undefined,
+    ),
+    variablePay: pick('variablePay', 'variable_pay', number),
+    otherIncome: pick('otherIncome', 'other_income', number),
+    childBenefitChildren: pick('childBenefitChildren', 'child_benefit_children', number),
+    higherEarner: pick('higherEarner', 'higher_earner', yes),
+    otherPensionSavings: pick('otherPensionSavings', 'other_pension_savings', number),
+    flexiblyAccessed: pick('flexiblyAccessed', 'flexibly_accessed', yes),
+    age: pick('age', 'age', number),
+  };
+  return { profile, assumed };
 }

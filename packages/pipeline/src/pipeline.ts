@@ -4,7 +4,7 @@ import { CalcResult, DecisionSpec, ScreenLayout, type Fact, type ScreenCopy, typ
 import { checkCopy } from './checks';
 import { guard } from './guards';
 import { sweepLever, type LeverSweep } from './sweep';
-import { FAMILIES, familiesFor, type FamilyData, type FamilyDef } from './families';
+import { FAMILIES, factIds, familiesFor, type FamilyData, type FamilyDef } from './families';
 import type { FactStore, Subject } from './facts';
 import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
 import { withStatedPay } from './stated';
@@ -347,7 +347,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     if (route.confidence === 'low') return clarify(family.description);
     step({ id: 'understood', label: 'Understood the question', detail: family.description });
 
-    const facts = await deps.facts.get(input.subject, family.facts.map((f) => f.id));
+    const facts = await deps.facts.get(input.subject, factIds(family));
     const missing = family.facts.filter((d) => !facts.some((f) => f.id === d.id));
     if (missing.length) return needsFacts(missing.map((m) => m.label));
     step({ id: 'facts', label: family.steps.facts });

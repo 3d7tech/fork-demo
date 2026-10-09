@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { floorFor, num } from './shared';
+import { floorFor, num, profileFrom } from './shared';
 
 export const cycleToWork: FamilyDef<'benefits.cycle_to_work'> = {
   id: 'benefits.cycle_to_work',
@@ -7,6 +7,7 @@ export const cycleToWork: FamilyDef<'benefits.cycle_to_work'> = {
   title: 'A bike through the cycle to work scheme',
   description: 'Whether to get a bike through the company cycle to work scheme (salary sacrifice) or buy it outright, and what it saves',
   module: 'benefits.cycle_to_work',
+  profile: true,
   rulePack: 'uk-2026-27',
   questionSetsLevers: true,
   template: {
@@ -36,6 +37,7 @@ export const cycleToWork: FamilyDef<'benefits.cycle_to_work'> = {
   levers: ['bike_price'],
   buildInput(f, _a, l) {
     return {
+      ...profileFrom(f),
       salary: num(f.salary),
       hoursPerWeek: num(f.hours_per_week),
       bikePrice: l.bike_price ?? 1000,
