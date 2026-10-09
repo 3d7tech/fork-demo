@@ -50,7 +50,8 @@ export interface DecisionScreen {
     /** Places Fork fell back to the family's own spec or layout. */
     fallbacks: string[];
   };
-  provenance: { rulePack: CalcResult['rulePack']; roles: RoleUseRecord[] };
+  /** specFrom: the family's reviewed template, or a spec the spec writer wrote for this question. */
+  provenance: { rulePack: CalcResult['rulePack']; roles: RoleUseRecord[]; specFrom: 'template' | 'spec_writer' };
 }
 
 export type ForkAnswer = DecisionScreen | ForkMessage;
@@ -268,7 +269,12 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     if (missing.length) return needsFacts(missing.map((m) => m.label));
     step({ id: 'facts', label: family.steps.facts });
 
-    let spec = await writeSpec(t, family, question, facts);
+    // A confident route to a family with a reviewed template needs no spec writer: the template
+    // already fits, and skipping the strongest (slowest) model saves most of the wait (ADR 0005).
+    // The spec writer still runs when the route is less certain, or when the verifier asks for
+    // a missing option or constraint.
+    let specFrom: 'template' | 'spec_writer' = route.confidence === 'high' ? 'template' : 'spec_writer';
+    let spec = specFrom === 'template' ? DecisionSpec.parse({ ...family.template, question, facts }) : await writeSpec(t, family, question, facts);
     step({ id: 'spec', label: family.steps.checks });
     let answers = defaultAnswers(family, spec);
     let calc = calculate(family, facts, answers, {});
@@ -297,7 +303,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
           copy,
           visual: visualFor(family, calc, numbers),
           checks: { code: v.code, verifier: v.verifier, revised: t.revised, fallbacks: t.fallbacks },
-          provenance: { rulePack: calc.rulePack, roles: t.roles },
+          provenance: { rulePack: calc.rulePack, roles: t.roles, specFrom },
         };
       }
       if (round === 1 || v.verifier.issues.some((i) => i.sendBackTo === 'human')) break;
@@ -310,6 +316,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
 
       if (toSpec.length) {
         spec = await writeSpec(t, family, question, facts, toSpec);
+        specFrom = 'spec_writer';
         answers = defaultAnswers(family, spec);
         calc = calculate(family, facts, answers, {});
         numbers = screenNumbers(family, calc, facts);

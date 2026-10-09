@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { askFork, recalculate, reexplain, type BuildStep, type DecisionScreen } from '../src';
 import { deps, ELLA, facts, good, QUESTION } from './helpers';
 
+/** A less certain route, so the spec writer runs. */
+const unsure = { ...good, router: () => ({ ...good.router(), confidence: 'medium' as const }) };
+
 const display = (s: DecisionScreen, key: string) => s.numbers.find((n) => n.key === key)?.display;
 const asScreen = (a: unknown) => {
   expect(a).toMatchObject({ kind: 'decision' });
@@ -21,9 +24,19 @@ describe('golden end to end: employee switches to salary sacrifice', () => {
     expect(s.copy.verdict).toContain('£128');
     expect(s.checks.code).toEqual([]);
     expect(steps.map((x) => x.id)).toEqual(['understood', 'facts', 'spec', 'calc', 'screen', 'checked']);
-    expect(models.rolesCalled().sort()).toEqual(['explainer', 'router', 'screen_composer', 'spec_writer', 'verifier']);
+    // A confident route uses the family's reviewed template, so the spec writer isn't needed.
+    expect(models.rolesCalled().sort()).toEqual(['explainer', 'router', 'screen_composer', 'verifier']);
+    expect(s.provenance.specFrom).toBe('template');
     expect(s.provenance.rulePack.id).toBe('uk-2026-27');
-    expect(s.provenance.roles.map((r) => r.promptVersion)).toEqual(['v1', 'v1', 'v1', 'v2', 'v2']);
+    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v2', 'router:v1', 'screen_composer:v1', 'verifier:v2']);
+  });
+
+  it('a less certain route has the spec writer write the spec', async () => {
+    const { deps: d, models } = deps(unsure);
+    const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
+    expect(models.rolesCalled()).toContain('spec_writer');
+    expect(s.provenance.specFrom).toBe('spec_writer');
+    expect(display(s, 'take_home_gain')).toBe('£128');
   });
 
   it('the router never sees pay; the explainer sees only formatted numbers', async () => {
@@ -36,7 +49,7 @@ describe('golden end to end: employee switches to salary sacrifice', () => {
   });
 
   it('code owns the facts: a spec writer that changes pay is overruled', async () => {
-    const { deps: d } = deps({ ...good, spec_writer: (i) => ({ ...i.template, facts: [{ id: 'salary', value: 50000, source: 'user_answer' }] }) });
+    const { deps: d } = deps({ ...unsure, spec_writer: (i) => ({ ...i.template, facts: [{ id: 'salary', value: 50000, source: 'user_answer' }] }) });
     const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
     expect(s.spec.facts.find((f) => f.id === 'salary')).toMatchObject({ value: 32000, source: 'payroll_export' });
     expect(display(s, 'take_home_gain')).toBe('£128');
@@ -54,7 +67,7 @@ describe('numbers the engine did not produce are blocked', () => {
     const retry = models.calls.filter((c) => c.role === 'explainer')[1]!.input;
     expect(retry.feedback.join(' ')).toContain('£150');
     // The spec is not rewritten when only the wording was wrong.
-    expect(models.calls.filter((c) => c.role === 'spec_writer')).toHaveLength(1);
+    expect(models.calls.filter((c) => c.role === 'spec_writer')).toHaveLength(0);
   });
 
   it('a screen that keeps quoting an invented number is never shown', async () => {
@@ -79,7 +92,7 @@ describe('the model verifier', () => {
       verifier: (_i, call) => (call === 0 ? { pass: false, issues: [{ kind: 'constraint', detail: 'Ask about parental leave', sendBackTo: 'spec_writer' }] } : { pass: true, issues: [] }),
     });
     asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
-    expect(models.calls.filter((c) => c.role === 'spec_writer')[1]!.input.feedback).toEqual(['constraint: Ask about parental leave']);
+    expect(models.calls.filter((c) => c.role === 'spec_writer')[0]!.input.feedback).toEqual(['constraint: Ask about parental leave']);
     expect(models.calls.filter((c) => c.role === 'explainer')).toHaveLength(2);
   });
 
@@ -96,7 +109,7 @@ describe('spec and layout safeguards', () => {
       levers: [{ id: 'bonus_amount', label: 'Bonus', min: 0, max: 1, step: 1, default: 0 }],
       constraints: [...i.template.constraints.filter((c: any) => c.id !== 'min_wage'), { id: 'buying_a_car', kind: 'ask', question: 'Buying a car?', effect: 'caution' }],
     });
-    const { deps: d, models } = deps({ ...good, spec_writer: (i) => bad(i) });
+    const { deps: d, models } = deps({ ...unsure, spec_writer: (i) => bad(i) });
     const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
     expect(models.calls.filter((c) => c.role === 'spec_writer')).toHaveLength(1);
     expect(s.spec.levers.map((l) => l.id)).toEqual(['contribution_pct']);
@@ -105,7 +118,7 @@ describe('spec and layout safeguards', () => {
   });
 
   it('a wrong calculation module is put right in code', async () => {
-    const { deps: d, models } = deps({ ...good, spec_writer: (i) => ({ ...i.template, calculation: { module: 'pay.threshold_100k', rulePack: 'uk-2026-27' } }) });
+    const { deps: d, models } = deps({ ...unsure, spec_writer: (i) => ({ ...i.template, calculation: { module: 'pay.threshold_100k', rulePack: 'uk-2026-27' } }) });
     const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
     expect(s.spec.calculation?.module).toBe('pension.ss_switch');
     expect(models.calls.filter((c) => c.role === 'spec_writer')).toHaveLength(1);
@@ -113,7 +126,7 @@ describe('spec and layout safeguards', () => {
 
   it('an invalid spec is retried with feedback, then falls back to the reviewed template', async () => {
     const broken = (i: any) => ({ ...i.template, levers: [{ ...i.template.levers[0], default: 'fact:bonus_pct' }] });
-    const { deps: d, models } = deps({ ...good, spec_writer: (i) => broken(i) });
+    const { deps: d, models } = deps({ ...unsure, spec_writer: (i) => broken(i) });
     const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
     const calls = models.calls.filter((c) => c.role === 'spec_writer');
     expect(calls).toHaveLength(2);

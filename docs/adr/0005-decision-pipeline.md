@@ -33,3 +33,8 @@ A family (`packages/pipeline/src/families`) declares its router description, spe
 - Verifier prompt v2 blocks only what could mislead or harm (wrong numbers, wrong sources, advice, a `caution` constraint left out, not answering the question). It no longer blocks on style, conditional wording or adviser wording, which the screen's fixed guidance note now covers.
 - Explainer prompt v2 names each assumption's real source and writes no digits that aren't in `numbers` (it had written "12 months").
 - Engine: the 2029 figures are now marked as estimates, and the contribution rate is credited to the pension scheme, not payroll.
+
+## Template first (2026-10-09)
+
+- When the router is confident (`high`), the family's reviewed template becomes the spec directly and the spec writer doesn't run. It still runs when the route is less certain, and whenever the verifier sends back a missing option or constraint. `provenance.specFrom` records which.
+- Measured live: 9.4 to 10.5 seconds for the salary sacrifice question (was 17 to 30), about 3p a question.
