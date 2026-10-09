@@ -2,10 +2,10 @@ import { runModule, type ModuleId } from '@fork/calc';
 import { RoleFailedError, runRole, type RoleContext, type RoleId, type RoleOutput } from '@fork/models';
 import { CalcResult, DecisionSpec, ScreenLayout, type Fact, type ScreenCopy, type VisualData } from '@fork/spec';
 import { checkCopy } from './checks';
-import { FAMILIES, familiesFor, type FamilyDef } from './families';
+import { FAMILIES, familiesFor, type FamilyData, type FamilyDef } from './families';
 import type { FactStore, Subject } from './facts';
-import { formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
-import { BLOCKED, clarify, DISTRESS, failed, HUMAN, LOOKUP_UNKNOWN, needsFacts, NOT_SUPPORTED, type ForkMessage } from './messages';
+import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
+import { BLOCKED, clarify, DISTRESS, failed, HUMAN, LOOKUP_UNKNOWN, needsFacts, notYet, type ForkMessage } from './messages';
 
 export interface PipelineDeps {
   roles: RoleContext;
@@ -86,12 +86,32 @@ function factDisplay(family: FamilyDef, f: Fact): ScreenNumber | null {
 }
 
 /** The complete list of numbers the explainer may quote: engine outputs, the facts used, and the tipping point. */
-export function screenNumbers(family: FamilyDef, calc: CalcResult, facts: Fact[]): ScreenNumber[] {
+export function screenNumbers(family: FamilyDef, calc: CalcResult, facts: Fact[], spec?: DecisionSpec, levers: Record<string, number> = {}): ScreenNumber[] {
   const out: ScreenNumber[] = Object.entries(calc.outputs).map(([key, o]) => ({ key, label: o.label, display: formatQuantity(o), estimate: o.estimate }));
   for (const f of facts) {
     const n = factDisplay(family, f);
     if (n) out.push(n);
   }
+  // The values the levers are set to: the person's own choices, which the copy may repeat.
+  if (spec) {
+    const values = leverValues(spec, facts, levers);
+    for (const l of spec.levers) {
+      const v = values[l.id];
+      if (v === undefined) continue;
+      const unit = l.unit === 'GBP' ? 'GBP' : l.unit === 'pct' ? 'pct' : l.unit === 'miles' ? 'miles' : 'count';
+      out.push({ key: `lever.${l.id}`, label: l.label, display: formatQuantity({ value: v, unit }), estimate: false });
+    }
+  }
+  // Numbers written by code in the engine's own labels and assumptions ("Each extra 1%",
+  // "£430 a month lease", "from April 2029") may be quoted as written. They are never model-made.
+  const fromText = (text: string, label: string, estimate: boolean) => {
+    for (const tok of extractNumbers(text)) {
+      if (out.some((n) => n.display === tok.raw)) continue;
+      out.push({ key: `text.${out.length}`, label: `As written in “${label}”`, display: tok.raw, estimate });
+    }
+  };
+  for (const o of Object.values(calc.outputs)) fromText(o.label, o.label, false);
+  for (const a of calc.assumptions) fromText(a.text, a.text, a.estimate);
   // Official rule values (rates, thresholds) may be quoted too: "you don't pay 8% National Insurance".
   const seen = new Set(out.map((n) => n.display));
   for (const r of calc.rulesUsed) {
@@ -172,6 +192,20 @@ async function writeSpec(t: Trace, family: FamilyDef, question: string, facts: F
   return DecisionSpec.parse({ ...template, facts });
 }
 
+/**
+ * Start levers from numbers in the question ("a £1,500 bonus", "someone on 40k"). A small model
+ * reads them; code keeps only levers the spec has, within range and on a step.
+ */
+async function readLevers(t: Trace, spec: DecisionSpec, question: string): Promise<DecisionSpec> {
+  const out = await t.run('lever_reader', { question, levers: spec.levers.map((l) => ({ id: l.id, label: l.label, unit: l.unit ?? 'count', min: l.min, max: l.max })) });
+  const levers = spec.levers.map((l) => {
+    const v = out.values.find((x) => x.id === l.id)?.value;
+    if (v === undefined || v === null || !Number.isFinite(v) || v < l.min || v > l.max) return l;
+    return { ...l, default: Math.round((v - l.min) / l.step) * l.step + l.min };
+  });
+  return DecisionSpec.parse({ ...spec, levers });
+}
+
 // ---------- Layout ----------
 
 function layoutProblems(layout: ScreenLayout, spec: DecisionSpec, calc: CalcResult): string[] {
@@ -229,8 +263,29 @@ function factValues(facts: Fact[]): Record<string, Fact['value']> {
   return Object.fromEntries(facts.map((f) => [f.id, f.value]));
 }
 
-function calculate(family: FamilyDef, facts: Fact[], answers: Record<string, string>, levers: Record<string, number>): CalcResult {
-  return runModule(family.module as ModuleId, family.rulePack, family.buildInput(factValues(facts), answers, levers) as never);
+/** Lever values in use: what the person chose, else the spec's default (a number or a fact). */
+export function leverValues(spec: DecisionSpec, facts: Fact[], chosen: Record<string, number>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const l of spec.levers) {
+    if (l.id in chosen) out[l.id] = chosen[l.id]!;
+    else if (typeof l.default === 'number') out[l.id] = l.default;
+    else {
+      const f = facts.find((x) => x.id === l.default.toString().slice(5));
+      if (typeof f?.value === 'number') out[l.id] = f.value;
+    }
+  }
+  return out;
+}
+
+function calculate(family: FamilyDef, spec: DecisionSpec, facts: Fact[], answers: Record<string, string>, levers: Record<string, number>, data: FamilyData): CalcResult {
+  return runModule(family.module as ModuleId, family.rulePack, family.buildInput(factValues(facts), answers, leverValues(spec, facts, levers), data) as never);
+}
+
+/** Data beyond single facts, for families that need it. Read by code; never sent to a model. */
+export async function gatherData(deps: Pick<PipelineDeps, 'facts'>, family: FamilyDef, subject: Subject): Promise<FamilyData> {
+  const data: FamilyData = {};
+  if (family.needs?.includes('payrollRows') && deps.facts.payrollRows) data.payrollRows = await deps.facts.payrollRows(subject);
+  return data;
 }
 
 /** The answers used before the person picks: the spec's own defaults where given, else the family's. */
@@ -260,7 +315,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     if (route.route === 'human') return HUMAN;
     if (route.route === 'lookup') return (await deps.lookup?.(question, input.subject)) ?? LOOKUP_UNKNOWN;
     const family = route.family ? FAMILIES[route.family] : undefined;
-    if (route.route === 'not_supported' || !family || family.audience !== audience) return NOT_SUPPORTED;
+    if (route.route === 'not_supported' || !family || family.audience !== audience) return notYet(families.map((f) => f.title));
     if (route.confidence === 'low') return clarify(family.description);
     step({ id: 'understood', label: 'Understood the question', detail: family.description });
 
@@ -269,17 +324,19 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     if (missing.length) return needsFacts(missing.map((m) => m.label));
     step({ id: 'facts', label: family.steps.facts });
 
-    // A confident route to a family with a reviewed template needs no spec writer: the template
-    // already fits, and skipping the strongest (slowest) model saves most of the wait (ADR 0005).
-    // The spec writer still runs when the route is less certain, or when the verifier asks for
-    // a missing option or constraint.
-    let specFrom: 'template' | 'spec_writer' = route.confidence === 'high' ? 'template' : 'spec_writer';
-    let spec = specFrom === 'template' ? DecisionSpec.parse({ ...family.template, question, facts }) : await writeSpec(t, family, question, facts);
+    // The family's reviewed template is the spec. The spec writer, the strongest and slowest
+    // model, runs only when the verifier asks for a missing option or constraint (ADR 0005).
+    const data = await gatherData(deps, family, input.subject);
+    if (family.needs?.includes('payrollRows') && !data.payrollRows?.length) return needsFacts(['Your payroll export']);
+    let specFrom: 'template' | 'spec_writer' = 'template';
+    let spec = DecisionSpec.parse({ ...family.template, question, facts });
+    // Levers only the person can set (a bonus amount, a salary) start from the numbers in their question.
+    if (family.questionSetsLevers && /\d/.test(question)) spec = await readLevers(t, spec, question);
     step({ id: 'spec', label: family.steps.checks });
     let answers = defaultAnswers(family, spec);
-    let calc = calculate(family, facts, answers, {});
+    let calc = calculate(family, spec, facts, answers, {}, data);
     step({ id: 'calc', label: 'Did the sums', detail: `using tax rules ${calc.rulePack.id}` });
-    let numbers = screenNumbers(family, calc, facts);
+    let numbers = screenNumbers(family, calc, facts, spec, {});
     let [layout, copy] = await Promise.all([compose(t, family, spec, calc), explain(t, family, question, spec, calc, numbers)]);
     step({ id: 'screen', label: 'Chose the screen' });
 
@@ -318,8 +375,8 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
         spec = await writeSpec(t, family, question, facts, toSpec);
         specFrom = 'spec_writer';
         answers = defaultAnswers(family, spec);
-        calc = calculate(family, facts, answers, {});
-        numbers = screenNumbers(family, calc, facts);
+        calc = calculate(family, spec, facts, answers, {}, data);
+        numbers = screenNumbers(family, calc, facts, spec, {});
       }
       [layout, copy] = await Promise.all([
         toSpec.length || toLayout.length ? compose(t, family, spec, calc, toLayout.length ? toLayout : undefined) : layout,
@@ -338,7 +395,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
  * no models, so it is instant. The verdict code and numbers update; the copy is marked stale
  * and re-explained by `reexplain` when the person settles.
  */
-export function recalculate(screen: DecisionScreen, facts: Fact[], change: { answers?: Record<string, string>; levers?: Record<string, number> }) {
+export function recalculate(screen: DecisionScreen, facts: Fact[], change: { answers?: Record<string, string>; levers?: Record<string, number> }, data: FamilyData = {}) {
   const family = FAMILIES[screen.family];
   if (!family) throw new Error(`Unknown family ${screen.family}`);
   const answers = { ...screen.answers, ...change.answers };
@@ -347,8 +404,8 @@ export function recalculate(screen: DecisionScreen, facts: Fact[], change: { ans
     const l = screen.spec.levers.find((x) => x.id === id);
     if (!l || v < l.min || v > l.max) throw new Error(`Lever ${id} out of range`);
   }
-  const calc = calculate(family, facts, answers, levers);
-  const numbers = screenNumbers(family, calc, facts);
+  const calc = calculate(family, screen.spec, facts, answers, levers, data);
+  const numbers = screenNumbers(family, calc, facts, screen.spec, levers);
   return { answers, levers, calc, numbers, visual: visualFor(family, calc, numbers), copyStale: true as const };
 }
 

@@ -1,7 +1,8 @@
 import 'server-only';
 import { AnthropicProvider, anthropicApiKey, JsonLinesLogger, loadRegistry } from '@fork/models';
-import { DEMO_FACTS, DemoModels, FAMILIES, type DecisionScreen, type FactStore, type PipelineDeps, type Subject } from '@fork/pipeline';
-import { DbFactStore } from '@fork/setup';
+import { DEMO_FACTS, DemoModels, FAMILIES, gatherData, type DecisionScreen, type FactStore, type PipelineDeps, type Subject } from '@fork/pipeline';
+import { answerLookup, DbFactStore } from '@fork/setup';
+import { runRole } from '@fork/models';
 import { database } from './db';
 import { getViewer } from './viewer';
 
@@ -30,7 +31,10 @@ export async function asker(): Promise<{ subject: Subject; deps: PipelineDeps } 
   if (!viewer) return null;
   if (viewer.mode === 'demo') return { subject: viewer.subject, deps: pipelineDeps() };
   const facts: FactStore = new DbFactStore(database(), viewer.ctx);
-  return { subject: viewer.subject, deps: { ...pipelineDeps(), facts } };
+  const base = pipelineDeps();
+  const matcher = DEMO ? undefined : async (input: Parameters<typeof runRole<'lookup_matcher'>>[2]) => (await runRole(base.roles, 'lookup_matcher', input)).output;
+  const lookup = (question: string) => answerLookup(database(), viewer.ctx, matcher, question);
+  return { subject: viewer.subject, deps: { ...base, facts, lookup } };
 }
 
 /**
@@ -53,5 +57,5 @@ export function loadScreen(subject: Subject, runId: string): DecisionScreen | nu
 
 export async function factsFor(deps: PipelineDeps, subject: Subject, screen: DecisionScreen) {
   const family = FAMILIES[screen.family]!;
-  return deps.facts.get(subject, family.facts.map((f) => f.id));
+  return { facts: await deps.facts.get(subject, family.facts.map((f) => f.id)), data: await gatherData(deps, family, subject) };
 }

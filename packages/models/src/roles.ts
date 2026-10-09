@@ -135,6 +135,24 @@ export const DocumentInterpreterOutput = z.strictObject({
   instructionsFound: z.boolean(),
 });
 
+// ---------- Lookup matcher ----------
+
+/** Picks which confirmed company facts answer a plain question. It never sees the values, and never writes the answer. */
+export const LookupMatcherInput = z.strictObject({
+  question: z.string().min(1).max(2000),
+  available: z.array(z.strictObject({ key: z.string(), label: z.string() })),
+});
+export const LookupMatcherOutput = z.strictObject({ keys: z.array(z.string()).max(2) });
+
+// ---------- Lever reader ----------
+
+/** Reads numbers the person gave in their question ("a £1,500 bonus") into the screen's levers. */
+export const LeverReaderInput = z.strictObject({
+  question: z.string().min(1).max(2000),
+  levers: z.array(z.strictObject({ id: z.string(), label: z.string(), unit: z.string(), min: z.number(), max: z.number() })).min(1),
+});
+export const LeverReaderOutput = z.strictObject({ values: z.array(z.strictObject({ id: z.string(), value: z.number().nullable() })) });
+
 // ---------- Role table ----------
 
 export interface RoleDef<I extends z.ZodType = z.ZodType, O extends z.ZodType = z.ZodType> {
@@ -159,6 +177,8 @@ export const ROLES = {
   verifier: def('verifier', 'v2', VerifierInput, VerifierOutput),
   column_matcher: def('column_matcher', 'v1', ColumnMatcherInput, ColumnMatcherOutput),
   document_interpreter: def('document_interpreter', 'v1', DocumentInterpreterInput, DocumentInterpreterOutput),
+  lookup_matcher: def('lookup_matcher', 'v1', LookupMatcherInput, LookupMatcherOutput),
+  lever_reader: def('lever_reader', 'v1', LeverReaderInput, LeverReaderOutput),
 } satisfies Record<RoleId, RoleDef>;
 
 export type Roles = typeof ROLES;

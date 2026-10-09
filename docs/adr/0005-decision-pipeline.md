@@ -38,3 +38,10 @@ A family (`packages/pipeline/src/families`) declares its router description, spe
 
 - When the router is confident (`high`), the family's reviewed template becomes the spec directly and the spec writer doesn't run. It still runs when the route is less certain, and whenever the verifier sends back a missing option or constraint. `provenance.specFrom` records which.
 - Measured live: 9.4 to 10.5 seconds for the salary sacrifice question (was 17 to 30), about 3p a question.
+
+## Step 7 changes (2026-10-09)
+
+- The reviewed template is always the starting spec. The spec writer runs only when the verifier sends back a missing option or constraint.
+- Levers only the person can set (a salary, a bonus, a car's price, a contribution rate) start from numbers in the question, read by a small `lever_reader` role. Code keeps a value only if the lever exists, it's in range, and it's rounded to a step.
+- Numbers that code wrote into the engine's own labels and assumptions ("Each extra 1%", "£430 a month lease", "April 2029") may be quoted. Everything else must still be an engine output, a fact, a rule value or a lever value.
+- Live, 10 questions across all 7 families: every one answered, 9 to 17 seconds typical, 33 seconds when a revision round is needed, about 3p a question.

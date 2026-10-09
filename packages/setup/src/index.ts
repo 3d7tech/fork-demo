@@ -11,3 +11,4 @@ export * from './payroll/suggest';
 export * from './documents/keys';
 export * from './documents/read';
 export * from './documents/store';
+export * from './lookup';

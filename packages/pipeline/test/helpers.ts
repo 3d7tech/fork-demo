@@ -69,6 +69,8 @@ export const good = {
   column_matcher: () => ({ mapping: [], unsure: [] }),
   // Without a model, the owner types the scheme details in themselves.
   document_interpreter: () => ({ facts: [], instructionsFound: false }),
+  lookup_matcher: () => ({ keys: [] }),
+  lever_reader: () => ({ values: [] }),
 };
 
 export function deps(handlers: Partial<Record<RoleId, Handler>>, extra: Partial<PipelineDeps> = {}) {

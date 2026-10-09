@@ -12,6 +12,10 @@ export interface ForkMessage {
   body: string;
   /** Who can help next. */
   routeTo: 'documents' | 'owner' | 'accountant' | 'support' | null;
+  /** Where a looked-up answer came from, such as "Staff handbook, page 4". */
+  source?: string;
+  /** For "not yet": the decisions Fork can help with today. */
+  canHelpWith?: string[];
 }
 
 export const DISTRESS: ForkMessage = {
@@ -24,6 +28,9 @@ export const DISTRESS: ForkMessage = {
     'If it would help to talk about your pay or pension at work, you can ask your employer privately. Fork won’t tell them you asked.',
   routeTo: 'support',
 };
+
+/** An honest "not yet", with what Fork can help with today for this person. */
+export const notYet = (titles: string[]): ForkMessage => ({ ...NOT_SUPPORTED, canHelpWith: titles });
 
 export const NOT_SUPPORTED: ForkMessage = {
   kind: 'message',

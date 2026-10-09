@@ -203,6 +203,21 @@ describe('importing into the database', () => {
       ['employer_contribution_pct', 3, 'pension_scheme', expect.any(String)],
       ['relief_method', 'relief_at_source', 'pension_scheme', expect.any(String)],
     ]);
+    // An owner gets company-wide counts, and the engine gets every salary; an employee gets neither.
+    const asOwner = new DbFactStore(t.db, ctx);
+    const ownerFacts = await asOwner.get({ companyId: ctx.companyId }, ['headcount', 'median_salary', 'fee_per_employee', 'employment_allowance', 'contribution_pct', 'pension_basis']);
+    expect(Object.fromEntries(ownerFacts.map((f) => [f.id, f.value]))).toEqual({
+      headcount: 34,
+      median_salary: 40500,
+      fee_per_employee: 4,
+      employment_allowance: true,
+      contribution_pct: 5,
+      pension_basis: 'full_salary',
+    });
+    expect(await asOwner.payrollRows({ companyId: ctx.companyId })).toHaveLength(34);
+    expect(await asElla.payrollRows({ companyId: ctx.companyId })).toEqual([]);
+    expect(await asElla.get({ companyId: ctx.companyId, employeeId: ella.id }, ['headcount', 'median_salary'])).toEqual([]);
+
     // Ella asking about someone else's record gets nothing.
     const tom = (await listPeople(t.db, ctx)).find((p) => p.name === 'Tom Hale')!;
     expect(await asElla.get({ companyId: ctx.companyId, employeeId: tom.id }, ['salary'])).toEqual([]);

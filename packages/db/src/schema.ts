@@ -47,6 +47,8 @@ export const company = pgTable('company', {
   /** Share of the employer's NI saving passed into employees' pensions. */
   employerNiSharePct: pct('employer_ni_share_pct').notNull().default('0'),
   rulePack: text('rule_pack').notNull().default('uk-2026-27'),
+  /** Next auto-enrolment re-enrolment date, from the pension regulator's letter. Set by an owner. */
+  reenrolmentDate: date('reenrolment_date'),
   createdAt: createdAt(),
 });
 

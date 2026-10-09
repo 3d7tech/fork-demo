@@ -16,7 +16,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 4 | Pipeline end to end for "switch to salary sacrifice" | Done |
 | 5 | Component library and screen grammar, web app | Done |
 | 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | Done |
-| 7 | Remaining owner and employee decisions, lookups, "not yet" | To do |
+| 7 | Remaining owner and employee decisions, lookups, "not yet" | Done: 7 families (3 owner, 4 employee), lookups from confirmed documents, "not yet" with what Fork can do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | To do |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
 | 10 | "How to add a decision family" guide, tested by adding one | To do |
@@ -89,4 +89,3 @@ Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`
 - New companies are created by the operator: `pnpm fork create-company "<name>" <owner email>`.
 - Screens are kept in server memory until the DecisionRun table exists (step 8).
 - The action button confirms the next step but sends nothing (step 8).
-- Only one decision family exists: `pension.salary_sacrifice_switch`. The calc modules for the other five golden cases exist but have no family yet (step 7).

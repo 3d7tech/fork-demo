@@ -4,18 +4,20 @@ import type { BuildStep, DecisionScreen, ForkAnswer } from '@fork/pipeline';
 import { BuildingSteps, DecisionScreenView, MessageCard } from '@fork/ui';
 import { useRef, useState } from 'react';
 
-const SUGGESTIONS = [
+export const EMPLOYEE_SUGGESTIONS = [
   'maya says we can switch the pension to salary sacrifice?? I’m on 32k, is it worth it or is there a catch',
+  'should I pay more into my pension?',
   'where is my p60 lol',
-  'which fund should my pension be in',
 ];
+
+export const OWNER_SUGGESTIONS = ['Should we introduce salary sacrifice for pensions?', 'What does hiring someone on £40,000 really cost us?', 'Should we pay this year’s bonus as cash or into pensions?'];
 
 /** How long to wait after the last change before rewriting the words. */
 const SETTLE_MS = 700;
 
 type Recalc = Pick<DecisionScreen, 'answers' | 'levers' | 'calc' | 'numbers' | 'visual'>;
 
-export function AskApp() {
+export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS }: { suggestions?: string[] }) {
   const [question, setQuestion] = useState('');
   const [steps, setSteps] = useState<BuildStep[]>([]);
   const [busy, setBusy] = useState(false);
@@ -114,7 +116,7 @@ export function AskApp() {
         </div>
         {!answer && !busy && (
           <ul className="chips" aria-label="Examples">
-            {SUGGESTIONS.map((s) => (
+            {suggestions.map((s) => (
               <li key={s}>
                 <button type="button" onClick={() => void ask(s)}>
                   {s}

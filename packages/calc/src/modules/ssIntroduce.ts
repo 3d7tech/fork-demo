@@ -97,11 +97,13 @@ export function ssIntroduce(r: Rules, i: SsIntroduceInput): CalcResult {
     leverRanges: leverRanges('take_up_pct', { min: 0, max: 100, step: 5 }, (v) =>
       scenario(r, { ...i, takeUpPct: v }, fee).keep.gt(0) ? 'introduce' : 'saving_below_fee',
     ),
-    constraints: [{ id: 'min_wage', outcome: 'pass', detail: `${i.employees.length - n} employees left out so sacrifice never takes anyone below the National Living Wage` }],
+    // Leaving people out is a caution, not a pass: the owner needs to know who can't join.
+    constraints: [{ id: 'min_wage', outcome: i.employees.length - n > 0 ? 'caution' : 'pass', detail: `${i.employees.length - n} employees left out so sacrifice never takes anyone below the National Living Wage` }],
     rulesUsed: r.rulesUsed(),
     assumptions: [
       { text: `${i.employees.length} salaries and contracted hours from the payroll export`, source: 'payroll_export', estimate: false },
-      { text: `Staff contribute ${i.contributionPct}%; ${i.takeUpPct}% of eligible staff switch`, source: 'user_answer', estimate: true },
+      { text: `Staff contribute ${i.contributionPct}% of pay`, source: 'pension_scheme', estimate: false },
+      { text: `${i.takeUpPct}% of eligible staff switch`, source: 'user_answer', estimate: true },
       { text: `${i.sharePct}% of the saving goes into staff pensions`, source: 'company_setting', estimate: false },
       { text: `Fork costs £${i.feePerEmployeePerMonth} per employee per month`, source: 'company_setting', estimate: false },
       {

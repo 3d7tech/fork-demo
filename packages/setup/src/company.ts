@@ -10,6 +10,11 @@ export const CompanySettings = z.object({
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/)
     .nullable(),
+  reenrolmentDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable()
+    .default(null),
 });
 
 export const SchemeSettings = z.object({
@@ -34,7 +39,7 @@ export async function saveCompanySettings(db: ForkDatabase, ctx: RequestContext,
   await db.asMember(ctx, async (tx) => {
     const done = await tx
       .update(s.company)
-      .set({ employerNiSharePct: String(v.employerNiSharePct), employmentAllowance: v.employmentAllowance, brandColour: v.brandColour })
+      .set({ employerNiSharePct: String(v.employerNiSharePct), employmentAllowance: v.employmentAllowance, brandColour: v.brandColour, reenrolmentDate: v.reenrolmentDate })
       .where(eq(s.company.id, ctx.companyId))
       .returning({ id: s.company.id });
     if (!done.length) throw new Error('Only an owner can change company settings.');

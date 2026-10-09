@@ -8,6 +8,7 @@ const num = (v: unknown) => {
 export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
   id: 'pension.salary_sacrifice_switch',
   audience: 'employee',
+  title: 'Switching your pension to salary sacrifice',
   description: 'Whether to switch your own pension contributions to salary sacrifice, and what the catches are',
   module: 'pension.ss_switch',
   rulePack: 'uk-2026-27',
@@ -44,7 +45,7 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
   ],
   answers: { mortgage_12m: 'no', parental_leave_12m: 'no' },
   levers: ['contribution_pct'],
-  buildInput(f, a, l) {
+  buildInput(f, a, l, _data) {
     const method = f.relief_method;
     if (method !== 'relief_at_source' && method !== 'net_pay') throw new Error(`Unknown relief method ${String(method)}`);
     return {

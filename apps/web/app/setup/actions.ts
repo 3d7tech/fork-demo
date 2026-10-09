@@ -35,6 +35,7 @@ export async function saveSettingsAction(form: FormData) {
     employerNiSharePct: num(form.get('employerNiSharePct')),
     employmentAllowance: form.get('employmentAllowance') === 'on',
     brandColour: colour || null,
+    reenrolmentDate: String(form.get('reenrolmentDate') ?? '') || null,
   });
   redirect('/setup?saved=settings');
 }

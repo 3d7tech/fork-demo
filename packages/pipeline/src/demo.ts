@@ -32,7 +32,14 @@ function route(question: string) {
   if (/rent|debt|can'?t afford|cant afford|bereave|struggling/.test(q)) return { ...base, route: 'human', distress: true, reason: 'Sounds like money worries.' };
   if (/fund|invest|shares|crypto/.test(q)) return { ...base, route: 'human', reason: 'Investment choice.' };
   if (/p60|p45|payslip|where is/.test(q)) return { ...base, route: 'lookup', reason: 'A document lookup.' };
+  if (/introduce|bring in|offer|for (our|the) (staff|team)/.test(q) && /sacrifice/.test(q)) return { ...base, route: 'decision', family: 'employer.introduce_salary_sacrifice', reason: 'Company-wide salary sacrifice.' };
   if (/sacrifice|salary exchange|switch/.test(q)) return { ...base, route: 'decision', family: 'pension.salary_sacrifice_switch', reason: 'Asks about salary sacrifice.' };
+  if (/hire|hiring|recruit/.test(q)) return { ...base, route: 'decision', family: 'employer.true_cost_of_hire', reason: 'Cost of a hire.' };
+  if (/bonus/.test(q)) return { ...base, route: 'decision', family: 'employer.bonus_cash_or_pension', reason: 'Bonus.' };
+  if (/100k|100,000|childcare|allowance/.test(q)) return { ...base, route: 'decision', family: 'pay.threshold_100k', reason: 'The £100,000 threshold.' };
+  if (/electric|\bev\b|car/.test(q)) return { ...base, route: 'decision', family: 'benefits.ev_scheme_or_own_car', reason: 'Electric car scheme.' };
+  if (/how much|contribut|pay more|put more/.test(q)) return { ...base, route: 'decision', family: 'pension.how_much_to_contribute', reason: 'Contribution level.' };
+  if (/re-?enrol|pay ?day|days'? holiday|holiday allowance|sick pay|maternity pay|paternity pay/.test(q)) return { ...base, route: 'lookup', reason: 'A lookup.' };
   return { ...base, route: 'not_supported', reason: 'Not a demo decision.' };
 }
 
@@ -64,19 +71,41 @@ function explainSsSwitch(input: { verdict: string; numbers: ScreenNumber[]; cons
   };
 }
 
+/** Which family a role's input belongs to, from the outputs it carries. */
+function familyOf(keys: string[]) {
+  return Object.values(FAMILIES).find((f) => f.defaultLayout.outcomeTiles.every((k) => keys.includes(k)));
+}
+
+/** Templated wording for families without their own demo copy: the key numbers, plainly. */
+function explainGeneric(input: { numbers: ScreenNumber[]; actionLabel: string | null }) {
+  const family = familyOf(input.numbers.map((x) => x.key));
+  const tiles = (family?.defaultLayout.outcomeTiles ?? []).map((k) => input.numbers.find((x) => x.key === k)!).filter(Boolean);
+  const say = (x: ScreenNumber) => `${x.estimate ? 'about ' : ''}${x.display}`;
+  return {
+    title: family?.title ?? 'Your numbers',
+    verdict: tiles[0] ? `${tiles[0].label}: ${say(tiles[0])}.` : 'Here are your numbers.',
+    why: tiles.slice(1).map((x) => `${x.label}: ${say(x)}.`).join(' ') || 'Move the sliders to see how the numbers change.',
+    tippingPoint: null,
+    assumptions: [],
+    actionLabel: input.actionLabel,
+  };
+}
+
 const HANDLERS: Record<RoleId, (input: any) => unknown> = {
   router: (i) => route(i.question),
   spec_writer: (i) => i.template,
   screen_composer: (i) => ({
-    ...FAMILIES['pension.salary_sacrifice_switch']!.defaultLayout,
+    ...(familyOf(i.outputs.map((o: { key: string }) => o.key)) ?? FAMILIES['pension.salary_sacrifice_switch']!).defaultLayout,
     highlightConstraint: i.constraints.find((c: { outcome: string }) => c.outcome !== 'pass')?.id ?? null,
   }),
-  explainer: (i) => explainSsSwitch(i),
+  explainer: (i) => (i.numbers.some((x: ScreenNumber) => x.key === 'take_home_gain') ? explainSsSwitch(i) : explainGeneric(i)),
   verifier: () => ({ pass: true, issues: [] }),
   // Demo mode matches columns by header words alone (packages/setup), so the model adds nothing.
   column_matcher: () => ({ mapping: [], unsure: [] }),
   // Without a model, the owner types the scheme details in themselves.
   document_interpreter: () => ({ facts: [], instructionsFound: false }),
+  lookup_matcher: () => ({ keys: [] }),
+  lever_reader: () => ({ values: [] }),
 };
 
 export class DemoModels implements ModelProvider {

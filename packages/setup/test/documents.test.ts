@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { asAdmin, schema as s } from '@fork/db';
 import { freshDatabase, type TestDatabase } from '@fork/db/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { cleanFacts, confirmAllFacts, confirmedFacts, confirmFact, documentType, listDocuments, LocalFileStore, parseTyped, prepareDocument, readDocument, removeFact, uploadDocument, type DocumentInterpreter } from '../src';
+import { answerLookup, saveCompanySettings, cleanFacts, confirmAllFacts, confirmedFacts, confirmFact, documentType, listDocuments, LocalFileStore, parseTyped, prepareDocument, readDocument, removeFact, uploadDocument, type DocumentInterpreter } from '../src';
 
 const fixture = (name: string) => new Uint8Array(readFileSync(join(import.meta.dirname, '../fixtures', name)));
 
@@ -135,5 +135,32 @@ describe('documents in the database', () => {
     const unconfirmed = (await readDocument(t.db, owner, handbook.id))!.facts[0]!;
     await confirmFact(t.db, employee, unconfirmed.id).catch(() => {});
     expect((await confirmedFacts(t.db, employee)).has('payslip_location')).toBe(false);
+  });
+
+  it('lookups are answered from confirmed facts only, with their source, never in a model’s words', async () => {
+    const where = async (keys: string[]) => answerLookup(t.db, employee, async (input) => {
+      expect(JSON.stringify(input)).not.toContain('payroll portal');
+      return { keys };
+    }, 'where is my p60');
+    // Not confirmed yet: nothing to answer from.
+    expect(await where(['payslip_location'])).toBeNull();
+    const handbook = (await listDocuments(t.db, owner)).find((d) => d.kind === 'handbook')!;
+    await confirmAllFacts(t.db, owner, handbook.id);
+    expect(await where(['payslip_location'])).toEqual({
+      kind: 'message',
+      reason: 'lookup',
+      title: 'Where payslips and P60s are',
+      body: 'On the payroll portal; P60s by 31 May',
+      routeTo: null,
+      source: 'Staff handbook',
+    });
+    expect(await where(['made_up_key'])).toBeNull();
+    expect(await where([])).toBeNull();
+  });
+
+  it('owners can answer "when is re-enrolment?" from company settings', async () => {
+    await saveCompanySettings(t.db, owner, { employerNiSharePct: 50, employmentAllowance: false, brandColour: null, reenrolmentDate: '2027-03-01' });
+    const a = await answerLookup(t.db, owner, async () => ({ keys: ['reenrolment_date'] }), 'when is re-enrolment');
+    expect(a).toMatchObject({ title: 'Next auto-enrolment re-enrolment date', body: '1 March 2027', source: 'Company settings' });
   });
 });

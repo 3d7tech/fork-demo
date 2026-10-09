@@ -119,3 +119,27 @@ describe('golden: electric car scheme', () => {
     expect(r.outputs.scheme_charging?.estimate).toBe(true);
   });
 });
+
+describe('golden: how much to contribute (worked by hand)', () => {
+  const base = { salary: 32000, hoursPerWeek: 37.5, currentPct: 5, chosenPct: 8, employerContributionPct: 3, reliefMethod: 'relief_at_source' as const, bySacrifice: false };
+  it('relief at source: 8% puts £3,520 a year in for £2,048 of take-home; £960 more in for £768 more', () => {
+    const r = runModule('pension.contribution_level', PACK, base);
+    expect(pounds(r, 'your_contribution')).toBe(2560);
+    expect(pounds(r, 'pension_total')).toBe(3520);
+    expect(pounds(r, 'take_home_cost')).toBe(2048);
+    expect(pounds(r, 'extra_into_pension')).toBe(960);
+    expect(pounds(r, 'extra_take_home_cost')).toBe(768);
+    expect(r.outputs.cost_per_pound?.value).toBeCloseTo(0.8, 10);
+    expect(r.verdict).toBe('more');
+  });
+  it('by salary sacrifice the same 8% costs £1,843 (20% tax and 8% NI saved)', () => {
+    const r = runModule('pension.contribution_level', PACK, { ...base, bySacrifice: true });
+    expect(pounds(r, 'take_home_cost')).toBe(1843);
+    expect(r.outputs.cost_per_pound?.value).toBeCloseTo(0.72, 10);
+  });
+  it('net pay: 8% costs £2,048 (20% tax relief, NI still due)', () => {
+    const r = runModule('pension.contribution_level', PACK, { ...base, reliefMethod: 'net_pay' });
+    expect(pounds(r, 'take_home_cost')).toBe(2048);
+  });
+  it('validates as a CalcResult', () => expect(() => CalcResult.parse(runModule('pension.contribution_level', PACK, base))).not.toThrow());
+});

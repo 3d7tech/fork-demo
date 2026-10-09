@@ -1,0 +1,72 @@
+import type { FamilyDef } from './types';
+import { num } from './shared';
+
+export const bonus: FamilyDef<'employer.bonus_cash_or_pension'> = {
+  id: 'employer.bonus_cash_or_pension',
+  audience: 'owner',
+  title: 'A bonus as cash or into pensions',
+  description: 'Whether to pay a staff bonus as cash or let staff take it into their pension, and what the company saves',
+  module: 'employer.bonus_cash_or_pension',
+  rulePack: 'uk-2026-27',
+  questionSetsLevers: true,
+  template: {
+    specVersion: '1.0',
+    decisionType: 'comparison',
+    family: 'employer.bonus_cash_or_pension',
+    audience: 'owner',
+    question: '',
+    options: [
+      { id: 'cash', label: 'Pay it all as cash' },
+      { id: 'choice', label: 'Let staff choose cash or pension' },
+    ],
+    constraints: [],
+    levers: [
+      { id: 'amount_per_person', label: 'Bonus per person', min: 100, max: 10000, step: 100, default: 1000, unit: 'GBP' },
+      { id: 'people', label: 'People getting it', min: 1, max: 100, step: 1, default: 'fact:headcount', unit: 'count' },
+      { id: 'pension_share_pct', label: 'Share taken into pensions', min: 0, max: 100, step: 10, default: 50, unit: 'pct' },
+    ],
+    facts: [],
+    calculation: { module: 'employer.bonus_cash_or_pension', rulePack: 'uk-2026-27' },
+    visual: 'cost_bars',
+    action: { type: 'plan.send', to: 'accountant', label: 'Send the plan to our accountant' },
+    watch: ['headcount', 'rulePack'],
+  },
+  facts: [
+    { id: 'headcount', label: 'Employees on payroll', unit: 'count' },
+    { id: 'median_salary', label: 'Typical salary (the middle of your payroll)', unit: 'GBP' },
+  ],
+  answers: {},
+  levers: ['amount_per_person', 'people', 'pension_share_pct'],
+  buildInput(f, _a, l) {
+    return {
+      amountPerPerson: l.amount_per_person ?? 1000,
+      people: l.people ?? num(f.headcount),
+      pensionShare: (l.pension_share_pct ?? 50) / 100,
+      typicalSalary: num(f.median_salary),
+    };
+  },
+  defaultLayout: {
+    visual: 'cost_bars',
+    leverOrder: ['amount_per_person', 'people', 'pension_share_pct'],
+    outcomeTiles: ['company_saves', 'all_cash_cost', 'cash_reaches_employee'],
+    constraintOrder: [],
+    highlightConstraint: null,
+  },
+  visual(calc, display) {
+    const o = calc.outputs;
+    return {
+      type: 'bars',
+      title: 'What the bonus costs the company',
+      rows: [
+        { label: 'All as cash', total: { value: o.all_cash_cost!.value, display: display('all_cash_cost') }, segments: [{ value: o.all_cash_cost!.value, tone: 'a', label: 'All as cash' }] },
+        { label: 'With your split', total: { value: o.chosen_cost!.value, display: display('chosen_cost') }, segments: [{ value: o.chosen_cost!.value, tone: 'b', label: 'With your split' }] },
+      ],
+      keys: [
+        { tone: 'a', label: 'All as cash' },
+        { tone: 'b', label: 'With your split' },
+      ],
+      floor: null,
+    };
+  },
+  steps: { facts: 'Read your payroll', checks: 'Checked employer NI on bonuses' },
+};

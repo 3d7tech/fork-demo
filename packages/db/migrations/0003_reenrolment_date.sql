@@ -1,0 +1,1 @@
+ALTER TABLE "company" ADD COLUMN "reenrolment_date" date;

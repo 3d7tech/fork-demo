@@ -1,12 +1,17 @@
 import { redirect } from 'next/navigation';
+import { setupProgress } from '@fork/setup';
+import { database } from '@/lib/db';
 import { requireViewer } from '@/lib/viewer';
-import { AskApp } from './AskApp';
+import { AskApp, OWNER_SUGGESTIONS } from './AskApp';
 
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
   const viewer = await requireViewer();
-  // Owner decisions arrive in step 7; until then an owner's home is setup.
-  if (viewer.role === 'owner') redirect('/setup');
+  if (viewer.role === 'owner') {
+    // Until payroll is in, an owner's first stop is setup.
+    if (viewer.mode === 'db' && !(await setupProgress(database(), viewer.ctx)).payrollImports) redirect('/setup');
+    return <AskApp suggestions={OWNER_SUGGESTIONS} />;
+  }
   return <AskApp />;
 }

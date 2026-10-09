@@ -25,3 +25,6 @@ Still open:
 9. **Production hosting.** Not AWS for now. Does the cPanel host offer PostgreSQL 16, Node.js and a UK data centre?
 7. **Data gatherer as code.** ADR 0004 proposes deterministic code for Phase 1 instead of a model role with tools. Needs agreement.
 8. **Distress wording.** The fixed reply points to MoneyHelper and Samaritans (116 123). Needs your review, and ideally a charity's, before any pilot.
+10. **Electric car estimates.** The own-car and charging figures (£430 a month lease, £1,200 insurance and servicing, 45 mpg, £1.40 a litre, 10p and 70p a kWh, 3.5 miles a kWh) are the demo's estimates. They're labelled as estimates on screen and the person can change the car's cost, price and miles, but they need a reviewed source or a way for the person to enter their own.
+11. **£100,000 threshold and pension method.** The module assumes the person's pension contribution is by salary sacrifice when working out adjusted net income. Relief-at-source contributions also reduce it (grossed up). Needs the rule for both, reviewed.
+12. **Answers from the question.** "Two kids in nursery" doesn't yet set the childcare question; the person taps it. The lever reader could also read constraint answers.

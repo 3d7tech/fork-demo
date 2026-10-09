@@ -32,6 +32,13 @@ export default async function CompanySettingsPage() {
           <span className="hint">It reduces your employer NI bill each year, which changes how much salary sacrifice saves.</span>
         </fieldset>
         <div className="field">
+          <label htmlFor="reenrol">Next re-enrolment date (optional)</label>
+          <span className="hint" id="reenrol-hint">
+            Every three years you re-enrol eligible staff into the pension. The Pensions Regulator writes to you with the date.
+          </span>
+          <input id="reenrol" name="reenrolmentDate" type="date" defaultValue={c.reenrolmentDate ?? ''} aria-describedby="reenrol-hint" />
+        </div>
+        <div className="field">
           <label htmlFor="colour">Brand colour (optional)</label>
           <span className="hint" id="colour-hint">
             A hex colour such as #1f3fa8, used for buttons. It must be dark enough to read white text on.

@@ -13,7 +13,8 @@ export async function POST(req: Request) {
   const screen = body?.runId ? loadScreen(subject, body.runId) : null;
   if (!screen) return Response.json({ error: 'That answer has expired. Ask again.' }, { status: 404 });
   try {
-    const r = recalculate(screen, await factsFor(deps, subject, screen), { answers: body?.answers, levers: body?.levers });
+    const { facts, data } = await factsFor(deps, subject, screen);
+    const r = recalculate(screen, facts, { answers: body?.answers, levers: body?.levers }, data);
     const answer = await reexplain(deps, screen, r);
     if (answer.kind === 'decision') saveScreen(subject, answer);
     return Response.json({ answer });

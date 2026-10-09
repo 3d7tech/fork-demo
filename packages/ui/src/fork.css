@@ -631,3 +631,11 @@ a {
     animation: none !important;
   }
 }
+.fk-can-help {
+  margin: 0;
+  padding-left: 20px;
+}
+.fk-message h2.fk-note {
+  margin: 8px 0 0;
+  font-weight: 600;
+}

@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { askFork, recalculate, reexplain, type BuildStep, type DecisionScreen } from '../src';
 import { deps, ELLA, facts, good, QUESTION } from './helpers';
 
-/** A less certain route, so the spec writer runs. */
-const unsure = { ...good, router: () => ({ ...good.router(), confidence: 'medium' as const }) };
+/** The verifier asks for a missing constraint once, so the spec writer runs. */
+const unsure = {
+  ...good,
+  verifier: (_i: any, call: number) => (call === 0 ? { pass: false, issues: [{ kind: 'constraint', detail: 'Ask about parental leave', sendBackTo: 'spec_writer' }] } : { pass: true, issues: [] }),
+};
 
 const display = (s: DecisionScreen, key: string) => s.numbers.find((n) => n.key === key)?.display;
 const asScreen = (a: unknown) => {
@@ -31,7 +34,14 @@ describe('golden end to end: employee switches to salary sacrifice', () => {
     expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v2', 'router:v1', 'screen_composer:v1', 'verifier:v2']);
   });
 
-  it('a less certain route has the spec writer write the spec', async () => {
+  it('a less certain route still starts from the reviewed template', async () => {
+    const { deps: d, models } = deps({ ...good, router: () => ({ ...good.router(), confidence: 'medium' }) });
+    const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
+    expect(models.rolesCalled()).not.toContain('spec_writer');
+    expect(s.provenance.specFrom).toBe('template');
+  });
+
+  it('the spec writer runs when the verifier asks for a missing option or constraint', async () => {
     const { deps: d, models } = deps(unsure);
     const s = asScreen(await askFork(d, { question: QUESTION, subject: ELLA }));
     expect(models.rolesCalled()).toContain('spec_writer');

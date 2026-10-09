@@ -2,6 +2,7 @@ import type { CalcResult } from '@fork/spec';
 import { loadRulePack } from '@fork/rules';
 import { Rules } from './core';
 import { bonusCashOrPension } from './modules/bonus';
+import { contributionLevel } from './modules/contributionLevel';
 import { evScheme } from './modules/evScheme';
 import { hireCost } from './modules/hireCost';
 import { ssIntroduce } from './modules/ssIntroduce';
@@ -20,6 +21,7 @@ export const MODULES = {
   'employer.hire_cost': hireCost,
   'employer.bonus_cash_or_pension': bonusCashOrPension,
   'benefits.ev_scheme': evScheme,
+  'pension.contribution_level': contributionLevel,
 } as const;
 
 export type ModuleId = keyof typeof MODULES;

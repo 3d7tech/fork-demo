@@ -3,7 +3,7 @@ import { parse } from 'yaml';
 import { z } from 'zod';
 import { repoPath } from './paths';
 
-export const ROLE_IDS = ['router', 'spec_writer', 'screen_composer', 'explainer', 'verifier', 'column_matcher', 'document_interpreter'] as const;
+export const ROLE_IDS = ['router', 'spec_writer', 'screen_composer', 'explainer', 'verifier', 'column_matcher', 'document_interpreter', 'lookup_matcher', 'lever_reader'] as const;
 export type RoleId = (typeof ROLE_IDS)[number];
 
 export const ModelRef = z.strictObject({
