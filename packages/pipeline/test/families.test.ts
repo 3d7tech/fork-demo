@@ -20,6 +20,7 @@ const store = new InMemoryFactStore({
       f('fee_per_employee', 4, 'company_setting'),
       f('employment_allowance', false, 'company_setting'),
       f('contribution_pct', 5, 'pension_scheme'),
+      f('cycle_to_work_limit', 2500, 'policy_document'),
     ],
   },
   employee: {
@@ -115,6 +116,24 @@ describe('every family runs end to end and matches its golden case', () => {
     expect(shown(r, 'extra_into_pension')).toBe('£960');
     const sac = recalculate(s, facts, { levers: { chosen_pct: 8 }, answers: { pay_method: 'sacrifice' } });
     expect(shown(sac, 'take_home_cost')).toBe('£1,843');
+  });
+});
+
+describe('the family added by following the guide', () => {
+  it('employee: a £1,000 bike through cycle to work costs £720, and the request says what to set up', async () => {
+    const { s } = await screenFor('benefits.cycle_to_work', emp('ella'), 'should I get a £1,000 bike through cycle to work?', { bike_price: 1000 });
+    expect(shown(s, 'scheme_cost')).toBe('£720');
+    expect(shown(s, 'saving')).toBe('£280');
+    expect(shown(s, 'fact.cycle_to_work_limit')).toBe('£2,500');
+    const r = FAMILIES['benefits.cycle_to_work']!.request!({ calc: s.calc, levers: { bike_price: 1000 }, answers: {}, facts: {}, person: { name: 'Ella Brooks', payrollRef: 'LA104' }, companyName: 'Larkfield' });
+    expect(r?.summary).toMatch(/^Ella Brooks \(payroll LA104\) would like to join the cycle to work scheme for a bike and kit costing about £1,000/);
+  });
+
+  it('without a confirmed scheme limit, Fork asks for it rather than guessing', async () => {
+    const family = FAMILIES['benefits.cycle_to_work']!;
+    const noLimit = new InMemoryFactStore({ company: { larkfield: [] }, employee: { 'larkfield/ella': [f('salary', 32000, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')] } });
+    const { deps: d } = deps(modelsFor(family), { facts: noLimit });
+    expect(await askFork(d, { question: 'bike through work?', subject: emp('ella') })).toMatchObject({ kind: 'message', reason: 'needs_facts' });
   });
 });
 

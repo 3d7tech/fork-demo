@@ -119,6 +119,27 @@
    "expect": {
     "extra_sacrifice": 3000
    }
+  },
+  {
+   "question": "should I get a £1,200 bike through the cycle to work scheme",
+   "family": "benefits.cycle_to_work",
+   "expect": {
+    "bike_price": 1200
+   }
+  },
+  {
+   "question": "ebike for 2.5k through work, worth it?",
+   "family": "benefits.cycle_to_work",
+   "expect": {
+    "bike_price": 2500
+   }
+  },
+  {
+   "question": "cycle to work scheme worth it?",
+   "family": "benefits.cycle_to_work",
+   "expect": {
+    "bike_price": null
+   }
   }
  ]
 }

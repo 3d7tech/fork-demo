@@ -1,5 +1,6 @@
 import { bonus } from './bonus';
 import { contributionLevel } from './contributionLevel';
+import { cycleToWork } from './cycleToWork';
 import { evScheme } from './evScheme';
 import { hireCost } from './hireCost';
 import { ssIntroduce } from './ssIntroduce';
@@ -9,7 +10,7 @@ import type { FamilyDef } from './types';
 
 export type { FamilyData, FamilyDef, FactDef, RequestInput } from './types';
 
-const ALL = [ssSwitch, contributionLevel, threshold100k, evScheme, ssIntroduce, hireCost, bonus];
+const ALL = [ssSwitch, contributionLevel, threshold100k, evScheme, cycleToWork, ssIntroduce, hireCost, bonus];
 
 export const FAMILIES: Record<string, FamilyDef> = Object.fromEntries(ALL.map((f) => [f.id, f as unknown as FamilyDef]));
 

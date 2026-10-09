@@ -21,6 +21,7 @@ export const FACTS = new InMemoryFactStore({
       f('fee_per_employee', 4, 'company_setting'),
       f('employment_allowance', false, 'company_setting'),
       f('contribution_pct', 5, 'pension_scheme'),
+      f('cycle_to_work_limit', 2500, 'policy_document'),
     ],
   },
   employee: {

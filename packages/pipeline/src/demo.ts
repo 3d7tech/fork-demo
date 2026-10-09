@@ -37,6 +37,7 @@ function route(question: string) {
   if (/hire|hiring|recruit/.test(q)) return { ...base, route: 'decision', family: 'employer.true_cost_of_hire', reason: 'Cost of a hire.' };
   if (/bonus/.test(q)) return { ...base, route: 'decision', family: 'employer.bonus_cash_or_pension', reason: 'Bonus.' };
   if (/100k|100,000|childcare|allowance/.test(q)) return { ...base, route: 'decision', family: 'pay.threshold_100k', reason: 'The £100,000 threshold.' };
+  if (/\bbike|cycle ?(to|2) ?work|cyclescheme/.test(q)) return { ...base, route: 'decision', family: 'benefits.cycle_to_work', reason: 'Cycle to work.' };
   if (/electric|\bev\b|car/.test(q)) return { ...base, route: 'decision', family: 'benefits.ev_scheme_or_own_car', reason: 'Electric car scheme.' };
   if (/how much|contribut|pay more|put more/.test(q)) return { ...base, route: 'decision', family: 'pension.how_much_to_contribute', reason: 'Contribution level.' };
   if (/re-?enrol|pay ?day|days'? holiday|holiday allowance|sick pay|maternity pay|paternity pay/.test(q)) return { ...base, route: 'lookup', reason: 'A lookup.' };

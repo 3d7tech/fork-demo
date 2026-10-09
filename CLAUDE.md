@@ -16,10 +16,10 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 4 | Pipeline end to end for "switch to salary sacrifice" | Done |
 | 5 | Component library and screen grammar, web app | Done |
 | 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | Done |
-| 7 | Remaining owner and employee decisions, lookups, "not yet" | Done: 7 families (3 owner, 4 employee), lookups from confirmed documents, "not yet" with what Fork can do |
+| 7 | Remaining owner and employee decisions, lookups, "not yet" | Done: 7 families (3 owner, 4 employee; cycle to work added in step 10), lookups from confirmed documents, "not yet" with what Fork can do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | Done (ADR 0008) |
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | Done (ADR 0009) |
-| 10 | "How to add a decision family" guide, tested by adding one | To do |
+| 10 | "How to add a decision family" guide, tested by adding one | Done: `docs/adding-a-decision-family.md`, tested by adding cycle to work |
 
 **Model key:** `FORK_ANTHROPIC_API_KEY` in the Default environment (`ANTHROPIC_API_KEY` is reserved for Claude Code). The live check passed on 2026-10-08; `pnpm smoke:models` re-runs it. Never print, log or commit the key. Live screenshots are in `docs/screens/`.
 

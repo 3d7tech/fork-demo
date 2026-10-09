@@ -3,6 +3,7 @@ import { loadRulePack } from '@fork/rules';
 import { Rules } from './core';
 import { bonusCashOrPension } from './modules/bonus';
 import { contributionLevel } from './modules/contributionLevel';
+import { cycleToWork } from './modules/cycleToWork';
 import { evScheme } from './modules/evScheme';
 import { hireCost } from './modules/hireCost';
 import { ssIntroduce } from './modules/ssIntroduce';
@@ -22,6 +23,7 @@ export const MODULES = {
   'employer.bonus_cash_or_pension': bonusCashOrPension,
   'benefits.ev_scheme': evScheme,
   'pension.contribution_level': contributionLevel,
+  'benefits.cycle_to_work': cycleToWork,
 } as const;
 
 export type ModuleId = keyof typeof MODULES;

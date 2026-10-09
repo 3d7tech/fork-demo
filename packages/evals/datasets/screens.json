@@ -46,6 +46,11 @@
    "question": "we want to give everyone a £1,500 christmas bonus, cash or pension?",
    "subject": "maya",
    "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "should I get a £1,200 bike through the cycle to work scheme or just buy it?",
+   "subject": "ella",
+   "family": "benefits.cycle_to_work"
   }
  ]
 }

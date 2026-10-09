@@ -143,3 +143,25 @@ describe('golden: how much to contribute (worked by hand)', () => {
   });
   it('validates as a CalcResult', () => expect(() => CalcResult.parse(runModule('pension.contribution_level', PACK, base))).not.toThrow());
 });
+
+describe('golden: cycle to work (worked by hand)', () => {
+  const base = { salary: 32000, hoursPerWeek: 37.5, bikePrice: 1000, schemeLimit: 2500, termMonths: 12 };
+  it('basic-rate taxpayer: a £1,000 bike costs £720 (20% tax and 8% NI saved), saving £280', () => {
+    const r = runModule('benefits.cycle_to_work', PACK, base);
+    expect(pounds(r, 'scheme_cost')).toBe(720);
+    expect(pounds(r, 'saving')).toBe(280);
+    expect(r.outputs.saving_pct?.value).toBeCloseTo(28, 10);
+    expect(r.verdict).toBe('scheme');
+  });
+  it('higher-rate taxpayer above the NI upper limit: a £1,500 bike costs £870 (40% and 2% saved)', () => {
+    const r = runModule('benefits.cycle_to_work', PACK, { ...base, salary: 58000, bikePrice: 1500 });
+    expect(pounds(r, 'scheme_cost')).toBe(870);
+    expect(pounds(r, 'saving')).toBe(630);
+  });
+  it('over the scheme limit is not allowed', () => {
+    const r = runModule('benefits.cycle_to_work', PACK, { ...base, bikePrice: 3000 });
+    expect(r.verdict).toBe('over_limit');
+    expect(r.constraints.find((c) => c.id === 'scheme_limit')?.outcome).toBe('excluded');
+  });
+  it('validates as a CalcResult', () => expect(() => CalcResult.parse(runModule('benefits.cycle_to_work', PACK, base))).not.toThrow());
+});

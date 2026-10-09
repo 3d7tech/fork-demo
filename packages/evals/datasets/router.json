@@ -818,6 +818,63 @@
    "audience": "owner",
    "route": "decision",
    "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "should i get a bike through cycle to work",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "cycle to work scheme worth it?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "bike via salary sacrifice or just buy it",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "is the cyclescheme thing a good deal on a £1,200 bike",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "ebike through work, how much do i save",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "thinking of a new road bike, should i use the work scheme",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "cycle 2 work - yes or no",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "does buying a bike through payroll save tax",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "how much can i spend on a bike through the scheme",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup",
+    "decision"
+   ]
   }
  ]
 }

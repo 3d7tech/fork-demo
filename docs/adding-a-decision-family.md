@@ -80,3 +80,13 @@ Add a pattern to `route()` in `packages/pipeline/src/demo.ts` so the app's demo 
 - [ ] Router, screen and lever eval cases; `pnpm eval` passes.
 - [ ] No change to `packages/pipeline/src/pipeline.ts`.
 - [ ] Open questions recorded.
+
+## Tested by adding cycle to work (2026-10-09)
+
+Following this guide added `benefits.cycle_to_work`: a module with two hand-worked golden cases (a £1,000 bike costs a basic-rate taxpayer £720; a £1,500 bike costs a higher-rate taxpayer above the NI upper limit £870), a family, an end-to-end test, eight router questions, a screen case and three lever cases. `pipeline.ts` didn't change. Every evaluation suite still passed (router 95%, lever reader 97%, screens 100% shown, typical 9.9 seconds).
+
+What it taught us, now folded into the guide:
+
+- Facts from documents weren't reaching decisions. `DbFactStore` now serves any confirmed document fact, with its page.
+- A non-pension salary sacrifice mustn't use the pension NI cap from 2029, so the module works out take-home itself rather than reusing `takeHome()`. Check the helpers you reuse apply to your decision.
+- The offline dataset checks caught the missing evaluation cases before any live run.
