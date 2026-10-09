@@ -1,6 +1,6 @@
 # 0010: A person's tax profile, so numbers fit real people
 
-Date: 2026-10-09 · Status: accepted, being built
+Date: 2026-10-09 · Status: accepted; steps 1 to 4 built, 5 and 6 to do
 
 ## Problem
 
@@ -57,14 +57,17 @@ thresholds, annual allowance, taper limits, money purchase allowance, minimum wa
 
 ## Plan
 
-| Step | What | Result |
+| Step | What | Status |
 |---|---|---|
-| 1 | Rules and engine functions above, golden tests by hand | Correct sums for each case |
-| 2 | `TaxProfile` through every module; new outputs and constraints (charge, allowance) | Every decision uses the profile |
-| 3 | Profile storage (RLS), payroll columns for tax code and student loan, "a few details first" | Real people get their profile |
-| 4 | Families: a Child Benefit charge decision (£60,000 to £80,000); bonus per person from payroll | Where sacrifice helps most |
-| 5 | Rule pack review tool: every value with source, checked and signed off by a person | Pack can be published |
-| 6 | Evaluation cases and wording for the new assumptions and constraints | Screens explain the new facts |
+| 1 | Rules and engine functions above, golden tests by hand | **Done** (`715d34d`) |
+| 2 | `TaxProfile` through every employee module (`jobPay`); annual allowance check; minimum wage by age | **Done** (`412b8b9`) |
+| 3 | Profile storage (RLS), payroll columns for tax code and student loan, "a few details first", "Your tax details" page | **Done** (`28c8217`) |
+| 4 | Child Benefit charge decision (£60,000 to £80,000); owner minimum wage by each person's age | **Done** (`611ec93`, `f1ed1ce`). Bonus per person from payroll still to do |
+| 5 | Rule pack review tool: every value with source, checked and signed off by a person | To do |
+| 6 | Evaluation cases and wording for the new assumptions and constraints | Mostly done with steps 2 to 4 (router, screen, spec cases; screens pass at 10.6s). Wording needs Richard's review |
+
+Built along the way: profile assumptions are written by code and shown as written (the explainer never
+rewrites them), which keeps screens at about 10 seconds.
 
 ## Not in scope
 

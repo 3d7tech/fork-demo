@@ -1,6 +1,6 @@
 # Fork: project memory
 
-Read this first in every session. Last updated 2026-10-09.
+Read this first in every session. Last updated 2026-10-09 (evening).
 
 Fork (3d7 Technologies) helps employees of small UK companies (20 to 100 people) decide about pay, pensions and benefits, and saves the employer National Insurance through salary sacrifice. The full brief is [`BUILD_PROMPT.md`](BUILD_PROMPT.md); its principles are non-negotiable. Product owner: Richard Awe (richard.awe@3d7tech.com).
 
@@ -21,6 +21,24 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). Phase 
 | 9 | Privacy enforcement tests, evaluation suites, red-team tests | Done (ADR 0009) |
 | 10 | "How to add a decision family" guide, tested by adding one | Done: `docs/adding-a-decision-family.md`, tested by adding cycle to work |
 
+## After Phase 1: what's in progress (start here)
+
+Three plans, agreed with Richard on 2026-10-09. Read them before changing the engine, screens or owner decisions:
+
+| Plan | What | Status |
+|---|---|---|
+| [ADR 0010](docs/adr/0010-tax-profile.md) | **Tax profile**: Scottish tax, student loans, Child Benefit charge, annual allowance, other income and variable pay, minimum wage by age | Steps 1 to 4 built. **Next: step 5, a rule pack review tool** (every value with its source, signed off by a person), then bonus per person from payroll |
+| [ADR 0011](docs/adr/0011-take-up.md) | **Take-up**: switching looks like a pay cut; real take-up from payroll instead of the assumed 70%; opt-out introduction and notional salary; each employee's own figure by email; objections answered; an "opt out of the pension" decision | Proposed, not started. Steps 1 and 2 matter most: they decide whether the sales promise holds |
+| [ADR 0012](docs/adr/0012-visuals-that-feel-real.md) | **Visuals that feel real**: payslip before and after, where each £1 goes, pension pot over time, the tax cliff as terrain (three.js, with static fallbacks) | Proposed, not started. Start with the payslip view (no 3D needed) |
+
+Also done on 2026-10-09:
+
+- Blocked screens: a salary in the question that differs from payroll is noted in code ("Your payroll shows £95,000…"); assumption sources come from the real fact; blocked answers keep the verifier's findings in the run record.
+- "What is my salary?" is answered from the person's own payroll; "what can you do?" gets a fixed reply listing their decisions (router prompt v2); "couldn't find that" lists what Fork can help with.
+- A new employee decision, the Child Benefit charge (8 families now: 3 owner, 5 employee).
+- Tax profile facts: payroll (tax code with an `S` prefix, student loan column) or the person's own answers in `tax_profile`, readable only by them (migration 0007). Fork asks region and student loan before the first screen; the rest are on "Your tax details" (`/me/tax`).
+- Profile assumptions are code-written and shown as written (`asWritten`); the explainer never rewrites them.
+
 **Model key:** `FORK_ANTHROPIC_API_KEY` in the Default environment (`ANTHROPIC_API_KEY` is reserved for Claude Code). The live check passed on 2026-10-08; `pnpm smoke:models` re-runs it. Never print, log or commit the key. Live screenshots are in `docs/screens/`.
 
 ## Layout
@@ -39,14 +57,14 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). Phase 
 | `apps/web` | Next.js 15 app; `/preview` shows every screen state |
 | `packages/jobs` | Monthly emails and saved-decision re-checks |
 | `packages/evals` | Evaluation suites and labelled datasets per model role |
-| `docs/adr/` | Decision records 0001 to 0009: read before changing architecture |
+| `docs/adr/` | Decision records 0001 to 0012: read before changing architecture |
 | `docs/open-questions.md` | Answers given and questions still open |
 
 ## Commands
 
 ```sh
 pnpm install
-pnpm test            # unit, golden and database tests (228)
+pnpm test            # unit, golden and database tests (277)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev
@@ -59,7 +77,9 @@ pnpm smoke:documents # live document interpreter on the fixtures, including a hi
 pnpm eval [suite]    # evaluation suites per role against live models (~$1.30 for all); report in .data/evals/
 ```
 
-Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`@playwright/test` pinned to 1.56.1). Don't run `playwright install`.
+Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`@playwright/test` pinned to 1.56.1). Don't run `playwright install`. That browser exists only in the cloud environment: on Richard's Mac `pnpm e2e` builds the app but can't launch the browser.
+
+Locally (Richard's Mac) the web app's settings and the key are in `apps/web/.env.local` (database URLs, `FORK_DEV_OUTBOX`, `FORK_ANTHROPIC_API_KEY`). For live scripts, read the key from there without printing it. Local accounts: owner `maya@larkfield.test`; employees include `ella.brooks@` (£32,000), `callum.fraser@` (£95,000), `asha.gill@` (£80,000) at `larkfield.test`. Sign in at `/signin`, then open the link at `/dev/outbox`.
 
 ## Decisions made with Richard (2026-10-08)
 
@@ -74,6 +94,14 @@ Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`
 - Wording is reviewed as we go.
 - 2029 salary sacrifice cap: law passed (NICs (Employer Pensions Contributions) Act 2026), £2,000 set by regulations. It applies to employee and employer NI and is stored as `legislated`.
 - Electric car benefit-in-kind: 4%, 5%, 7%, 9% for 2026-27 to 2029-30; the demo's 5.33% is the average of the first three.
+
+## Decisions made with Richard (2026-10-09)
+
+- Fix what makes numbers wrong for real people before adding breadth: the tax profile (ADR 0010).
+- New 2026-27 values (Scottish bands, student loans, minimum wage age bands, Child Benefit and its charge, annual allowance) are read from GOV.UK and marked for a person's check, like the rest of the pack.
+- Region and student loan are asked before the first screen, never assumed; other profile facts default and are shown as estimates.
+- Take-up is the business risk: show it from payroll, not a guess (ADR 0011).
+- Visuals should feel real (payslips, monthly amounts, a pot that grows), using three.js where it helps, always with a static fallback (ADR 0012).
 
 ## Rules for working here
 
