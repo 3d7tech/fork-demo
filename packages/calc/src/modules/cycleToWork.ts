@@ -58,7 +58,7 @@ export function cycleToWork(r: Rules, i: CycleToWorkInput): CalcResult {
     ],
     rulesUsed: r.rulesUsed(),
     assumptions: [
-      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false },
+      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false, fact: 'salary' },
       { text: `Paid over ${i.termMonths} months by salary sacrifice`, source: 'policy_document', estimate: false },
       { text: 'No fee to own the bike at the end of the hire; some schemes charge one', source: 'estimate', estimate: true },
     ],

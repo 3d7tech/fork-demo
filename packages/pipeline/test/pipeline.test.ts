@@ -31,7 +31,7 @@ describe('golden end to end: employee switches to salary sacrifice', () => {
     expect(models.rolesCalled().sort()).toEqual(['explainer', 'router', 'screen_composer', 'verifier']);
     expect(s.provenance.specFrom).toBe('template');
     expect(s.provenance.rulePack.id).toBe('uk-2026-27');
-    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v2', 'router:v1', 'screen_composer:v1', 'verifier:v3']);
+    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v3', 'router:v1', 'screen_composer:v1', 'verifier:v3']);
   });
 
   it('a less certain route still starts from the reviewed template', async () => {
@@ -82,7 +82,10 @@ describe('numbers the engine did not produce are blocked', () => {
 
   it('a screen that keeps quoting an invented number is never shown', async () => {
     const { deps: d } = deps({ ...good, explainer: invented });
-    expect(await askFork(d, { question: QUESTION, subject: ELLA })).toMatchObject({ kind: 'message', reason: 'blocked' });
+    const a = await askFork(d, { question: QUESTION, subject: ELLA });
+    expect(a).toMatchObject({ kind: 'message', reason: 'blocked' });
+    // The run record keeps why, so a blocked screen can be explained later.
+    expect(a.kind === 'message' && a.checks?.code.join(' ')).toContain('£150');
   });
 });
 
@@ -108,7 +111,10 @@ describe('the model verifier', () => {
 
   it('blocks when it says only a person can fix the screen', async () => {
     const { deps: d } = deps({ ...good, verifier: () => ({ pass: false, issues: [{ kind: 'advice', detail: 'Needs an adviser', sendBackTo: 'human' }] }) });
-    expect(await askFork(d, { question: QUESTION, subject: ELLA })).toMatchObject({ reason: 'blocked' });
+    expect(await askFork(d, { question: QUESTION, subject: ELLA })).toMatchObject({
+      reason: 'blocked',
+      checks: { issues: [{ kind: 'advice', sendBackTo: 'human', detail: 'Needs an adviser' }] },
+    });
   });
 });
 

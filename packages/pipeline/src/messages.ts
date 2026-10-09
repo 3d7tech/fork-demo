@@ -16,6 +16,8 @@ export interface ForkMessage {
   source?: string;
   /** For "not yet": the decisions Fork can help with today. */
   canHelpWith?: string[];
+  /** For "blocked": the last round of checks, kept with the run so the cause can be found later. */
+  checks?: { code: string[]; issues: Array<{ kind: string; sendBackTo: string; detail: string }> };
 }
 
 export const DISTRESS: ForkMessage = {
@@ -63,6 +65,8 @@ export const BLOCKED: ForkMessage = {
   body: 'Fork worked this out but couldn’t confirm every part of it, so it won’t show you something that might be wrong. Try asking again, or ask your employer or accountant.',
   routeTo: 'accountant',
 };
+
+export const blocked = (checks: NonNullable<ForkMessage['checks']>): ForkMessage => ({ ...BLOCKED, checks });
 
 export const clarify = (description: string): ForkMessage => ({
   kind: 'message',

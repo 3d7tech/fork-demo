@@ -7,7 +7,8 @@ import { sweepLever, type LeverSweep } from './sweep';
 import { FAMILIES, familiesFor, type FamilyData, type FamilyDef } from './families';
 import type { FactStore, Subject } from './facts';
 import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
-import { BLOCKED, clarify, DISTRESS, failed, HUMAN, LOOKUP_UNKNOWN, needsFacts, notYet, type ForkMessage } from './messages';
+import { withStatedPay } from './stated';
+import { blocked, clarify, DISTRESS, failed, HUMAN, LOOKUP_UNKNOWN, needsFacts, notYet, type ForkMessage } from './messages';
 
 export interface PipelineDeps {
   roles: RoleContext;
@@ -261,6 +262,11 @@ async function verify(t: Trace, family: FamilyDef, question: string, spec: Decis
   return { code, verifier, ok: code.length === 0 && verifier.pass };
 }
 
+/** The blocked message, carrying the last round's findings so the run record shows why. */
+function blockedBy(v: Awaited<ReturnType<typeof verify>>): ForkMessage {
+  return blocked({ code: v.code, issues: v.verifier.issues.map(({ kind, sendBackTo, detail }) => ({ kind, sendBackTo, detail })) });
+}
+
 // ---------- Calculation ----------
 
 function factValues(facts: Fact[]): Record<string, Fact['value']> {
@@ -282,7 +288,20 @@ export function leverValues(spec: DecisionSpec, facts: Fact[], chosen: Record<st
 }
 
 function calculate(family: FamilyDef, spec: DecisionSpec, facts: Fact[], answers: Record<string, string>, levers: Record<string, number>, data: FamilyData): CalcResult {
-  return runModule(family.module as ModuleId, family.rulePack, family.buildInput(factValues(facts), answers, leverValues(spec, facts, levers), data) as never);
+  const calc = runModule(family.module as ModuleId, family.rulePack, family.buildInput(factValues(facts), answers, leverValues(spec, facts, levers), data) as never);
+  return withStatedPay({ ...calc, assumptions: calc.assumptions.map((a) => ({ ...a, source: assumptionSource(a, facts, levers) })) }, spec.question, facts);
+}
+
+/**
+ * A module can't know where a fact came from (an employee's contribution may come from payroll
+ * or from the scheme's default), so an assumption that restates one fact takes that fact's source.
+ * A lever the person moved away from the fact is their own choice.
+ */
+function assumptionSource(a: CalcResult['assumptions'][number], facts: Fact[], levers: Record<string, number>): CalcResult['assumptions'][number]['source'] {
+  if (!a.fact) return a.source;
+  const fact = facts.find((f) => f.id === a.fact);
+  if (a.fact in levers && levers[a.fact] !== fact?.value) return 'user_answer';
+  return fact?.source ?? a.source;
 }
 
 /** Data beyond single facts, for families that need it. Read by code; never sent to a model. */
@@ -349,8 +368,9 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     step({ id: 'screen', label: 'Chose the screen' });
 
     // Check, then allow one revision round in which each problem goes back to the step that can fix it.
+    let v!: Awaited<ReturnType<typeof verify>>;
     for (let round = 0; round < 2; round++) {
-      const v = await verify(t, family, question, spec, calc, numbers, copy);
+      v = await verify(t, family, question, spec, calc, numbers, copy);
       if (v.ok) {
         step({ id: 'checked', label: 'Checked every number against the calculation' });
         return {
@@ -392,7 +412,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
         toSpec.length || toCopy.length ? explain(t, family, question, spec, calc, numbers, toCopy.length ? toCopy : undefined) : copy,
       ]);
     }
-    return BLOCKED;
+    return blockedBy(v);
   } catch (error) {
     if (error instanceof RoleFailedError) return failed(error.userMessage);
     throw error;
@@ -424,9 +444,10 @@ export async function reexplain(deps: PipelineDeps, screen: DecisionScreen, reca
   const t = new Trace(deps);
   try {
     let feedback: string[] | undefined;
+    let v!: Awaited<ReturnType<typeof verify>>;
     for (let round = 0; round < 2; round++) {
       const copy = await explain(t, family, screen.question, screen.spec, recalc.calc, recalc.numbers, feedback);
-      const v = await verify(t, family, screen.question, screen.spec, recalc.calc, recalc.numbers, copy);
+      v = await verify(t, family, screen.question, screen.spec, recalc.calc, recalc.numbers, copy);
       if (v.ok) {
         const highlight = recalc.calc.constraints.find((c) => c.outcome !== 'pass')?.id ?? null;
         return {
@@ -446,7 +467,7 @@ export async function reexplain(deps: PipelineDeps, screen: DecisionScreen, reca
       feedback = [...v.code, ...v.verifier.issues.map((i) => `${i.kind}: ${i.detail}`)];
       t.revised.push(...feedback);
     }
-    return BLOCKED;
+    return blockedBy(v);
   } catch (error) {
     if (error instanceof RoleFailedError) return failed(error.userMessage);
     throw error;

@@ -85,14 +85,15 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
     constraints,
     rulesUsed: r.rulesUsed(),
     assumptions: [
-      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false },
-      { text: `Contributing ${i.contributionPct}% of pay today`, source: 'pension_scheme', estimate: false },
+      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false, fact: 'salary' },
+      { text: `Contributing ${i.contributionPct}% of pay today`, source: 'pension_scheme', estimate: false, fact: 'contribution_pct' },
       {
         text: i.reliefMethod === 'relief_at_source' ? 'Pension uses relief at source: the provider adds basic-rate relief' : 'Pension uses a net pay arrangement',
         source: 'pension_scheme',
         estimate: false,
+        fact: 'relief_method',
       },
-      { text: `Employer shares ${i.employerSharePct}% of its NI saving`, source: 'company_setting', estimate: false },
+      { text: `Employer shares ${i.employerSharePct}% of its NI saving`, source: 'company_setting', estimate: false, fact: 'employer_share_pct' },
       { text: 'Figures from April 2029 use today’s tax bands with the salary sacrifice cap applied', source: 'rules', estimate: true },
     ],
   };

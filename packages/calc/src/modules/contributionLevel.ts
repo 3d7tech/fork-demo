@@ -67,8 +67,8 @@ export function contributionLevel(r: Rules, i: ContributionLevelInput): CalcResu
     constraints: i.bySacrifice ? [{ id: 'min_wage', outcome: minWageOk ? 'pass' : 'excluded' }] : [],
     rulesUsed: r.rulesUsed(),
     assumptions: [
-      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false },
-      { text: `Employer puts in ${i.employerContributionPct}% of pay whatever you choose`, source: 'pension_scheme', estimate: false },
+      { text: `Pay £${i.salary.toLocaleString('en-GB')} a year`, source: 'payroll_export', estimate: false, fact: 'salary' },
+      { text: `Employer puts in ${i.employerContributionPct}% of pay whatever you choose`, source: 'pension_scheme', estimate: false, fact: 'employer_contribution_pct' },
       {
         text: i.bySacrifice ? 'Paid by salary sacrifice' : i.reliefMethod === 'relief_at_source' ? 'Relief at source: the provider adds basic-rate relief' : 'Net pay arrangement: paid before income tax',
         source: 'pension_scheme',

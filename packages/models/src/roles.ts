@@ -175,7 +175,7 @@ export const ROLES = {
   router: def('router', 'v1', RouterInput, RouterOutput),
   spec_writer: def('spec_writer', 'v1', SpecWriterInput, SpecWriterOutput),
   screen_composer: def('screen_composer', 'v1', ScreenComposerInput, ScreenComposerOutput),
-  explainer: def('explainer', 'v2', ExplainerInput, ExplainerOutput),
+  explainer: def('explainer', 'v3', ExplainerInput, ExplainerOutput),
   verifier: def('verifier', 'v3', VerifierInput, VerifierOutput),
   column_matcher: def('column_matcher', 'v1', ColumnMatcherInput, ColumnMatcherOutput),
   document_interpreter: def('document_interpreter', 'v1', DocumentInterpreterInput, DocumentInterpreterOutput),

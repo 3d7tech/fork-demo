@@ -46,7 +46,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). Phase 
 
 ```sh
 pnpm install
-pnpm test            # unit, golden and database tests (193)
+pnpm test            # unit, golden and database tests (228)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev

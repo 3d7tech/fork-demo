@@ -47,7 +47,7 @@ export function hireCost(r: Rules, i: HireCostInput): CalcResult {
     constraints: [],
     rulesUsed: r.rulesUsed(),
     assumptions: [
-      { text: `Employer pension ${i.employerPensionPct}% of ${i.pensionBasis === 'full_salary' ? 'full salary' : 'qualifying earnings'}`, source: 'pension_scheme', estimate: false },
+      { text: `Employer pension ${i.employerPensionPct}% of ${i.pensionBasis === 'full_salary' ? 'full salary' : 'qualifying earnings'}`, source: 'pension_scheme', estimate: false, fact: 'employer_contribution_pct' },
       { text: 'NI bill already above the Employment Allowance, so the new hire’s NI is a real cost', source: 'payroll_export', estimate: false },
       { text: 'Not included: recruitment fees, training, bonus or car allowance', source: 'rules', estimate: false },
     ],

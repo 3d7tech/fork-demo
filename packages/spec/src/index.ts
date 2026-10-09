@@ -153,7 +153,10 @@ export const CalcResult = z.object({
   leverRanges: z.array(z.object({ lever: slug, verdict: slug, from: z.number(), to: z.number() })).default([]),
   constraints: z.array(z.object({ id: slug, outcome: z.enum(['pass', 'caution', 'excluded']), detail: z.string().optional() })).default([]),
   rulesUsed: z.array(RuleUse),
-  assumptions: z.array(z.object({ text: z.string(), source: FactSource.or(z.literal('rules')), estimate: z.boolean().default(false) })).default([]),
+  /** `fact` names the single fact an assumption restates; the pipeline then uses that fact's own source. */
+  assumptions: z
+    .array(z.object({ text: z.string(), source: FactSource.or(z.literal('rules')), estimate: z.boolean().default(false), fact: slug.optional() }))
+    .default([]),
 });
 export type CalcResult = z.infer<typeof CalcResult>;
 

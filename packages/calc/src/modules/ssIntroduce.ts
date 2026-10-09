@@ -102,10 +102,10 @@ export function ssIntroduce(r: Rules, i: SsIntroduceInput): CalcResult {
     rulesUsed: r.rulesUsed(),
     assumptions: [
       { text: `${i.employees.length} salaries and contracted hours from the payroll export`, source: 'payroll_export', estimate: false },
-      { text: `Staff contribute ${i.contributionPct}% of pay`, source: 'pension_scheme', estimate: false },
+      { text: `Staff contribute ${i.contributionPct}% of pay`, source: 'pension_scheme', estimate: false, fact: 'contribution_pct' },
       { text: `${i.takeUpPct}% of eligible staff switch`, source: 'user_answer', estimate: true },
       { text: `${i.sharePct}% of the saving goes into staff pensions`, source: 'company_setting', estimate: false },
-      { text: `Fork costs £${i.feePerEmployeePerMonth} per employee per month`, source: 'company_setting', estimate: false },
+      { text: `Fork costs £${i.feePerEmployeePerMonth} per employee per month`, source: 'company_setting', estimate: false, fact: 'fee_per_employee' },
       {
         text: i.employmentAllowanceEligible ? 'Employment Allowance claimed: only NI above the allowance counts as saved' : 'Employment Allowance not claimed',
         source: 'company_setting',
