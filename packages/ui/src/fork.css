@@ -1052,3 +1052,283 @@ a {
 .fk-profile .fk-pills {
   flex-wrap: wrap;
 }
+
+/* ---------- Payslip, before and after (ADR 0012 step 1) ---------- */
+.fk-payslip-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.fk-payslip-diff {
+  margin: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  animation: fk-pop 0.7s 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+.fk-payslip-diff strong {
+  font-family: var(--fk-display);
+  font-weight: var(--fk-display-weight);
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.fk-payslip-diff.fk-up {
+  background: var(--fk-gain-soft);
+  color: var(--fk-gain);
+}
+.fk-payslip-diff.fk-down {
+  background: var(--fk-warn-bg);
+  color: var(--fk-warn-ink);
+}
+@keyframes fk-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* The slip itself: paper with a torn-off bottom edge. */
+.fk-paper {
+  position: relative;
+  background: var(--fk-ground);
+  border: 1px solid var(--fk-line);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  padding: 6px 14px 18px;
+  --fk-tear: 10px;
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--fk-tear)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--fk-tear) * 2) var(--fk-tear) repeat-x;
+  mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--fk-tear)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--fk-tear) * 2) var(--fk-tear) repeat-x;
+}
+.fk-paper table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.fk-paper thead th {
+  padding: 10px 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fk-muted);
+  text-align: right;
+  border-bottom: 1px solid var(--fk-line);
+}
+.fk-paper thead th.fk-col-new {
+  color: var(--fk-gain);
+}
+.fk-paper tbody th {
+  text-align: left;
+  font-weight: 400;
+  color: var(--fk-ink-2);
+  padding: 9px 8px 9px 0;
+  line-height: 1.3;
+}
+.fk-paper td {
+  text-align: right;
+  white-space: nowrap;
+  padding: 9px 0 9px 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fk-muted);
+}
+.fk-paper td.fk-col-new {
+  color: var(--fk-ink);
+  font-weight: 500;
+}
+.fk-paper tbody tr {
+  border-bottom: 1px dashed var(--fk-line);
+  animation: fk-slip-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(0.15s + var(--i, 0) * 0.08s);
+}
+.fk-paper tbody tr:last-child {
+  border-bottom: 0;
+}
+@keyframes fk-slip-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* A changed line gets a highlighter stroke that sweeps in after the rows land. */
+.fk-paper .fk-hl {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.fk-paper tr.fk-slip-changed .fk-hl {
+  background: linear-gradient(var(--fk-gain-soft), var(--fk-gain-soft)) right / 0% 100% no-repeat;
+  animation: fk-highlight 0.6s 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  color: var(--fk-gain);
+}
+@keyframes fk-highlight {
+  to {
+    background-size: 100% 100%;
+  }
+}
+.fk-paper tr.fk-slip-changed th::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--fk-gain);
+  vertical-align: middle;
+}
+.fk-paper tr.fk-slip-take_home {
+  border-top: 2px solid var(--fk-ink);
+  border-bottom: 0;
+}
+.fk-paper tr.fk-slip-take_home th,
+.fk-paper tr.fk-slip-take_home td {
+  white-space: nowrap;
+  padding-top: 12px;
+  font-weight: 600;
+  color: var(--fk-ink);
+  font-size: 15px;
+}
+.fk-paper tr.fk-slip-take_home td.fk-col-new {
+  font-size: 17px;
+  font-family: var(--fk-display);
+  font-weight: var(--fk-display-weight);
+}
+.fk-paper tr.fk-slip-take_home th::after {
+  display: none;
+}
+@media (max-width: 380px) {
+  .fk-paper {
+    padding: 4px 10px 16px;
+  }
+  .fk-paper table {
+    font-size: 13px;
+  }
+}
+
+/* ---------- Polish: calm motion that says "this is working for you" ---------- */
+body {
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+.fk-card,
+.fk-constraints,
+.fk-levers,
+.fk-vis,
+.fk-method,
+.fk-tile {
+  transition: background-color 0.35s ease, border-color 0.35s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (hover: hover) {
+  .fk-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 2px rgba(17, 17, 16, 0.05), 0 14px 32px -16px rgba(17, 17, 16, 0.22);
+  }
+}
+/* Checks tick themselves off one after another. */
+.fk-hard::before {
+  animation: fk-tick 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+.fk-hard:nth-child(2)::before {
+  animation-delay: 0.12s;
+}
+.fk-hard:nth-child(3)::before {
+  animation-delay: 0.24s;
+}
+@keyframes fk-tick {
+  from {
+    transform: scale(0) rotate(-30deg);
+  }
+  to {
+    transform: none;
+  }
+}
+/* The verdict gets an accent rule and settles in a beat after the card. */
+.fk-verdict {
+  position: relative;
+  overflow: hidden;
+}
+.fk-verdict::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--fk-gain);
+  transform-origin: top;
+  animation: fk-rule 0.7s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+@keyframes fk-rule {
+  from {
+    transform: scaleY(0);
+  }
+}
+.fk-verdict h2 {
+  animation: fk-rise 0.6s 0.15s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.fk-verdict.fk-stale h2 {
+  animation: none;
+}
+/* The hero number: a soft light passes over it once it lands. */
+.fk-tile.fk-hero {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--fk-gain) 14%, var(--fk-gain-soft)), var(--fk-gain-soft) 60%);
+}
+.fk-tile.fk-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, color-mix(in srgb, var(--fk-surface) 55%, transparent) 50%, transparent 65%);
+  transform: translateX(-100%);
+  animation: fk-sheen 1.4s 0.9s ease-in-out both;
+  pointer-events: none;
+}
+@keyframes fk-sheen {
+  to {
+    transform: translateX(100%);
+  }
+}
+/* Bars: thicker, rounded, with depth. */
+.fk-stack {
+  height: 16px;
+  border-radius: 8px;
+}
+.fk-stack > span {
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.06));
+  border-radius: 8px;
+}
+/* Pills and buttons answer a press. */
+.fk-pills button:active,
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+.fk-pills button {
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.12s;
+}
+/* The lever thumb glows while held. */
+.fk-lever input[type='range']:focus-visible::-webkit-slider-thumb,
+.fk-lever input[type='range']:active::-webkit-slider-thumb {
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--fk-gain) 18%, transparent);
+}
+/* Dark shows the verdict without a card, so it needs room for the rule. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .fk-verdict {
+    padding-left: 18px;
+  }
+}
+:root[data-theme='dark'] .fk-verdict {
+  padding-left: 18px;
+}

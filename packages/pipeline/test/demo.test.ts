@@ -10,7 +10,12 @@ describe('demo mode', () => {
     const s = (await askFork(deps, { question: 'is salary sacrifice worth it?', subject: DEMO_SUBJECT })) as DecisionScreen;
     expect(s.kind).toBe('decision');
     expect(s.copy.verdict).toBe('Switch. You take home £128 more a year, and Larkfield adds £120 to your pension.');
-    expect(s.visual.type).toBe('bars');
+    // A month's payslip, every figure an engine number shown as the screen formats it.
+    expect(s.visual.type).toBe('payslip');
+    if (s.visual.type !== 'payslip') return;
+    expect(s.visual.difference).toMatchObject({ display: '£10.66', label: 'more a month' });
+    expect(s.visual.slips.map((x) => x.lines.find((l) => l.id === 'take_home')!.display)).toEqual(['£2,106.64', '£2,117.30']);
+    for (const slip of s.visual.slips) for (const l of slip.lines) expect(s.numbers.some((n) => n.display === l.display), l.label).toBe(true);
   });
 
   it('caution answers re-explain and still pass the checks', async () => {

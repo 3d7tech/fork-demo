@@ -25,6 +25,12 @@ export function formatGBP(v: number): string {
   return `${sign}£${r.toLocaleString('en-GB')}`;
 }
 
+/** Money to the penny, as a payslip shows it: £2,666.67. */
+export function formatPence(v: number): string {
+  const sign = v < 0 ? '−' : '';
+  return `${sign}£${Math.abs(v).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 export function formatPct(v: number): string {
   return `${Number(v.toFixed(2)).toLocaleString('en-GB')}%`;
 }
@@ -39,6 +45,8 @@ export function formatQuantity(q: Pick<Quantity, 'value' | 'unit'>): string {
   switch (q.unit) {
     case 'GBP':
       return formatGBP(q.value);
+    case 'GBP_pence':
+      return formatPence(q.value);
     case 'pct':
       return formatPct(q.value);
     case 'rate':

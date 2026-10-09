@@ -1,5 +1,5 @@
 import { uk } from '@fork/calc';
-import type { Fact } from '@fork/spec';
+import type { CalcResult, Fact, VisualData } from '@fork/spec';
 
 export const num = (v: unknown, what = 'value'): number => {
   if (typeof v !== 'number') throw new Error(`Expected a number for ${what}, got ${typeof v}`);
@@ -67,4 +67,44 @@ export function profileFrom(f: Record<string, Fact['value']>): { profile: uk.Tax
     age: pick('age', 'age', number),
   };
   return { profile, assumed };
+}
+
+type SlipKey = 'gross' | 'pension' | 'tax' | 'ni' | 'student_loan' | 'take_home';
+const SLIP_LINES: Array<{ key: SlipKey; label: string; kind: 'pay' | 'deduction' | 'take_home' }> = [
+  { key: 'gross', label: 'Pay', kind: 'pay' },
+  { key: 'pension', label: 'Pension', kind: 'deduction' },
+  { key: 'tax', label: 'Income tax', kind: 'deduction' },
+  { key: 'ni', label: 'National Insurance', kind: 'deduction' },
+  { key: 'student_loan', label: 'Student loan', kind: 'deduction' },
+  { key: 'take_home', label: 'Take-home', kind: 'take_home' },
+];
+
+/**
+ * Two payslips from the engine's `payslipOutputs` (prefixes `a` and `b`). Every figure is an
+ * engine output with its screen display; lines the engine didn't produce (no student loan) are left out.
+ */
+export function payslipVisual(
+  calc: CalcResult,
+  display: (key: string) => string,
+  o: { title: string; a: { prefix: string; label: string }; b: { prefix: string; label: string }; difference: string; note?: string },
+): VisualData {
+  const slip = (s: typeof o.a, tone: 'a' | 'b') => ({
+    label: s.label,
+    tone,
+    lines: SLIP_LINES.filter((l) => calc.outputs[`${s.prefix}_${l.key}`]).map((l) => ({
+      id: l.key,
+      label: l.label,
+      value: calc.outputs[`${s.prefix}_${l.key}`]!.value,
+      display: display(`${s.prefix}_${l.key}`),
+      kind: l.kind,
+    })),
+  });
+  const gain = calc.outputs[o.difference]!;
+  return {
+    type: 'payslip',
+    title: o.title,
+    difference: { value: gain.value, display: display(o.difference), label: gain.value >= 0 ? 'more a month' : 'less a month' },
+    slips: [slip(o.a, 'a'), slip(o.b, 'b')],
+    ...(o.note ? { note: o.note } : {}),
+  };
 }

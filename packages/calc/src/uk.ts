@@ -1,4 +1,5 @@
-import { D, Decimal, max, min, ZERO, type Num, type Rules } from './core';
+import type { Quantity } from '@fork/spec';
+import { D, Decimal, max, min, q, ZERO, type Num, type Rules } from './core';
 
 export type TaxRegion = 'rest_of_uk' | 'scotland';
 export type StudentLoanPlan = 'plan_1' | 'plan_2' | 'plan_4' | 'plan_5' | 'postgraduate';
@@ -235,6 +236,38 @@ export function jobPay(r: Rules, i: JobPayInput): JobPay {
 }
 
 /** Yearly hours from weekly contracted hours. */
+/** One month's payslip, to the penny. Take-home is what's left after the lines above it, so the lines always add up. */
+export interface PayslipMonth {
+  gross: Decimal;
+  pension: Decimal;
+  incomeTax: Decimal;
+  employeeNI: Decimal;
+  studentLoan: Decimal;
+  takeHome: Decimal;
+}
+
+/**
+ * A month of a year's `jobPay`. `gross` is pay before any pension; `pension` is what the payslip
+ * takes for it (a sacrifice, a net pay contribution, or a relief-at-source contribution after relief).
+ */
+export function payslipMonth(job: JobPay, gross: Num, pension: Num): PayslipMonth {
+  const m = (v: Num) => D(v).div(12).toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+  const line = { gross: m(gross), pension: m(pension), incomeTax: m(job.incomeTax), employeeNI: m(job.employeeNI), studentLoan: m(job.studentLoan) };
+  return { ...line, takeHome: line.gross.minus(line.pension).minus(line.incomeTax).minus(line.employeeNI).minus(line.studentLoan) };
+}
+
+/** Payslip lines as engine outputs (`<prefix>_gross` …), so every figure on a payslip is a checked number. */
+export function payslipOutputs(prefix: string, label: string, p: PayslipMonth, withLoan: boolean): Record<string, Quantity> {
+  return {
+    [`${prefix}_gross`]: q(p.gross, 'GBP_pence', `Pay a month, ${label}`),
+    [`${prefix}_pension`]: q(p.pension, 'GBP_pence', `Pension a month, ${label}`),
+    [`${prefix}_tax`]: q(p.incomeTax, 'GBP_pence', `Income tax a month, ${label}`),
+    [`${prefix}_ni`]: q(p.employeeNI, 'GBP_pence', `National Insurance a month, ${label}`),
+    ...(withLoan ? { [`${prefix}_student_loan`]: q(p.studentLoan, 'GBP_pence', `Student loan a month, ${label}`) } : {}),
+    [`${prefix}_take_home`]: q(p.takeHome, 'GBP_pence', `Take-home a month, ${label}`),
+  };
+}
+
 export function yearlyHours(hoursPerWeek: Num): Decimal {
   return D(hoursPerWeek).times(52);
 }

@@ -29,7 +29,7 @@ Three plans, agreed with Richard on 2026-10-09. Read them before changing the en
 |---|---|---|
 | [ADR 0010](docs/adr/0010-tax-profile.md) | **Tax profile**: Scottish tax, student loans, Child Benefit charge, annual allowance, other income and variable pay, minimum wage by age | Steps 1 to 5 built (step 5: `pnpm rules`, checklist in `docs/rule-pack-review.md`; 0 of 60 values signed so far, Richard to check). **Next: bonus per person from payroll**, then ADR 0011 steps 1 and 2 |
 | [ADR 0011](docs/adr/0011-take-up.md) | **Take-up**: switching looks like a pay cut; real take-up from payroll instead of the assumed 70%; opt-out introduction and notional salary; each employee's own figure by email; objections answered; an "opt out of the pension" decision | Proposed, not started. Steps 1 and 2 matter most: they decide whether the sales promise holds |
-| [ADR 0012](docs/adr/0012-visuals-that-feel-real.md) | **Visuals that feel real**: payslip before and after, where each £1 goes, pension pot over time, the tax cliff as terrain (three.js, with static fallbacks) | Proposed, not started. Start with the payslip view (no 3D needed) |
+| [ADR 0012](docs/adr/0012-visuals-that-feel-real.md) | **Visuals that feel real**: payslip before and after, where each £1 goes, pension pot over time, the tax cliff as terrain (three.js, with static fallbacks) | Step 1 built for salary sacrifice: a month's payslip today and after, to the penny, with motion. Next: payslips for pension amount and cycle to work, then step 2 (where each £1 goes) |
 
 Also done on 2026-10-09:
 
@@ -66,7 +66,7 @@ Also done on 2026-10-09:
 
 ```sh
 pnpm install
-pnpm test            # unit, golden and database tests (287)
+pnpm test            # unit, golden and database tests (288)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev

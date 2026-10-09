@@ -1,4 +1,4 @@
-import { profileFrom } from './shared';
+import { payslipVisual, profileFrom } from './shared';
 import type { FamilyDef } from './types';
 
 const num = (v: unknown) => {
@@ -71,22 +71,16 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
     highlightConstraint: null,
   },
   visual(calc, display) {
-    const before = calc.outputs.take_home_before!.value;
-    const after = calc.outputs.take_home_after!.value;
-    const floor = Math.floor((Math.min(before, after) * 0.97) / 100) * 100;
-    return {
-      type: 'bars',
-      title: 'Your take-home pay a year',
-      rows: [
-        { label: 'Today', total: { value: before, display: display('take_home_before') }, segments: [{ value: before, tone: 'a', label: 'Take-home today' }] },
-        { label: 'On salary sacrifice', total: { value: after, display: display('take_home_after') }, segments: [{ value: after, tone: 'b', label: 'Take-home on salary sacrifice' }] },
-      ],
-      keys: [
-        { tone: 'a', label: 'Today' },
-        { tone: 'b', label: 'On salary sacrifice' },
-      ],
-      floor: { value: floor, display: `£${floor.toLocaleString('en-GB')}` },
-    };
+    const ras = calc.assumptions.some((a) => a.fact === 'relief_method' && a.text.startsWith('Pension uses relief at source'));
+    return payslipVisual(calc, display, {
+      title: 'Your payslip each month',
+      a: { prefix: 'slip_today', label: 'Today' },
+      b: { prefix: 'slip_sacrifice', label: 'On salary sacrifice' },
+      difference: 'slip_gain',
+      note: ras
+        ? 'Today your pension provider adds basic-rate tax relief, so less leaves your pay than goes into the pension. On salary sacrifice the full amount comes off before tax and National Insurance.'
+        : 'On salary sacrifice your pension comes off before National Insurance as well as tax.',
+    });
   },
   request(r) {
     const pct = r.levers.contribution_pct ?? r.facts.contribution_pct;

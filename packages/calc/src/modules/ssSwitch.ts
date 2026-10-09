@@ -1,7 +1,7 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, leverRanges, q, type Rules } from '../core';
 import { annualAllowanceCheck, profileAssumptions, profileOf, type Profiled } from '../profile';
-import { employerNISaving, jobPay, minimumWage, yearlyHours } from '../uk';
+import { employerNISaving, jobPay, minimumWage, payslipMonth, payslipOutputs, yearlyHours } from '../uk';
 
 export interface SsSwitchInput extends Profiled {
   salary: number;
@@ -31,7 +31,12 @@ function at(r: Rules, i: SsSwitchInput) {
   const erSaving = employerNISaving(r, salary.plus(profile.variablePay), con);
   const share = erSaving.times(i.employerSharePct).div(100);
   const chargeSaved = before.childBenefitCharge.minus(after.childBenefitCharge);
-  return { salary, con, before, after, gain, erSaving, share, chargeSaved, loanSaved: before.studentLoan.minus(after.studentLoan) };
+  const gross = salary.plus(profile.variablePay);
+  const slips = {
+    before: payslipMonth(before, gross, i.reliefMethod === 'relief_at_source' ? before.pensionFromPay : con),
+    after: payslipMonth(after, gross, con),
+  };
+  return { salary, con, before, after, gain, erSaving, share, chargeSaved, slips, loanSaved: before.studentLoan.minus(after.studentLoan) };
 }
 
 /** Basic pay after sacrifice against the minimum wage for the person's age. Variable pay isn't counted on. */
@@ -72,6 +77,9 @@ export function ssSwitch(r: Rules, i: SsSwitchInput): CalcResult {
       ...(profileOf(i).studentLoans.length ? { student_loan_saving: q(now.loanSaved, 'GBP', 'Less student loan repaid a year') } : {}),
       ...(now.chargeSaved.gt(0) ? { child_benefit_charge_saving: q(now.chargeSaved, 'GBP', 'Less Child Benefit charge a year') } : {}),
       ...(allowance.constraint.outcome === 'caution' ? { annual_allowance: q(allowance.allowance, 'GBP', 'Your pension annual allowance') } : {}),
+      ...payslipOutputs('slip_today', 'today', now.slips.before, profileOf(i).studentLoans.length > 0),
+      ...payslipOutputs('slip_sacrifice', 'on salary sacrifice', now.slips.after, profileOf(i).studentLoans.length > 0),
+      slip_gain: q(now.slips.after.takeHome.minus(now.slips.before.takeHome), 'GBP_pence', 'Extra take-home a month'),
       take_home_gain_2029: q(later.gain, 'GBP', 'Extra take-home a year from April 2029', true),
       employer_share_2029: q(later.share, 'GBP', 'Employer share from April 2029', true),
       parental_pay_reduction: q(parentalPayReduction, 'GBP', 'Less statutory parental pay over the first six weeks'),

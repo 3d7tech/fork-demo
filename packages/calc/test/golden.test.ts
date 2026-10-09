@@ -27,6 +27,15 @@ describe('golden: employee switches to salary sacrifice', () => {
     expect(r.verdict).toBe('switch');
   });
   it('validates as a CalcResult', () => expect(() => CalcResult.parse(r)).not.toThrow());
+  it('payslips a month, worked by hand to the penny', () => {
+    const slip = (p: string) => ['gross', 'pension', 'tax', 'ni', 'take_home'].map((k) => r.outputs[`${p}_${k}`]!.value);
+    // Today: relief at source, so £1,600 costs £1,280 from take-home; tax and NI on the full £32,000.
+    expect(slip('slip_today')).toEqual([2666.67, 106.67, 323.83, 129.53, 2106.64]);
+    // Sacrifice: £1,600 off pay first; tax and NI on £30,400.
+    expect(slip('slip_sacrifice')).toEqual([2666.67, 133.33, 297.17, 118.87, 2117.3]);
+    expect(r.outputs.slip_gain!.value).toBe(10.66);
+    expect(r.outputs.slip_today_student_loan).toBeUndefined();
+  });
 });
 
 describe('golden: company introduces salary sacrifice (Larkfield)', () => {

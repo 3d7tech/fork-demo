@@ -1,6 +1,6 @@
 # 0012: Visuals that feel real
 
-Date: 2026-10-09 · Status: proposed (agreed with Richard as the plan; not started)
+Date: 2026-10-09 · Status: accepted; step 1 built (salary sacrifice switch)
 
 ## Problem
 
@@ -45,4 +45,4 @@ then 3 (needs a reviewed projection source), then 5 with ADR 0011.
 ## Open questions for Richard
 
 - Projection growth rates for step 3: use the FCA's standard projection rates, or none until reviewed?
-- Should the payslip view be the default visual for salary sacrifice, replacing the bars?
+- ~~Should the payslip view be the default visual for salary sacrifice, replacing the bars?~~ Yes (Richard, 2026-10-09: the screens felt basic). Built: `payslipMonth`/`payslipOutputs` in `packages/calc/src/uk.ts` (to the penny, lines always add up; a `GBP_pence` unit), the `payslip` visual, and a motion pass (checks tick in, verdict rule, hero sheen, rows slide in, changed lines highlighted; all off with reduced motion). Next: payslips for pension amount and cycle to work, then step 2.

@@ -119,7 +119,8 @@ export type DecisionSpec = z.infer<typeof DecisionSpec>;
 
 // ---------- Calculation result ----------
 
-export const QuantityUnit = z.enum(['GBP', 'pct', 'rate', 'count', 'miles', 'GBP_per_hour']);
+/** `GBP_pence` is money shown to the penny, as on a payslip; `GBP` is shown in whole pounds. */
+export const QuantityUnit = z.enum(['GBP', 'GBP_pence', 'pct', 'rate', 'count', 'miles', 'GBP_per_hour']);
 
 /** One number the engine produced. The explainer may only quote numbers that appear here. */
 export const Quantity = z.object({
@@ -233,8 +234,27 @@ export const VisualData = z.discriminatedUnion('type', [
     title: z.string(),
     columns: z.array(z.object({ label: z.string(), total: Shown, parts: z.array(z.object({ value: z.number(), display: z.string(), label: z.string(), tone: Tone })) })),
   }),
+  /** Two monthly payslips side by side; lines whose amount differs are marked. ADR 0012 step 1. */
+  z.object({
+    type: z.literal('payslip'),
+    title: z.string(),
+    /** The difference in take-home a month, and how to say it ("more a month"). */
+    difference: Shown.extend({ label: z.string() }),
+    slips: z
+      .array(
+        z.object({
+          label: z.string(),
+          tone: Tone,
+          lines: z.array(z.object({ id: z.string(), label: z.string(), value: z.number(), display: z.string(), kind: z.enum(['pay', 'deduction', 'take_home']) })),
+        }),
+      )
+      .length(2),
+    /** A plain sentence under the slip, with no numbers of its own. */
+    note: z.string().optional(),
+  }),
 ]);
 export type VisualData = z.infer<typeof VisualData>;
+export type PayslipVisual = Extract<VisualData, { type: 'payslip' }>;
 
 export function toJsonSchemas() {
   return {
