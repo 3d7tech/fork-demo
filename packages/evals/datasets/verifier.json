@@ -1,0 +1,15 @@
+{
+ "suite": "verifier",
+ "threshold": {
+  "catch_rate": 0.85,
+  "false_alarm_max": 0.25
+ },
+ "faults": [
+  "wrong_number_meaning",
+  "advice",
+  "missing_caution",
+  "wrong_source",
+  "invented_number"
+ ],
+ "note": "Faults are seeded into real screens built from the screens suite's questions."
+}

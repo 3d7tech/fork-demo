@@ -1,0 +1,124 @@
+{
+ "suite": "lever_reader",
+ "threshold": {
+  "accuracy": 0.9
+ },
+ "cases": [
+  {
+   "question": "what does it actually cost us to hire someone on 40k",
+   "family": "employer.true_cost_of_hire",
+   "expect": {
+    "salary": 40000
+   }
+  },
+  {
+   "question": "true cost of a new hire on £35,500 with about £2k of kit",
+   "family": "employer.true_cost_of_hire",
+   "expect": {
+    "salary": 35500,
+    "extras": 2000
+   }
+  },
+  {
+   "question": "hiring at 55k, they'd sacrifice 5% into pension",
+   "family": "employer.true_cost_of_hire",
+   "expect": {
+    "salary": 55000,
+    "sacrifice_pct": 5
+   }
+  },
+  {
+   "question": "what does a new hire cost us",
+   "family": "employer.true_cost_of_hire",
+   "expect": {
+    "salary": null
+   }
+  },
+  {
+   "question": "we want to give everyone a £1,500 christmas bonus, cash or pension?",
+   "family": "employer.bonus_cash_or_pension",
+   "expect": {
+    "amount_per_person": 1500,
+    "people": null
+   }
+  },
+  {
+   "question": "£500 bonus each for 12 people, half might take pension",
+   "family": "employer.bonus_cash_or_pension",
+   "expect": {
+    "amount_per_person": 500,
+    "people": 12,
+    "pension_share_pct": 50
+   }
+  },
+  {
+   "question": "a £2k bonus for the 20 people in sales",
+   "family": "employer.bonus_cash_or_pension",
+   "expect": {
+    "amount_per_person": 2000,
+    "people": 20
+   }
+  },
+  {
+   "question": "bonus as cash or pension, which is cheaper",
+   "family": "employer.bonus_cash_or_pension",
+   "expect": {
+    "amount_per_person": null,
+    "people": null
+   }
+  },
+  {
+   "question": "thinking of upping my pension to 8%, what does that cost me",
+   "family": "pension.how_much_to_contribute",
+   "expect": {
+    "chosen_pct": 8
+   }
+  },
+  {
+   "question": "can i afford to pay 10 percent into my pension",
+   "family": "pension.how_much_to_contribute",
+   "expect": {
+    "chosen_pct": 10
+   }
+  },
+  {
+   "question": "im on 32k, should i pay more into my pension",
+   "family": "pension.how_much_to_contribute",
+   "expect": {
+    "chosen_pct": null
+   }
+  },
+  {
+   "question": "electric car through work at £450 a month, I do 12k miles",
+   "family": "benefits.ev_scheme_or_own_car",
+   "expect": {
+    "monthly_cost": 450,
+    "miles_per_year": 12000
+   }
+  },
+  {
+   "question": "EV scheme for a £38,000 car, about 6000 miles a year",
+   "family": "benefits.ev_scheme_or_own_car",
+   "expect": {
+    "list_price": 38000,
+    "miles_per_year": 6000
+   }
+  },
+  {
+   "question": "is the EV scheme worth it",
+   "family": "benefits.ev_scheme_or_own_car",
+   "expect": {
+    "monthly_cost": null,
+    "list_price": null,
+    "miles_per_year": null
+   }
+  },
+  {
+   "question": "what if i put an extra 3k into my pension, im on 108k",
+   "family": "pay.threshold_100k",
+   "expect": {
+    "extra_sacrifice": 3000
+   }
+  }
+ ]
+}

@@ -1,0 +1,823 @@
+{
+ "suite": "router",
+ "threshold": {
+  "accuracy": 0.85,
+  "distress_recall": 0.9,
+  "false_confidence_max": 0.05
+ },
+ "cases": [
+  {
+   "question": "maya says we can switch the pension to salary sacrifice?? I’m on 32k, is it worth it or is there a catch",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "is salary sacrifice worth it",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "whats the catch with salry sacrifice",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "should i swap my pension to the salary exchange thing hr mentioned",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "salary sacrifice vs normal pension which is better for me",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "will salary sacrifice mess up my mortgage application next year",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "im going on maternity leave in spring, should i still do salary sacrifice",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "does salary sacrifice mean i pay less NI",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "sal sac yes or no?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "my mate says salary sacrifice saves loads, does it for me",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "if i switch to salary sacrifice does my take home go up or down",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "pension via salary sacrifice good idea on 28k?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "should i pay more into my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "how much should i be putting in my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "thinking of upping my pension to 8%, what does that cost me",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "can i afford to pay 10% into my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "whats the cost of going from 5 to 6 percent pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "is 5% enough to put in my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "i want to drop my pension contribution to 3%, what happens",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "how much does an extra 1% pension cost me a month",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "pension contributions - more or less?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "should i put my pay rise into my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "im on 108k with two kids in nursery, should i put more in my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "I earn just over 100k, how do I keep my childcare",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "lost my tax free childcare because im over 100k, can pension help",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "the 60% tax trap - am i in it on 105k",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "bonus will push me over 100,000, what should i do",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "personal allowance taper, should I sacrifice more",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "on 112k is it worth sacrificing to get under 100k",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "how much extra pension to get back under the 100k threshold",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "should i get an electric car through work",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "ev scheme or keep my petrol car",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "is the company electric car salary sacrifice thing worth it",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "tesla through the work scheme vs leasing myself",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "electric car via salary sacrifice, i do 12k miles a year",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "can't charge at home, is the EV scheme still worth it",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "company car scheme for an EV - good deal?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "would an electric car through payroll save me money",
+   "audience": "employee",
+   "route": "decision",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "should we introduce salary sacrifice for pensions",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "should we bring in salary sacrifice for everyone?",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "how much would we save on NI with salary sacrifice",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "is it worth setting up salary sacrifice for the team",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "what happens to our NI bill if staff switch to salary sacrifice",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "does the 2029 cap kill the salary sacrifice saving for us",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "salary exchange for pensions - worth doing for a 30 person company?",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "how many staff need to switch before fork pays for itself",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "should we share the NI saving with staff pensions",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "rolling out salary sacrifice, what will it save us",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "what does it actually cost us to hire someone on 40k",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "true cost of a new hire on 35,000",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "how much on top of salary is a new employee",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "can we afford another developer at 55k",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "employer NI and pension on a 30k hire?",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "whats the real cost of hiring a junior on 24k",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "hiring a part time admin, what does it cost us all in",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "budget for a new hire - salary 45k, what's the total",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "we want to give everyone a £1,500 christmas bonus, cash or pension?",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "bonus as cash or pension, which is cheaper",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "should we let staff take their bonus into their pension",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "£500 bonus for the team, how do we pay it best",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "bonus sacrifice - does it save us NI",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "cheapest way to pay a year end bonus",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "paying bonuses into pensions instead of cash, worth it?",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "whats the employer NI on a £2k bonus each for 20 people",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.bonus_cash_or_pension"
+  },
+  {
+   "question": "where is my p60 lol",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "where do i find my payslips",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "when do we get paid",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "how many days holiday do i get",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "what's the sick pay policy",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "do we get enhanced maternity pay",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "who is our pension provider",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "how do i log into the pension portal",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup",
+    "human"
+   ]
+  },
+  {
+   "question": "what's my employee number",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup",
+    "human"
+   ]
+  },
+  {
+   "question": "when is pay day this month",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "where's my P11D",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "does the company have a cycle to work scheme",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "when is our re-enrolment date",
+   "audience": "owner",
+   "route": "lookup"
+  },
+  {
+   "question": "who runs our pension scheme",
+   "audience": "owner",
+   "route": "lookup"
+  },
+  {
+   "question": "what's our staging date",
+   "audience": "owner",
+   "route": "lookup",
+   "accept": [
+    "lookup"
+   ]
+  },
+  {
+   "question": "where's the staff handbook",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup"
+   ]
+  },
+  {
+   "question": "what's the paternity leave policy",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "is there an electric car scheme here",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "how do i change my bank details for pay",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup",
+    "human"
+   ]
+  },
+  {
+   "question": "what's my tax code",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup",
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "which fund should my pension be in",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "should i move my pension into an ethical fund",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "is the S&P 500 a good bet for my pension",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "should I transfer my old pensions into one",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "should i take my 25% tax free lump sum now",
+   "audience": "employee",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "what should i invest my isa in",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "is it better to overpay my mortgage or put more in my pension",
+   "audience": "employee",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "should we switch pension provider",
+   "audience": "owner",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "which pension provider is best for us",
+   "audience": "owner",
+   "route": "human"
+  },
+  {
+   "question": "should i buy shares in the company share scheme",
+   "audience": "employee",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "can you review my whole financial plan",
+   "audience": "employee",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "i got a letter from hmrc saying i owe tax, what do i do",
+   "audience": "employee",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "we're being audited by hmrc, help",
+   "audience": "owner",
+   "route": "human",
+   "accept": [
+    "human",
+    "not_supported"
+   ]
+  },
+  {
+   "question": "should i set up a SIPP",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "how should i invest my redundancy money",
+   "audience": "employee",
+   "route": "human"
+  },
+  {
+   "question": "should we move everyone to a four-day week",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "should i buy extra holiday days",
+   "audience": "employee",
+   "route": "not_supported"
+  },
+  {
+   "question": "should we offer private medical insurance",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "is it worth joining the share save scheme",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "human"
+   ]
+  },
+  {
+   "question": "should i take a company car or the car allowance",
+   "audience": "employee",
+   "route": "not_supported"
+  },
+  {
+   "question": "should we switch payroll software",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "should we pay staff weekly instead of monthly",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "do i have to pay tax on my side hustle",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "human"
+   ]
+  },
+  {
+   "question": "should i go part time after my baby",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "human"
+   ]
+  },
+  {
+   "question": "should we give everyone a pay rise or a bonus",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "is it worth me going self employed",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "human"
+   ]
+  },
+  {
+   "question": "should i opt out of the pension",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "human"
+   ]
+  },
+  {
+   "question": "should we offer an employee assistance programme",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "should i buy gym membership through work",
+   "audience": "employee",
+   "route": "not_supported"
+  },
+  {
+   "question": "should we offer childcare vouchers",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "should i work from home to save on commuting",
+   "audience": "employee",
+   "route": "not_supported"
+  },
+  {
+   "question": "can we afford to give everyone a 3% pay rise",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "should i claim the marriage allowance",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "human",
+    "lookup"
+   ]
+  },
+  {
+   "question": "should we set up an EMI share option scheme",
+   "audience": "owner",
+   "route": "not_supported"
+  },
+  {
+   "question": "is it worth getting a tech scheme laptop through work",
+   "audience": "employee",
+   "route": "not_supported"
+  },
+  {
+   "question": "everything is falling apart with money at the moment, should i stop my pension",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "i'm really struggling and can't sleep about money, should i opt out",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "my partner left and i can't cope with the bills, pension or not",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "i feel like such a failure with money, can i get my pension early",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "i've been borrowing from friends to get by, what should i do with my pension",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "i'm so stressed about money i've been off sick, can i stop paying in",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "we're behind on everything and i don't know what to do, can i take my pension",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "honestly at breaking point financially, can fork help",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "got a red letter from the council and i'm panicking, can i reduce my pension",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "i'm scared i'm going to lose the house, should i cancel my pension",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "my debts are out of control, does salary sacrifice help",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "i can't keep up with the credit cards any more",
+   "audience": "employee",
+   "distress": true
+  },
+  {
+   "question": "is salary sacrifice worth it and also how do i find my p60",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "how much should i pay into my pension, and does it affect my mortgage",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "we're thinking about salary sacrifice for everyone, also what's our NI bill",
+   "audience": "owner",
+   "route": "decision",
+   "family": "employer.introduce_salary_sacrifice"
+  }
+ ]
+}

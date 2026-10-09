@@ -14,6 +14,12 @@ importers:
       '@fork/db':
         specifier: workspace:*
         version: link:packages/db
+      '@fork/evals':
+        specifier: workspace:*
+        version: link:packages/evals
+      '@fork/jobs':
+        specifier: workspace:*
+        version: link:packages/jobs
       '@fork/models':
         specifier: workspace:*
         version: link:packages/models
@@ -137,6 +143,24 @@ importers:
       drizzle-kit:
         specifier: 0.31.11
         version: 0.31.11
+
+  packages/evals:
+    dependencies:
+      '@fork/calc':
+        specifier: workspace:*
+        version: link:../calc
+      '@fork/models':
+        specifier: workspace:*
+        version: link:../models
+      '@fork/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
+      '@fork/setup':
+        specifier: workspace:*
+        version: link:../setup
+      '@fork/spec':
+        specifier: workspace:*
+        version: link:../spec
 
   packages/jobs:
     dependencies:

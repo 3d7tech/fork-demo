@@ -1,0 +1,49 @@
+{
+ "suite": "spec_writer",
+ "threshold": {
+  "valid_rate": 0.9,
+  "correct_module": 1
+ },
+ "cases": [
+  {
+   "family": "pension.salary_sacrifice_switch",
+   "question": "is salary sacrifice worth it, im having a baby next year",
+   "subject": "ella",
+   "feedback": [
+    "constraint: the parental leave question must be included"
+   ]
+  },
+  {
+   "family": "pension.how_much_to_contribute",
+   "question": "should i pay more into my pension",
+   "subject": "ella",
+   "feedback": [
+    "missing option: keep my contribution as it is"
+   ]
+  },
+  {
+   "family": "pay.threshold_100k",
+   "question": "im on 108k, should i put more in my pension",
+   "subject": "priya",
+   "feedback": [
+    "constraint: ask how many children use Tax-Free Childcare"
+   ]
+  },
+  {
+   "family": "benefits.ev_scheme_or_own_car",
+   "question": "electric car through work or my own",
+   "subject": "ravi",
+   "feedback": [
+    "constraint: ask whether they can charge at home"
+   ]
+  },
+  {
+   "family": "employer.introduce_salary_sacrifice",
+   "question": "should we offer salary sacrifice",
+   "subject": "maya",
+   "feedback": [
+    "constraint: the minimum wage check must stay"
+   ]
+  }
+ ]
+}

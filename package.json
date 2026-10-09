@@ -11,7 +11,8 @@
     "e2e": "pnpm --filter web build && pnpm --filter web e2e && pnpm --filter web e2e:db",
     "db": "tsx scripts/db.ts",
     "fork": "tsx scripts/fork.ts",
-    "smoke:documents": "tsx scripts/smoke-documents.ts"
+    "smoke:documents": "tsx scripts/smoke-documents.ts",
+    "eval": "tsx scripts/eval.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
@@ -28,6 +29,8 @@
     "@fork/spec": "workspace:*",
     "@fork/db": "workspace:*",
     "drizzle-orm": "0.45.3",
-    "@fork/setup": "workspace:*"
+    "@fork/setup": "workspace:*",
+    "@fork/evals": "workspace:*",
+    "@fork/jobs": "workspace:*"
   }
 }

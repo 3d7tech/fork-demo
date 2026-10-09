@@ -1,0 +1,51 @@
+{
+ "suite": "screens",
+ "threshold": {
+  "shown": 0.9,
+  "first_pass_verifier": 0.6,
+  "p50_seconds": 12,
+  "max_cost_usd_each": 0.12
+ },
+ "cases": [
+  {
+   "question": "maya says we can switch the pension to salary sacrifice?? I’m on 32k, is it worth it or is there a catch",
+   "subject": "ella",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "is salary sacrifice worth it for me if I'm applying for a mortgage soon",
+   "subject": "ella",
+   "family": "pension.salary_sacrifice_switch"
+  },
+  {
+   "question": "should i pay more into my pension? thinking 8%",
+   "subject": "ella",
+   "family": "pension.how_much_to_contribute"
+  },
+  {
+   "question": "im on 108k with two kids in nursery, should i put more in my pension",
+   "subject": "priya",
+   "family": "pay.threshold_100k"
+  },
+  {
+   "question": "should i get an electric car through the work scheme or keep my petrol car",
+   "subject": "ravi",
+   "family": "benefits.ev_scheme_or_own_car"
+  },
+  {
+   "question": "should we bring in salary sacrifice for everyone?",
+   "subject": "maya",
+   "family": "employer.introduce_salary_sacrifice"
+  },
+  {
+   "question": "what does it actually cost us to hire someone on 40k",
+   "subject": "maya",
+   "family": "employer.true_cost_of_hire"
+  },
+  {
+   "question": "we want to give everyone a £1,500 christmas bonus, cash or pension?",
+   "subject": "maya",
+   "family": "employer.bonus_cash_or_pension"
+  }
+ ]
+}

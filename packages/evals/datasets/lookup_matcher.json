@@ -1,0 +1,92 @@
+{
+ "suite": "lookup_matcher",
+ "threshold": {
+  "accuracy": 0.9
+ },
+ "available": [
+  "pension_provider",
+  "employer_pct",
+  "employee_default_pct",
+  "relief_method",
+  "contribution_basis",
+  "salary_sacrifice_offered",
+  "holiday_days",
+  "company_sick_pay",
+  "enhanced_maternity_pay",
+  "enhanced_paternity_pay",
+  "payslip_location",
+  "pay_day",
+  "ev_scheme_offered",
+  "ev_scheme_provider",
+  "cycle_to_work_offered",
+  "cycle_to_work_limit",
+  "childcare_support",
+  "reenrolment_date"
+ ],
+ "cases": [
+  {
+   "question": "where is my p60 lol",
+   "expect": "payslip_location"
+  },
+  {
+   "question": "where do i find my payslips",
+   "expect": "payslip_location"
+  },
+  {
+   "question": "when do we get paid",
+   "expect": "pay_day"
+  },
+  {
+   "question": "how many days holiday do i get",
+   "expect": "holiday_days"
+  },
+  {
+   "question": "what's the sick pay policy",
+   "expect": "company_sick_pay"
+  },
+  {
+   "question": "do we get enhanced maternity pay",
+   "expect": "enhanced_maternity_pay"
+  },
+  {
+   "question": "what do dads get for paternity leave",
+   "expect": "enhanced_paternity_pay"
+  },
+  {
+   "question": "who is our pension provider",
+   "expect": "pension_provider"
+  },
+  {
+   "question": "how much does the company put in my pension",
+   "expect": "employer_pct"
+  },
+  {
+   "question": "is there a cycle to work scheme",
+   "expect": "cycle_to_work_offered"
+  },
+  {
+   "question": "how much can i spend on a bike through the scheme",
+   "expect": "cycle_to_work_limit"
+  },
+  {
+   "question": "when is our re-enrolment date",
+   "expect": "reenrolment_date"
+  },
+  {
+   "question": "is there an electric car scheme here",
+   "expect": "ev_scheme_offered"
+  },
+  {
+   "question": "what's my tax code",
+   "expect": null
+  },
+  {
+   "question": "how do i change my bank details",
+   "expect": null
+  },
+  {
+   "question": "what's the dress code",
+   "expect": null
+  }
+ ]
+}

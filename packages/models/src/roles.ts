@@ -80,6 +80,8 @@ export const VerifierInput = z.strictObject({
   question: z.string().min(1).max(2000),
   audience: Audience,
   spec: DecisionSpec,
+  /** Each constraint's outcome with the person's current answers: a `caution` must be reflected in the copy. */
+  constraints: CalcResult.shape.constraints,
   numbers: ExplainerInput.shape.numbers,
   copy: ScreenCopy,
   /** Problems the deterministic checks already found, so the model can weigh them. */
@@ -174,10 +176,10 @@ export const ROLES = {
   spec_writer: def('spec_writer', 'v1', SpecWriterInput, SpecWriterOutput),
   screen_composer: def('screen_composer', 'v1', ScreenComposerInput, ScreenComposerOutput),
   explainer: def('explainer', 'v2', ExplainerInput, ExplainerOutput),
-  verifier: def('verifier', 'v2', VerifierInput, VerifierOutput),
+  verifier: def('verifier', 'v3', VerifierInput, VerifierOutput),
   column_matcher: def('column_matcher', 'v1', ColumnMatcherInput, ColumnMatcherOutput),
   document_interpreter: def('document_interpreter', 'v1', DocumentInterpreterInput, DocumentInterpreterOutput),
-  lookup_matcher: def('lookup_matcher', 'v1', LookupMatcherInput, LookupMatcherOutput),
+  lookup_matcher: def('lookup_matcher', 'v2', LookupMatcherInput, LookupMatcherOutput),
   lever_reader: def('lever_reader', 'v1', LeverReaderInput, LeverReaderOutput),
 } satisfies Record<RoleId, RoleDef>;
 

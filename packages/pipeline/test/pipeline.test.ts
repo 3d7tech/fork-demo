@@ -31,7 +31,7 @@ describe('golden end to end: employee switches to salary sacrifice', () => {
     expect(models.rolesCalled().sort()).toEqual(['explainer', 'router', 'screen_composer', 'verifier']);
     expect(s.provenance.specFrom).toBe('template');
     expect(s.provenance.rulePack.id).toBe('uk-2026-27');
-    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v2', 'router:v1', 'screen_composer:v1', 'verifier:v2']);
+    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v2', 'router:v1', 'screen_composer:v1', 'verifier:v3']);
   });
 
   it('a less certain route still starts from the reviewed template', async () => {

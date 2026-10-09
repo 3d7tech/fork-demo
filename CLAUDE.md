@@ -18,7 +18,7 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | 6 | Company setup: payroll upload and column mapping, documents, invites, email sign-in | Done |
 | 7 | Remaining owner and employee decisions, lookups, "not yet" | Done: 7 families (3 owner, 4 employee), lookups from confirmed documents, "not yet" with what Fork can do |
 | 8 | Saved decisions, accountant requests, owner dashboard, monthly email | Done (ADR 0008) |
-| 9 | Privacy enforcement tests, evaluation suites, red-team tests | To do |
+| 9 | Privacy enforcement tests, evaluation suites, red-team tests | Done (ADR 0009) |
 | 10 | "How to add a decision family" guide, tested by adding one | To do |
 
 **Model key:** `FORK_ANTHROPIC_API_KEY` in the Default environment (`ANTHROPIC_API_KEY` is reserved for Claude Code). The live check passed on 2026-10-08; `pnpm smoke:models` re-runs it. Never print, log or commit the key. Live screenshots are in `docs/screens/`.
@@ -38,7 +38,8 @@ Work is on branch **`phase1/milestone-a`** (pushed; no pull request yet). The br
 | `packages/ui` | React screen components and `fork.css` |
 | `apps/web` | Next.js 15 app; `/preview` shows every screen state |
 | `packages/jobs` | Monthly emails and saved-decision re-checks |
-| `docs/adr/` | Decision records 0001 to 0008: read before changing architecture |
+| `packages/evals` | Evaluation suites and labelled datasets per model role |
+| `docs/adr/` | Decision records 0001 to 0009: read before changing architecture |
 | `docs/open-questions.md` | Answers given and questions still open |
 
 ## Commands
@@ -55,6 +56,7 @@ pnpm --filter web e2e:db   # setup flow end to end with the database
 pnpm fork monthly     # pay explained, owner reports, saved-decision re-checks (FORK_DEV_OUTBOX=1)
 pnpm smoke:models    # live pipeline on four questions, needs a working Anthropic key
 pnpm smoke:documents # live document interpreter on the fixtures, including a hidden-instruction test
+pnpm eval [suite]    # evaluation suites per role against live models (~$1.30 for all); report in .data/evals/
 ```
 
 Playwright uses the preinstalled Chromium at `/opt/pw-browsers/chromium-1194` (`@playwright/test` pinned to 1.56.1). Don't run `playwright install`.

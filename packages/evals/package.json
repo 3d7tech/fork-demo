@@ -1,0 +1,14 @@
+{
+  "name": "@fork/evals",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": {
+    "@fork/calc": "workspace:*",
+    "@fork/models": "workspace:*",
+    "@fork/pipeline": "workspace:*",
+    "@fork/setup": "workspace:*",
+    "@fork/spec": "workspace:*"
+  }
+}

@@ -252,9 +252,9 @@ function explain(t: Trace, family: FamilyDef, question: string, spec: DecisionSp
   });
 }
 
-async function verify(t: Trace, family: FamilyDef, question: string, spec: DecisionSpec, numbers: ScreenNumber[], copy: ScreenCopy) {
+async function verify(t: Trace, family: FamilyDef, question: string, spec: DecisionSpec, calc: CalcResult, numbers: ScreenNumber[], copy: ScreenCopy) {
   const code = checkCopy(copy, numbers);
-  const verifier = await t.run('verifier', { question, audience: family.audience, spec, numbers, copy, codeFindings: code });
+  const verifier = await t.run('verifier', { question, audience: family.audience, spec, constraints: calc.constraints, numbers, copy, codeFindings: code });
   return { code, verifier, ok: code.length === 0 && verifier.pass };
 }
 
@@ -347,7 +347,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
 
     // Check, then allow one revision round in which each problem goes back to the step that can fix it.
     for (let round = 0; round < 2; round++) {
-      const v = await verify(t, family, question, spec, numbers, copy);
+      const v = await verify(t, family, question, spec, calc, numbers, copy);
       if (v.ok) {
         step({ id: 'checked', label: 'Checked every number against the calculation' });
         return {
@@ -422,7 +422,7 @@ export async function reexplain(deps: PipelineDeps, screen: DecisionScreen, reca
     let feedback: string[] | undefined;
     for (let round = 0; round < 2; round++) {
       const copy = await explain(t, family, screen.question, screen.spec, recalc.calc, recalc.numbers, feedback);
-      const v = await verify(t, family, screen.question, screen.spec, recalc.numbers, copy);
+      const v = await verify(t, family, screen.question, screen.spec, recalc.calc, recalc.numbers, copy);
       if (v.ok) {
         const highlight = recalc.calc.constraints.find((c) => c.outcome !== 'pass')?.id ?? null;
         return {
