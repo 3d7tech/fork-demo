@@ -72,5 +72,6 @@ export const cycleToWork: FamilyDef<'benefits.cycle_to_work'> = {
       summary: `${r.person ? `${r.person.name} (payroll ${r.person.payrollRef})` : 'An employee'} would like to join the cycle to work scheme for a bike and kit costing about £${price.toLocaleString('en-GB')}, by salary sacrifice over 12 months. Please send them the scheme’s application and set up the sacrifice once it’s approved.`,
     };
   },
+  sweep: { lever: 'bike_price', series: [{ key: 'saving', label: 'Saving against buying outright' }] },
   steps: { facts: 'Read your pay and the scheme’s terms', checks: 'Checked the scheme limit and the minimum wage' },
 };

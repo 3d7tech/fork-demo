@@ -1,7 +1,7 @@
 'use client';
 
 import type { BuildStep, DecisionScreen, ForkAnswer } from '@fork/pipeline';
-import { BuildingSteps, DecisionScreenView, MessageCard } from '@fork/ui';
+import { BuildingSteps, DecisionScreenView, ForkField, MessageCard } from '@fork/ui';
 import { useRef, useState } from 'react';
 
 export const EMPLOYEE_SUGGESTIONS = [
@@ -17,7 +17,13 @@ const SETTLE_MS = 700;
 
 type Recalc = Pick<DecisionScreen, 'answers' | 'levers' | 'calc' | 'numbers' | 'visual'>;
 
-export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS, canSave = false }: { suggestions?: string[]; canSave?: boolean }) {
+/** A first name to greet by; an email address is never used as a name. */
+function firstName(name?: string): string | null {
+  if (!name || name.includes('@')) return null;
+  return name.trim().split(/\s+/)[0] || null;
+}
+
+export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS, canSave = false, name }: { suggestions?: string[]; canSave?: boolean; name?: string }) {
   const [question, setQuestion] = useState('');
   const [steps, setSteps] = useState<BuildStep[]>([]);
   const [busy, setBusy] = useState(false);
@@ -103,19 +109,48 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS, canSave = false }: 
 
   return (
     <>
+      {!answer && !busy && steps.length === 0 && (
+        <section className="home" aria-labelledby="home-title">
+          <div className="home-field">
+            <ForkField progress={1} idle />
+          </div>
+          <h1 id="home-title" className="home-title">
+            {firstName(name) ? `${firstName(name)}, what shall we work out?` : 'What shall we work out?'}
+          </h1>
+          <p className="home-lead">Pay, pension or benefits. Ask it how you’d say it and Fork builds you an answer you can try out.</p>
+        </section>
+      )}
       <form
-        className="ask"
+        className={`ask${answer || busy ? ' ask-compact' : ''}`}
         onSubmit={(e) => {
           e.preventDefault();
           void ask(question);
         }}
       >
-        <label htmlFor="q">What do you want to work out?</label>
-        <textarea id="q" value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Ask in your own words" maxLength={2000} />
-        <div className="ask-row">
-          <button type="submit" className="fk-btn fk-primary" disabled={busy || !question.trim()}>
-            {busy ? 'Working it out…' : 'Ask Fork'}
-          </button>
+        <label htmlFor="q" className="sr-only">
+          What do you want to work out?
+        </label>
+        <div className="composer">
+          <textarea
+            id="q"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                void ask(question);
+              }
+            }}
+            placeholder="Ask in your own words"
+            maxLength={2000}
+            rows={answer || busy ? 1 : 3}
+          />
+          <div className="composer-row">
+            <span className="composer-hint">Numbers come from the rules, never guessed</span>
+            <button type="submit" className="fk-btn fk-primary composer-send" disabled={busy || !question.trim()}>
+              {busy ? 'Working it out…' : 'Ask Fork'}
+            </button>
+          </div>
         </div>
         {!answer && !busy && (
           <ul className="chips" aria-label="Examples">

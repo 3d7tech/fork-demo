@@ -73,5 +73,6 @@ export const bonus: FamilyDef<'employer.bonus_cash_or_pension'> = {
       summary: `${r.companyName} plans a bonus of £${(r.levers.amount_per_person ?? 0).toLocaleString('en-GB')} for ${r.levers.people} people, with staff able to take it into their pension by salary sacrifice. Please confirm the bonus sacrifice can be agreed before the bonus is paid, and how payroll will run it.`,
     };
   },
+  sweep: { lever: 'pension_share_pct', series: [{ key: 'company_saves', label: 'Company saves' }] },
   steps: { facts: 'Read your payroll', checks: 'Checked employer NI on bonuses' },
 };

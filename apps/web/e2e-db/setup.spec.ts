@@ -8,6 +8,8 @@ const SHOTS = process.env.FORK_SCREENSHOTS;
 async function check(page: Page, shot?: string) {
   const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
   expect(scroll, 'page scrolls sideways at 360px').toBeLessThanOrEqual(client);
+  // Contrast is measured on the settled screen, not part-way through an entry animation.
+  await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity));
   const results = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
   if (SHOTS && shot) await page.screenshot({ path: join(SHOTS, `${shot}.png`), fullPage: true });

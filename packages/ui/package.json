@@ -9,13 +9,15 @@
   },
   "dependencies": {
     "@fork/pipeline": "workspace:*",
-    "@fork/spec": "workspace:*"
+    "@fork/spec": "workspace:*",
+    "three": "0.186.0"
   },
   "peerDependencies": {
     "react": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "19.3.0",
-    "react": "19.3.0"
+    "react": "19.3.0",
+    "@types/three": "0.186.0"
   }
 }

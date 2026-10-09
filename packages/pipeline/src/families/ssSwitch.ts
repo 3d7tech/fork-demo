@@ -91,5 +91,6 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
       figures: { employer_ni_saving: r.calc.outputs.employer_ni_saving?.value ?? 0 },
     };
   },
+  sweep: { lever: 'contribution_pct', series: [{ key: 'take_home_gain', label: 'Now' }, { key: 'take_home_gain_2029', label: 'From April 2029' }] },
   steps: { facts: 'Read your pay and pension', checks: 'Checked the catches: mortgage applications, parental pay, minimum wage' },
 };

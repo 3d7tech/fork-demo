@@ -15,8 +15,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f4f5f2' },
-    { media: '(prefers-color-scheme: dark)', color: '#111315' },
+    { media: '(prefers-color-scheme: light)', color: '#f6f6f3' },
+    { media: '(prefers-color-scheme: dark)', color: '#0c0d0b' },
   ],
 };
 
@@ -27,7 +27,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" />
       </head>
       <body>
         <a className="skip" href="#main">
@@ -36,6 +36,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="app-bar">
           <div className="app-bar-in">
             <span className="brand">
+              <span className="brand-mark" aria-hidden="true" />
               <strong>Fork</strong> {viewer && <span className="co">{viewer.companyName}</span>}
             </span>
             {viewer?.mode === 'db' ? (

@@ -180,3 +180,24 @@ describe('money on screen', () => {
     expect([formatGBP(0.72), formatGBP(0.8), formatGBP(1.4), formatGBP(1), formatGBP(128.4), formatGBP(-0.5), formatGBP(47950)]).toEqual(['72p', '80p', '£1.40', '£1', '£128', '−50p', '£47,950']);
   });
 });
+
+describe('the chart beside the main lever', () => {
+  it('is the engine’s result at every lever value, and follows recalculation', async () => {
+    const { s } = await screenFor('pension.how_much_to_contribute', emp('ella'), 'should i pay more into my pension');
+    expect(s.sweep?.lever).toBe('chosen_pct');
+    expect(s.sweep?.xs).toEqual(Array.from({ length: 20 }, (_, i) => i + 1));
+    const at8 = s.sweep!.series.find((x) => x.key === 'take_home_cost')!.values[7]!;
+    expect(Math.round(at8)).toBe(2048);
+    const facts = await store.get(emp('ella'), FAMILIES['pension.how_much_to_contribute']!.facts.map((x) => x.id));
+    const sac = recalculate(s, facts, { answers: { pay_method: 'sacrifice' } });
+    expect(Math.round(sac.sweep!.series.find((x) => x.key === 'take_home_cost')!.values[7]!)).toBe(1843);
+  });
+
+  it('every family has one, and long ranges are sampled to at most 41 points', async () => {
+    for (const fam of Object.values(FAMILIES)) expect(fam.sweep, fam.id).toBeDefined();
+    const { s } = await screenFor('benefits.cycle_to_work', emp('ella'), 'bike through work?');
+    expect(s.sweep!.xs.length).toBeLessThanOrEqual(41);
+    expect(s.sweep!.xs[0]).toBe(100);
+    expect(s.sweep!.xs.at(-1)).toBe(10000);
+  });
+});

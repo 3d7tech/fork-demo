@@ -76,5 +76,6 @@ export const hireCost: FamilyDef<'employer.hire_cost'> = {
       floor: null,
     };
   },
+  sweep: { lever: 'salary', series: [{ key: 'total', label: 'Total cost a year' }] },
   steps: { facts: 'Read your pension scheme', checks: 'Checked employer NI and pension rules' },
 };

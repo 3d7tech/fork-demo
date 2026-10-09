@@ -3,6 +3,7 @@ import { RoleFailedError, runRole, type RoleContext, type RoleId, type RoleOutpu
 import { CalcResult, DecisionSpec, ScreenLayout, type Fact, type ScreenCopy, type VisualData } from '@fork/spec';
 import { checkCopy } from './checks';
 import { guard } from './guards';
+import { sweepLever, type LeverSweep } from './sweep';
 import { FAMILIES, familiesFor, type FamilyData, type FamilyDef } from './families';
 import type { FactStore, Subject } from './facts';
 import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
@@ -43,6 +44,8 @@ export interface DecisionScreen {
   layout: ScreenLayout;
   copy: ScreenCopy;
   visual: VisualData;
+  /** The engine's result at every value of the family's main lever, for the chart beside it. */
+  sweep?: LeverSweep | null;
   checks: {
     code: string[];
     verifier: RoleOutput<'verifier'>;
@@ -364,6 +367,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
           layout,
           copy,
           visual: visualFor(family, calc, numbers),
+          sweep: sweepLever(family, spec, facts, answers, {}, data),
           checks: { code: v.code, verifier: v.verifier, revised: t.revised, fallbacks: t.fallbacks },
           provenance: { rulePack: calc.rulePack, roles: t.roles, specFrom },
         };
@@ -411,7 +415,7 @@ export function recalculate(screen: DecisionScreen, facts: Fact[], change: { ans
   }
   const calc = calculate(family, screen.spec, facts, answers, levers, data);
   const numbers = screenNumbers(family, calc, facts, screen.spec, levers);
-  return { answers, levers, calc, numbers, visual: visualFor(family, calc, numbers), copyStale: true as const };
+  return { answers, levers, calc, numbers, visual: visualFor(family, calc, numbers), sweep: sweepLever(family, screen.spec, facts, answers, levers, data), copyStale: true as const };
 }
 
 /** Re-write and re-check the copy after a recalculation. */
@@ -432,6 +436,7 @@ export async function reexplain(deps: PipelineDeps, screen: DecisionScreen, reca
           calc: recalc.calc,
           numbers: recalc.numbers,
           visual: recalc.visual,
+          sweep: recalc.sweep,
           layout: { ...screen.layout, highlightConstraint: highlight },
           copy,
           checks: { ...screen.checks, code: v.code, verifier: v.verifier, revised: [...screen.checks.revised, ...t.revised] },

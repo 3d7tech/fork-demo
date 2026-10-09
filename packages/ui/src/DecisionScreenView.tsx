@@ -3,6 +3,8 @@
 import type { DecisionScreen } from '@fork/pipeline';
 import type { DecisionSpec } from '@fork/spec';
 import { useId } from 'react';
+import { LeverChart } from './LeverChart';
+import { useCountUp } from './motion';
 import { SOURCE_LABEL, STATUS_LABEL } from './sources';
 import { Visual } from './visuals';
 
@@ -132,6 +134,7 @@ function Levers({ screen, onLever }: Pick<DecisionScreenViewProps, 'screen' | 'o
         const v = leverValue(screen, l);
         const id = `${base}-${l.id}`;
         const src = leverSource(screen, l);
+        const fill = `${(((v - l.min) / (l.max - l.min || 1)) * 100).toFixed(1)}%`;
         return (
           <div className="fk-lever" key={l.id}>
             <div className="fk-lever-top">
@@ -140,6 +143,7 @@ function Levers({ screen, onLever }: Pick<DecisionScreenViewProps, 'screen' | 'o
                 {formatLever(l, v)}
               </output>
             </div>
+            {screen.sweep?.lever === l.id && <LeverChart sweep={screen.sweep} value={v} label={l.label} />}
             <input
               id={id}
               type="range"
@@ -147,6 +151,7 @@ function Levers({ screen, onLever }: Pick<DecisionScreenViewProps, 'screen' | 'o
               max={l.max}
               step={l.step}
               value={v}
+              style={{ ['--fk-fill' as string]: fill }}
               aria-valuetext={formatLever(l, v)}
               onChange={(e) => onLever?.(l.id, Number(e.target.value))}
             />
@@ -158,22 +163,28 @@ function Levers({ screen, onLever }: Pick<DecisionScreenViewProps, 'screen' | 'o
   );
 }
 
+/** One tile. The figure counts up to the engine's display; screen readers get the final figure only. */
+function Tile({ label, display, estimate, hero }: { label: string; display: string; estimate: boolean; hero: boolean }) {
+  const shown = useCountUp(display);
+  return (
+    <div className={`fk-tile${hero ? ' fk-hero' : ''}`}>
+      <span>{label}</span>
+      <strong className="fk-num">
+        {estimate && <span className="fk-note">about </span>}
+        <span aria-hidden="true">{shown}</span>
+        <span className="fk-sr-only">{display}</span>
+      </strong>
+    </div>
+  );
+}
+
 /** 5. Outcome tiles: three numbers, the first being the one that answers the question. */
 function OutcomeTiles({ screen }: { screen: DecisionScreen }) {
   return (
     <section className="fk-tiles" aria-label="Key numbers">
       {screen.layout.outcomeTiles.map((key, i) => {
         const n = screen.numbers.find((x) => x.key === key);
-        if (!n) return null;
-        return (
-          <div key={key} className={`fk-tile${i === 0 ? ' fk-hero' : ''}`}>
-            <span>{n.label}</span>
-            <strong className="fk-num">
-              {n.estimate && <span className="fk-note">about </span>}
-              {n.display}
-            </strong>
-          </div>
-        );
+        return n ? <Tile key={key} label={n.label} display={n.display} estimate={n.estimate} hero={i === 0} /> : null;
       })}
     </section>
   );

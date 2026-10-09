@@ -95,5 +95,6 @@ export const evScheme: FamilyDef<'benefits.ev_scheme'> = {
   request(r) {
     return { summary: `${r.person ? `${r.person.name} (payroll ${r.person.payrollRef})` : 'An employee'} would like to join the electric car salary sacrifice scheme, at about £${(r.levers.monthly_cost ?? 0).toLocaleString('en-GB')} a month before tax. Please send them the scheme’s application and check it keeps their pay above the minimum wage.` };
   },
+  sweep: { lever: 'miles_per_year', series: [{ key: 'scheme_cost', label: 'Electric car scheme' }, { key: 'own_car_cost', label: 'Own petrol car' }] },
   steps: { facts: 'Read your pay', checks: 'Checked company car tax for the next three years' },
 };

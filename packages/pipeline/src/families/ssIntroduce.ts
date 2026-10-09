@@ -80,5 +80,6 @@ export const ssIntroduce: FamilyDef<'employer.ss_introduce'> = {
       summary: `${r.companyName} plans to offer salary sacrifice for pensions. Fork estimates ${o.eligible?.value} of ${o.headcount?.value} staff are eligible (${o.excluded_min_wage?.value} left out to protect the minimum wage), with ${r.levers.share_pct ?? 0}%% of the employer NI saving passed into staff pensions. Please confirm payroll can run it, and the contract variation and scheme steps needed.`,
     };
   },
+  sweep: { lever: 'take_up_pct', series: [{ key: 'company_keeps', label: 'Now' }, { key: 'company_keeps_2029', label: 'From April 2029' }] },
   steps: { facts: 'Read your payroll, pension scheme and settings', checks: 'Checked who the minimum wage leaves out' },
 };

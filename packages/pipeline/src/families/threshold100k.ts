@@ -90,5 +90,6 @@ export const threshold100k: FamilyDef<'pay.threshold_100k'> = {
     if (!extra) return null;
     return { summary: `Please increase the salary sacrifice pension contribution for ${r.person ? `${r.person.name} (payroll ${r.person.payrollRef})` : 'An employee'} by £${extra.toLocaleString('en-GB')} a year, spread across the remaining pay periods of this tax year.` };
   },
+  sweep: { lever: 'extra_sacrifice', series: [{ key: 'childcare_change', label: 'Childcare support gained' }, { key: 'take_home_change', label: 'Take-home change' }] },
   steps: { facts: 'Read your pay and pension', checks: 'Checked the personal allowance taper and childcare limit' },
 };

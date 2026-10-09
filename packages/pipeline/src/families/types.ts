@@ -63,6 +63,11 @@ export interface FamilyDef<M extends ModuleId = ModuleId> {
    * `figures` are company-level numbers for the dashboard, such as the employer NI saved a year.
    */
   request?(r: RequestInput): { summary: string; figures?: Record<string, number> } | null;
+  /**
+   * The chart beside one lever: these outputs at every value of the lever, from the engine.
+   * The first series is the line the person's position is marked on.
+   */
+  sweep?: { lever: string; series: Array<{ key: string; label?: string }> };
   /** Plain-English label for each building step shown while the screen is made. */
   steps: { facts: string; checks: string };
 }
