@@ -165,3 +165,37 @@ describe('golden: cycle to work (worked by hand)', () => {
   });
   it('validates as a CalcResult', () => expect(() => CalcResult.parse(runModule('benefits.cycle_to_work', PACK, base))).not.toThrow());
 });
+
+describe('golden: the Child Benefit charge (ADR 0010)', () => {
+  // £70,000, 5% relief at source (£3,500 gross), two children, the higher earner, rest of UK.
+  // Adjusted net income 66,500 → 32 whole £200s over £60,000 → 32% of £2,337.40 = £747.97 paid back.
+  // Getting back to £60,000 takes £6,500 of sacrifice, which costs 6,500 × (1 − 40% − 2%) = £3,770 of
+  // take-home, and keeps the £747.97: a real cost of £3,022.03 for £6,500 into the pension.
+  const input = {
+    salary: 70000,
+    hoursPerWeek: 37.5,
+    contributionPct: 5,
+    reliefMethod: 'relief_at_source' as const,
+    employerContributionPct: 3,
+    extraSacrifice: 6500,
+    children: 2,
+    higherEarner: true,
+  };
+  const r = runModule('pay.child_benefit_charge', PACK, input);
+  const v = (k: string) => r.outputs[k]!.value;
+
+  it('works out the charge and what it takes to stop it, to the penny', () => {
+    expect(v('adjusted_net_income')).toBe(66500);
+    expect(v('child_benefit')).toBeCloseTo(2337.4, 6);
+    expect(v('charge_now')).toBeCloseTo(747.968, 6);
+    expect(v('extra_to_threshold')).toBe(6500);
+    expect(v('take_home_cost_to_threshold')).toBeCloseTo(3770, 6);
+    expect(v('net_cost_to_threshold')).toBeCloseTo(3022.032, 6);
+    expect(v('charge_choice')).toBe(0);
+    expect(r.verdict).toBe('under_threshold');
+  });
+
+  it('nothing to pay back for someone who isn’t the higher earner', () => {
+    expect(runModule('pay.child_benefit_charge', PACK, { ...input, higherEarner: false }).verdict).toBe('not_affected');
+  });
+});

@@ -36,6 +36,8 @@ Add `<name>.ts` exporting a `FamilyDef` (see `types.ts`), and add it to the `ALL
 | `answers`, `levers` | Constraint questions and levers the module understands, with defaults. |
 | `questionSetsLevers` | `true` if the person usually says the numbers ("a £1,200 bike"), so the lever reader starts the levers there. |
 | `needs` | Data beyond single facts, such as every salary on payroll (`payrollRows`, owners only). |
+| `profile` | `true` for employee decisions that work out take-home pay. The person's tax profile facts (ADR 0010) are fetched too; spread `...profileFrom(f)` into the module input and use `jobPay` in the module. Fork asks for region and student loan before the first screen. |
+| `answersFrom` | Optional: start a screen question from a fact the person already gave (such as their number of children). |
 | `buildInput` | Facts, answers and levers → the module's input. |
 | `defaultLayout`, `visual` | The layout used if the composer's is invalid, and the chart data, built by code from the results. |
 | `request` | What the accountant is asked to do, written by code. Leave it out if the decision changes nothing in payroll. |
@@ -44,6 +46,7 @@ Add `<name>.ts` exporting a `FamilyDef` (see `types.ts`), and add it to the `ALL
 Where facts come from:
 
 - Payroll, scheme and company settings: `DbFactStore` in `packages/setup/src/facts.ts` already serves `salary`, `hours_per_week`, `contribution_pct`, `employer_contribution_pct`, `relief_method`, `pension_basis`, `employer_share_pct` and, for owners, `headcount`, `median_salary`, `fee_per_employee` and `employment_allowance`.
+- The person's tax profile (`profile: true`): `tax_region`, `student_loans`, `variable_pay`, `other_income`, `child_benefit_children`, `higher_earner`, `other_pension_savings`, `flexibly_accessed` and `age`, from payroll or their own answers. Any unknown takes a default that the module lists as an estimate (`profileAssumptions`).
 - Company documents: any key in `POLICY_KEYS` (`packages/setup/src/documents/keys.ts`) that an owner has confirmed is served automatically as a `policy_document` fact with its page. To use a new one, add the key there so the document interpreter extracts it.
 
 **Check:** `pnpm test`. `packages/pipeline/test/families.test.ts` checks every family's template against its module, levers and answers.

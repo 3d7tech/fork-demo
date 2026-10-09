@@ -155,7 +155,16 @@ export const CalcResult = z.object({
   rulesUsed: z.array(RuleUse),
   /** `fact` names the single fact an assumption restates; the pipeline then uses that fact's own source. */
   assumptions: z
-    .array(z.object({ text: z.string(), source: FactSource.or(z.literal('rules')), estimate: z.boolean().default(false), fact: slug.optional() }))
+    .array(
+      z.object({
+        text: z.string(),
+        source: FactSource.or(z.literal('rules')),
+        estimate: z.boolean().default(false),
+        fact: slug.optional(),
+        /** Already plain English, written by code for the screen: shown as written, never rewritten by a model. */
+        asWritten: z.boolean().optional(),
+      }),
+    )
     .default([]),
 });
 export type CalcResult = z.infer<typeof CalcResult>;

@@ -83,8 +83,8 @@ export function evScheme(r: Rules, i: EvSchemeInput): CalcResult {
     assumptions: [
       { text: `EV scheme £${i.scheme.monthlyGross} a month gross including insurance; list price £${i.scheme.listPrice.toLocaleString('en-GB')}`, source: 'policy_document', estimate: false },
       { text: `Company car tax averaged over ${i.scheme.termYears} tax years from ${i.scheme.startDate}`, source: 'rules', estimate: false },
-      { text: `Own car: £${i.ownCar.leaseMonthly} a month lease, £${i.ownCar.insuranceServicing.toLocaleString('en-GB')} insurance and servicing, ${i.ownCar.mpg} mpg at £${i.ownCar.fuelPerLitre.toFixed(2)} a litre`, source: 'estimate', estimate: true },
-      { text: `Charging ${Math.round(i.charging.homePerKwh * 100)}p a kWh at home, ${Math.round(i.charging.publicPerKwh * 100)}p public, ${i.charging.milesPerKwh} miles a kWh`, source: 'estimate', estimate: true },
+      { text: `Own car: about £${i.ownCar.leaseMonthly} a month lease, about £${i.ownCar.insuranceServicing.toLocaleString('en-GB')} insurance and servicing, about ${i.ownCar.mpg} mpg at about £${i.ownCar.fuelPerLitre.toFixed(2)} a litre`, source: 'estimate', estimate: true },
+      { text: `Charging about ${Math.round(i.charging.homePerKwh * 100)}p a kWh at home, about ${Math.round(i.charging.publicPerKwh * 100)}p public, about ${i.charging.milesPerKwh} miles a kWh`, source: 'estimate', estimate: true },
       ...profileAssumptions(r, i, { adjustedNetIncome: withCar.adjustedNetIncome }),
     ],
   };

@@ -1,7 +1,7 @@
 import { runModule } from '@fork/calc';
 import type { Fact } from '@fork/spec';
 import { describe, expect, it } from 'vitest';
-import { askFork, FAMILIES, InMemoryFactStore, recalculate, type DecisionScreen, type FamilyDef } from '../src';
+import { askFork, FAMILIES, factIds, InMemoryFactStore, recalculate, type DecisionScreen, type FamilyDef } from '../src';
 import { taxYearStart } from '../src/families/shared';
 import { LARKFIELD } from '../../calc/test/fixtures/larkfield';
 import { deps } from './helpers';
@@ -26,6 +26,8 @@ const store = new InMemoryFactStore({
   employee: {
     'larkfield/ella': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 32000, 'payroll_export'), f('contribution_pct', 5, 'pension_scheme'), f('hours_per_week', 37.5, 'payroll_export')],
     'larkfield/priya': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 108000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
+    // Dan has told Fork about his children; the screen's questions start from his answers.
+    'larkfield/dan': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 70000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export'), f('child_benefit_children', 2, 'user_answer'), f('higher_earner', true, 'user_answer')],
     'larkfield/ravi': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 58000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
   },
   payroll: { larkfield: LARKFIELD },
@@ -92,6 +94,16 @@ describe('every family runs end to end and matches its golden case', () => {
     const r = recalculate(s, await store.get(emp('priya'), FAMILIES['pay.threshold_100k']!.facts.map((x) => x.id)), { answers: { children: 'two' } });
     expect(shown(r, 'childcare_kept_at_threshold')).toBe('£4,000');
     expect(s.visual.type).toBe('ladder');
+  });
+
+  it('employee: £70,000 with two children pays back £748 of Child Benefit; £6,500 into the pension stops it', async () => {
+    const { s } = await screenFor('pay.child_benefit_charge', emp('dan'), 'on 70k with 2 kids, should i put more in my pension to stop paying back child benefit?');
+    expect(s.answers).toMatchObject({ children: 'two', higher_earner: 'yes' });
+    expect(shown(s, 'charge_now')).toBe('£748');
+    expect(shown(s, 'extra_to_threshold')).toBe('£6,500');
+    expect(shown(s, 'net_cost_to_threshold')).toBe('£3,022');
+    const r = recalculate(s, await store.get(emp('dan'), factIds(FAMILIES['pay.child_benefit_charge']!)), { levers: { extra_sacrifice: 6500 }, answers: { higher_earner: 'no' } });
+    expect(r.calc.verdict).toBe('not_affected');
   });
 
   it('employee: electric car scheme or own car', async () => {

@@ -254,7 +254,7 @@ describe('switching to salary sacrifice with a tax profile', () => {
     const res = runModule('pension.ss_switch', 'uk-2026-27', ella);
     expect(res.outputs.take_home_gain!.value).toBeCloseTo(128, 6);
     expect(res.assumptions.filter((a) => a.source === 'estimate').map((a) => a.text)).toEqual(
-      expect.arrayContaining(['Income tax rates for England, Wales and Northern Ireland', 'No student loan to repay', 'No overtime, commission or income outside this job', 'Minimum wage checked at the rate for 21 and over']),
+      expect.arrayContaining(['Income tax rates for England, Wales and Northern Ireland', 'No student loan to repay', 'No overtime, commission or income outside this job', 'Your age isn’t known, so the minimum wage check uses the adult rate']),
     );
   });
 

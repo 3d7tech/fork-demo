@@ -44,6 +44,14 @@
    "feedback": [
     "constraint: the minimum wage check must stay"
    ]
+  },
+  {
+   "family": "pay.child_benefit_charge",
+   "question": "should i up my pension to avoid the child benefit charge",
+   "subject": "dan",
+   "feedback": [
+    "constraint: the question about who earns more at home must stay"
+   ]
   }
  ]
 }

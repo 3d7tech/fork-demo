@@ -42,6 +42,8 @@ export interface FamilyDef<M extends ModuleId = ModuleId> {
   facts: FactDef[];
   /** Constraint ids whose answers the module understands, with the answer used before the person picks. */
   answers: Record<string, string>;
+  /** Answers already known from the person's facts (their profile), used before they pick. */
+  answersFrom?(facts: Record<string, Fact['value']>): Record<string, string>;
   /** Lever ids the module understands. */
   levers: string[];
   /** Uses the person's tax profile (ADR 0010): its facts are fetched too, and are optional. */

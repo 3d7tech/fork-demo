@@ -27,6 +27,7 @@ export const FACTS = new InMemoryFactStore({
   employee: {
     'larkfield/ella': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 32000, 'payroll_export'), f('contribution_pct', 5, 'pension_scheme'), f('hours_per_week', 37.5, 'payroll_export')],
     'larkfield/priya': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 108000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
+    'larkfield/dan': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 70000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export'), f('child_benefit_children', 2, 'user_answer'), f('higher_earner', true, 'user_answer')],
     'larkfield/ravi': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 58000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
   },
   payroll: { larkfield: SALARIES.map((salary) => ({ salary, hoursPerWeek: 37.5 })) },
@@ -36,5 +37,6 @@ export const SUBJECTS: Record<string, Subject> = {
   ella: { audience: 'employee', companyId: 'larkfield', employeeId: 'ella' },
   priya: { audience: 'employee', companyId: 'larkfield', employeeId: 'priya' },
   ravi: { audience: 'employee', companyId: 'larkfield', employeeId: 'ravi' },
+  dan: { audience: 'employee', companyId: 'larkfield', employeeId: 'dan' },
   maya: { audience: 'owner', companyId: 'larkfield' },
 };

@@ -242,18 +242,35 @@ async function compose(t: Trace, family: FamilyDef, spec: DecisionSpec, calc: Ca
 
 // ---------- Copy ----------
 
-function explain(t: Trace, family: FamilyDef, question: string, spec: DecisionSpec, calc: CalcResult, numbers: ScreenNumber[], feedback?: string[]) {
-  return t.run('explainer', {
+/** How a source reads on screen, as the explainer is told to write it. */
+const SOURCE_WORDS: Record<string, string> = {
+  payroll_export: 'your payroll',
+  pension_scheme: 'your pension scheme',
+  company_setting: 'your employer’s settings',
+  policy_document: 'your company’s documents',
+  rules: 'HMRC rules',
+  user_answer: 'your answer',
+  estimate: 'an estimate',
+};
+
+/**
+ * The words on the screen. Assumptions code already wrote in plain English (the tax profile) skip
+ * the model and are added as written, so the model writes less and the wording stays reviewed.
+ */
+async function explain(t: Trace, family: FamilyDef, question: string, spec: DecisionSpec, calc: CalcResult, numbers: ScreenNumber[], feedback?: string[]) {
+  const copy = await t.run('explainer', {
     audience: family.audience,
     question,
     verdict: calc.verdict,
     numbers,
     tippingPoint: calc.tippingPoint?.description ?? null,
     constraints: calc.constraints,
-    assumptions: calc.assumptions,
+    assumptions: calc.assumptions.filter((a) => !a.asWritten),
     actionLabel: spec.action?.label ?? null,
     ...(feedback ? { feedback } : {}),
   });
+  const asWritten = calc.assumptions.filter((a) => a.asWritten).map((a) => ({ text: a.text, source: SOURCE_WORDS[a.source] ?? a.source }));
+  return { ...copy, assumptions: [...copy.assumptions, ...asWritten] };
 }
 
 async function verify(t: Trace, family: FamilyDef, question: string, spec: DecisionSpec, calc: CalcResult, numbers: ScreenNumber[], copy: ScreenCopy) {
@@ -311,10 +328,14 @@ export async function gatherData(deps: Pick<PipelineDeps, 'facts'>, family: Fami
   return data;
 }
 
-/** The answers used before the person picks: the spec's own defaults where given, else the family's. */
-function defaultAnswers(family: FamilyDef, spec: DecisionSpec): Record<string, string> {
+/**
+ * The answers used before the person picks: what their facts already say, else the spec's own
+ * defaults, else the family's.
+ */
+function defaultAnswers(family: FamilyDef, spec: DecisionSpec, facts: Fact[] = []): Record<string, string> {
   const out = { ...family.answers };
   for (const c of spec.constraints) if (c.kind === 'ask' && c.default && c.id in out) out[c.id] = c.default;
+  for (const [id, v] of Object.entries(family.answersFrom?.(factValues(facts)) ?? {})) if (id in out) out[id] = v;
   return out;
 }
 
@@ -366,7 +387,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     // Levers only the person can set (a bonus amount, a salary) start from the numbers in their question.
     if (family.questionSetsLevers && /\d/.test(question)) spec = await readLevers(t, spec, question);
     step({ id: 'spec', label: family.steps.checks });
-    let answers = defaultAnswers(family, spec);
+    let answers = defaultAnswers(family, spec, facts);
     let calc = calculate(family, spec, facts, answers, {}, data);
     step({ id: 'calc', label: 'Did the sums', detail: `using tax rules ${calc.rulePack.id}` });
     let numbers = screenNumbers(family, calc, facts, spec, {});
@@ -409,7 +430,7 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
       if (toSpec.length) {
         spec = await writeSpec(t, family, question, facts, toSpec);
         specFrom = 'spec_writer';
-        answers = defaultAnswers(family, spec);
+        answers = defaultAnswers(family, spec, facts);
         calc = calculate(family, spec, facts, answers, {}, data);
         numbers = screenNumbers(family, calc, facts, spec, {});
       }

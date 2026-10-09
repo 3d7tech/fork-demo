@@ -2,6 +2,7 @@ import type { CalcResult } from '@fork/spec';
 import { loadRulePack } from '@fork/rules';
 import { Rules } from './core';
 import { bonusCashOrPension } from './modules/bonus';
+import { childBenefitCharge } from './modules/childBenefitCharge';
 import { contributionLevel } from './modules/contributionLevel';
 import { cycleToWork } from './modules/cycleToWork';
 import { evScheme } from './modules/evScheme';
@@ -12,6 +13,7 @@ import { threshold100k } from './modules/threshold100k';
 
 export { Rules, roundPounds, leverRanges } from './core';
 export * as uk from './uk';
+export { profileAssumptions, type Profiled } from './profile';
 export { ssSwitch, ssIntroduce, threshold100k, hireCost, bonusCashOrPension, evScheme };
 
 /** The modules a DecisionSpec can name in `calculation.module`. */
@@ -24,6 +26,7 @@ export const MODULES = {
   'benefits.ev_scheme': evScheme,
   'pension.contribution_level': contributionLevel,
   'benefits.cycle_to_work': cycleToWork,
+  'pay.child_benefit_charge': childBenefitCharge,
 } as const;
 
 export type ModuleId = keyof typeof MODULES;

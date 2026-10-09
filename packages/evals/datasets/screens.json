@@ -51,6 +51,11 @@
    "question": "should I get a £1,200 bike through the cycle to work scheme or just buy it?",
    "subject": "ella",
    "family": "benefits.cycle_to_work"
+  },
+  {
+   "question": "on 70k with 2 kids, should i put more in my pension to stop paying back child benefit?",
+   "subject": "dan",
+   "family": "pay.child_benefit_charge"
   }
  ]
 }

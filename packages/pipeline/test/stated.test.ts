@@ -82,6 +82,17 @@ describe('the person’s tax profile reaches the sums (ADR 0010)', () => {
     const by = (fact: string) => s.calc.assumptions.find((a) => a.fact === fact);
     expect(by('tax_region')).toMatchObject({ text: 'Scottish income tax rates', source: 'payroll_export', estimate: false });
     expect(by('student_loans')).toMatchObject({ text: 'Repaying Plan 2 through payroll', source: 'user_answer' });
+    // Written by code, so shown as written: the model never sees or rewrites them.
+    expect(s.copy.assumptions).toContainEqual({ text: 'Scottish income tax rates', source: 'your payroll' });
+    expect(s.copy.assumptions).toContainEqual({ text: 'Repaying Plan 2 through payroll', source: 'your answer' });
+  });
+
+  it('the explainer only rewrites the module’s own assumptions', async () => {
+    const { deps: d, models } = deps(good, { facts: ellaScot });
+    await askFork(d, { question: QUESTION, subject: ELLA });
+    const sent = models.calls.find((c) => c.role === 'explainer')!.input.assumptions.map((a: any) => a.text);
+    expect(sent).not.toContain('Scottish income tax rates');
+    expect(sent).toContain('Figures from April 2029 use today’s tax bands with the salary sacrifice cap applied');
   });
 
   it('unknown profile facts are listed as estimates', async () => {

@@ -942,6 +942,79 @@
     "lookup",
     "decision"
    ]
+  },
+  {
+   "question": "im on 68k with 2 kids, should i put more in my pension to stop paying back child benefit",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "hicbc is killing me, can salary sacrifice help?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "high income child benefit charge - worth upping my pension?",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "got a pay rise to 72k and now i have to pay back child benefit?? what can i do",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "is it worth sacrificing salary to keep my child benefit",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "earning 65,000, 3 children, child benefit tax charge - how much pension to avoid it",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "my wife gets child benefit and i earn 75k, should i pay more into my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "how do i avoid the child benefit charge",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge"
+  },
+  {
+   "question": "should i pay into my pension to get under 60k",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.child_benefit_charge",
+   "accept": [
+    "decision"
+   ]
+  },
+  {
+   "question": "how much child benefit do i get for two kids",
+   "audience": "employee",
+   "route": "not_supported",
+   "accept": [
+    "not_supported",
+    "lookup",
+    "human"
+   ]
+  },
+  {
+   "question": "im on 105k with kids in nursery, should i put more in my pension",
+   "audience": "employee",
+   "route": "decision",
+   "family": "pay.threshold_100k"
   }
  ]
 }
