@@ -27,7 +27,7 @@ const companyId = () =>
 const money = (name: string) => numeric(name, { precision: 12, scale: 2 });
 const pct = (name: string) => numeric(name, { precision: 5, scale: 2 });
 
-export const role = pgEnum('member_role', ['owner', 'employee']);
+export const role = pgEnum('member_role', ['owner', 'employee', 'accountant']);
 export const reliefMethod = pgEnum('relief_method', ['relief_at_source', 'net_pay']);
 export const pensionBasis = pgEnum('pension_basis', ['full_salary', 'qualifying_earnings']);
 export const uploadStatus = pgEnum('upload_status', ['uploaded', 'mapped', 'imported', 'failed']);
@@ -230,6 +230,96 @@ export const policyFact = pgTable('policy_fact', {
   confirmedAt: timestamp('confirmed_at', { withTimezone: true }),
   createdAt: createdAt(),
 });
+
+// ---------- Decisions, requests and accountants (step 8) ----------
+
+export const requestStatus = pgEnum('request_status', ['draft', 'sent', 'acknowledged', 'done', 'declined']);
+
+/**
+ * Every answer Fork gave: the question, the screen or message, and what produced it (rule pack,
+ * models, prompt versions). An employee's runs are readable by that employee only.
+ */
+export const decisionRun = pgTable(
+  'decision_run',
+  {
+    id: uuid('id').primaryKey(),
+    companyId: companyId(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => appUser.id, { onDelete: 'cascade' }),
+    employeeId: uuid('employee_id').references(() => employee.id, { onDelete: 'set null' }),
+    audience: text('audience').$type<'employee' | 'owner'>().notNull(),
+    family: text('family'),
+    /** 'decision' for a screen, else the message reason (lookup, distress, not_supported…). */
+    kind: text('kind').notNull(),
+    question: text('question').notNull(),
+    answer: jsonb('answer').notNull(),
+    rulePack: text('rule_pack'),
+    createdAt: createdAt(),
+  },
+  (t) => [index('decision_run_user_idx').on(t.userId, t.createdAt), index('decision_run_topics_idx').on(t.companyId, t.audience, t.family, t.createdAt)],
+);
+
+/** A decision someone asked Fork to keep an eye on. Re-run when their pay or the rules change. */
+export const savedDecision = pgTable(
+  'saved_decision',
+  {
+    id: id(),
+    companyId: companyId(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => appUser.id, { onDelete: 'cascade' }),
+    runId: uuid('run_id')
+      .notNull()
+      .references(() => decisionRun.id, { onDelete: 'cascade' }),
+    title: text('title').notNull(),
+    /** What the answer depended on when saved: fact values and the rule pack. */
+    watched: jsonb('watched').$type<{ facts: Record<string, string | number | boolean>; rulePack: string; verdict: string; headline: Record<string, number> }>().notNull(),
+    lastCheckedAt: timestamp('last_checked_at', { withTimezone: true }),
+    /** Set when a re-run finds something changed; cleared when the person opens it. */
+    changeNote: text('change_note'),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('saved_decision_run_key').on(t.runId)],
+);
+
+/** A request or plan for the accountant. Fork never changes payroll itself. */
+export const actionRequest = pgTable(
+  'action_request',
+  {
+    id: id(),
+    companyId: companyId(),
+    createdBy: uuid('created_by')
+      .notNull()
+      .references(() => appUser.id, { onDelete: 'cascade' }),
+    runId: uuid('run_id').references(() => decisionRun.id, { onDelete: 'set null' }),
+    audience: text('audience').$type<'employee' | 'owner'>().notNull(),
+    kind: text('kind').$type<'payroll.request' | 'plan.send'>().notNull(),
+    family: text('family'),
+    /** What the accountant needs to do, in plain words, written by code from the decision. */
+    summary: text('summary').notNull(),
+    /** Figures for the dashboard, such as the employer NI saved a year. Company-level only. */
+    figures: jsonb('figures').$type<Record<string, number>>(),
+    status: requestStatus('status').notNull().default('sent'),
+    accountantNote: text('accountant_note'),
+    statusChangedAt: timestamp('status_changed_at', { withTimezone: true }).notNull().defaultNow(),
+    createdAt: createdAt(),
+  },
+  (t) => [index('action_request_company_idx').on(t.companyId, t.status)],
+);
+
+/** An accountant or payroll bureau who handles requests for a company. */
+export const accountantAccess = pgTable(
+  'accountant_access',
+  {
+    companyId: companyId(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => appUser.id, { onDelete: 'cascade' }),
+    createdAt: createdAt(),
+  },
+  (t) => [uniqueIndex('accountant_access_key').on(t.companyId, t.userId)],
+);
 
 // ---------- Audit ----------
 

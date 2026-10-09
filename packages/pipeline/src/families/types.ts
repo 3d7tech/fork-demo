@@ -8,6 +8,16 @@ export interface FamilyData {
   payrollRows?: Array<{ salary: number; hoursPerWeek: number }>;
 }
 
+export interface RequestInput {
+  calc: CalcResult;
+  levers: Record<string, number>;
+  answers: Record<string, string>;
+  facts: Record<string, Fact['value']>;
+  /** The employee asking, for employee requests. */
+  person: { name: string; payrollRef: string } | null;
+  companyName: string;
+}
+
 export interface FactDef {
   id: string;
   label: string;
@@ -47,6 +57,12 @@ export interface FamilyDef<M extends ModuleId = ModuleId> {
   defaultLayout: ScreenLayout;
   /** The data for the screen's visual. Code, so every bar and label comes from the results. */
   visual(calc: CalcResult, display: (key: string) => string): VisualData;
+  /**
+   * What the accountant is asked to do, written by code from the result. Employee requests name
+   * the person (the accountant needs that to change payroll); owners never see them.
+   * `figures` are company-level numbers for the dashboard, such as the employer NI saved a year.
+   */
+  request?(r: RequestInput): { summary: string; figures?: Record<string, number> } | null;
   /** Plain-English label for each building step shown while the screen is made. */
   steps: { facts: string; checks: string };
 }

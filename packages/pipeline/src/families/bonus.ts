@@ -68,5 +68,10 @@ export const bonus: FamilyDef<'employer.bonus_cash_or_pension'> = {
       floor: null,
     };
   },
+  request(r) {
+    return {
+      summary: `${r.companyName} plans a bonus of £${(r.levers.amount_per_person ?? 0).toLocaleString('en-GB')} for ${r.levers.people} people, with staff able to take it into their pension by salary sacrifice. Please confirm the bonus sacrifice can be agreed before the bonus is paid, and how payroll will run it.`,
+    };
+  },
   steps: { facts: 'Read your payroll', checks: 'Checked employer NI on bonuses' },
 };

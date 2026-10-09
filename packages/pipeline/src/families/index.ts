@@ -7,7 +7,7 @@ import { ssSwitch } from './ssSwitch';
 import { threshold100k } from './threshold100k';
 import type { FamilyDef } from './types';
 
-export type { FamilyData, FamilyDef, FactDef } from './types';
+export type { FamilyData, FamilyDef, FactDef, RequestInput } from './types';
 
 const ALL = [ssSwitch, contributionLevel, threshold100k, evScheme, ssIntroduce, hireCost, bonus];
 

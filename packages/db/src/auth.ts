@@ -26,6 +26,8 @@ export interface SignedIn {
   userId: string;
   email: string;
   memberships: Membership[];
+  /** Companies this person handles requests for, as their accountant or payroll bureau. */
+  accountantFor: Array<{ companyId: string; companyName: string }>;
 }
 
 /**
@@ -80,7 +82,14 @@ export async function readSession(db: ForkDatabase, sessionToken: string, now = 
       .from(s.membership)
       .innerJoin(s.company, eq(s.company.id, s.membership.companyId))
       .where(eq(s.membership.userId, row.userId));
-    return { ...row, memberships };
+    const accountantFor = await tx
+      .select({ companyId: s.accountantAccess.companyId, companyName: s.company.name })
+      .from(s.accountantAccess)
+      .innerJoin(s.company, eq(s.company.id, s.accountantAccess.companyId))
+      .where(eq(s.accountantAccess.userId, row.userId));
+    // Accountants are linked through accountant_access, never membership, so only these two roles appear here.
+    const members = memberships.filter((m): m is Membership => m.role === 'owner' || m.role === 'employee');
+    return { ...row, memberships: members, accountantFor };
   });
 }
 
@@ -94,11 +103,16 @@ export function contextFor(who: SignedIn, companyId: string, role: 'owner' | 'em
   return m ? { userId: who.userId, companyId, role } : null;
 }
 
+/** The request context for an accountant, across every company they look after. */
+export function accountantContext(who: SignedIn): RequestContext | null {
+  return who.accountantFor.length ? { userId: who.userId, companyId: '', role: 'accountant' } : null;
+}
+
 // ---------- Invites ----------
 
 export interface NewInvite {
   email: string;
-  role: 'owner' | 'employee';
+  role: 'owner' | 'employee' | 'accountant';
   employeeId?: string;
 }
 
@@ -154,10 +168,18 @@ export async function acceptInvite(db: ForkDatabase, token: string, now = new Da
     if (!inv) return null;
     let [user] = await tx.select({ id: s.appUser.id }).from(s.appUser).where(sql`lower(${s.appUser.email}) = ${inv.email}`);
     user ??= (await tx.insert(s.appUser).values({ email: inv.email }).returning({ id: s.appUser.id }))[0]!;
-    await tx
-      .insert(s.membership)
-      .values({ userId: user.id, companyId: inv.companyId, role: inv.role, employeeId: inv.employeeId })
-      .onConflictDoNothing();
+    if (inv.role === 'accountant') {
+      await tx.insert(s.accountantAccess).values({ userId: user.id, companyId: inv.companyId }).onConflictDoNothing();
+      await tx
+        .update(s.actionRequest)
+        .set({ status: 'sent', statusChangedAt: now })
+        .where(and(eq(s.actionRequest.companyId, inv.companyId), eq(s.actionRequest.status, 'draft')));
+    } else {
+      await tx
+        .insert(s.membership)
+        .values({ userId: user.id, companyId: inv.companyId, role: inv.role, employeeId: inv.employeeId })
+        .onConflictDoNothing();
+    }
     await tx.insert(s.auditEvent).values({ companyId: inv.companyId, actorUserId: user.id, action: 'invite.accepted', targetType: 'invite', targetId: inv.id });
     return startSession(tx, user.id, now);
   });

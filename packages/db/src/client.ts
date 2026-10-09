@@ -9,8 +9,9 @@ export type Db = NodePgDatabase<typeof schema>;
 /** Who is making a signed-in request. Row-level security checks it against membership. */
 export interface RequestContext {
   userId: string;
+  /** Empty for an accountant, who works across the companies they look after. */
   companyId: string;
-  role: 'owner' | 'employee';
+  role: 'owner' | 'employee' | 'accountant';
 }
 
 export interface ForkDatabase {

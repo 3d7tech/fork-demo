@@ -74,5 +74,11 @@ export const ssIntroduce: FamilyDef<'employer.ss_introduce'> = {
       columns: [col('Now', 'employer_ni_saved', 'company_keeps', 'shared_with_staff'), col('From April 2029', 'employer_ni_saved_2029', 'company_keeps_2029', 'shared_with_staff_2029')],
     };
   },
+  request(r) {
+    const o = r.calc.outputs;
+    return {
+      summary: `${r.companyName} plans to offer salary sacrifice for pensions. Fork estimates ${o.eligible?.value} of ${o.headcount?.value} staff are eligible (${o.excluded_min_wage?.value} left out to protect the minimum wage), with ${r.levers.share_pct ?? 0}%% of the employer NI saving passed into staff pensions. Please confirm payroll can run it, and the contract variation and scheme steps needed.`,
+    };
+  },
   steps: { facts: 'Read your payroll, pension scheme and settings', checks: 'Checked who the minimum wage leaves out' },
 };

@@ -87,5 +87,12 @@ export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
       floor: null,
     };
   },
+  request(r) {
+    const from = r.facts.contribution_pct;
+    const to = r.levers.chosen_pct ?? from;
+    if (to === from && r.answers.pay_method !== 'sacrifice') return null;
+    const how = r.answers.pay_method === 'sacrifice' ? ', paid by salary sacrifice' : '';
+    return { summary: `Please change the pension contribution for ${r.person ? `${r.person.name} (payroll ${r.person.payrollRef})` : 'An employee'} from ${from}% to ${to}% of pay${how}, from the next pay period you can.` };
+  },
   steps: { facts: 'Read your pay and pension', checks: 'Checked tax relief and the minimum wage' },
 };

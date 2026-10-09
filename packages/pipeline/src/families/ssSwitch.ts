@@ -84,5 +84,12 @@ export const ssSwitch: FamilyDef<'pension.ss_switch'> = {
       floor: { value: floor, display: `£${floor.toLocaleString('en-GB')}` },
     };
   },
+  request(r) {
+    const pct = r.levers.contribution_pct ?? r.facts.contribution_pct;
+    return {
+      summary: `Please switch ${r.person ? `${r.person.name} (payroll ${r.person.payrollRef})` : 'An employee'} to paying their ${pct}% pension contribution by salary sacrifice, from the next pay period you can. Their contract needs a salary sacrifice variation; their pension contribution stays the same.`,
+      figures: { employer_ni_saving: r.calc.outputs.employer_ni_saving?.value ?? 0 },
+    };
+  },
   steps: { facts: 'Read your pay and pension', checks: 'Checked the catches: mortgage applications, parental pay, minimum wage' },
 };
