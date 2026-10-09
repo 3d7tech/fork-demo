@@ -12,9 +12,17 @@ export interface ScreenNumber {
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 /** British formatting: £1,234 with a true minus sign, whole pounds. */
+/**
+ * Money for display: whole pounds, except amounts under £10 that aren't whole, which keep their
+ * pence ("72p", "£1.40") so "each £1 costs you 72p" doesn't read as "£1".
+ */
 export function formatGBP(v: number): string {
-  const r = roundPounds(v);
-  return `${r < 0 ? '−' : ''}£${Math.abs(r).toLocaleString('en-GB')}`;
+  const sign = v < 0 ? '−' : '';
+  const a = Math.abs(v);
+  const pence = Math.round(a * 100);
+  if (a < 10 && pence % 100 !== 0) return pence < 100 ? `${sign}${pence}p` : `${sign}£${(pence / 100).toFixed(2)}`;
+  const r = roundPounds(a);
+  return `${sign}£${r.toLocaleString('en-GB')}`;
 }
 
 export function formatPct(v: number): string {

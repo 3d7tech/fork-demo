@@ -100,14 +100,14 @@ test('an owner sets up Larkfield and an employee asks their first question', asy
   // With payroll in, the owner's home is asking Fork. Company decisions use every salary.
   await page.goto('/');
   await page.getByRole('button', { name: 'Should we introduce salary sacrifice for pensions?' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'Introducing salary sacrifice for pensions' })).toBeVisible();
-  await expect(page.getByText('Where the employer NI saving goes each year')).toBeVisible();
+  // Titles are written by the model in live runs; the visual's title is written by code.
+  await expect(page.locator('figure').getByText('Where the employer NI saving goes each year')).toBeVisible();
   await check(page, 'step7-owner-introduce');
   await page.getByRole('textbox', { name: 'What do you want to work out?' }).fill('What does hiring someone really cost us?');
   await page.getByRole('button', { name: 'Ask Fork' }).click();
-  await expect(page.getByRole('heading', { level: 1, name: 'The true cost of a hire' })).toBeVisible();
+  await expect(page.locator('figure').getByText('What the hire costs a year')).toBeVisible();
   await check(page, 'step7-owner-hire');
-  await page.getByRole('textbox', { name: 'What do you want to work out?' }).fill('can you book my holiday flights');
+  await page.getByRole('textbox', { name: 'What do you want to work out?' }).fill('Should we move everyone to a four-day week?');
   await page.getByRole('button', { name: 'Ask Fork' }).click();
   await expect(page.getByRole('heading', { name: 'Fork can’t answer that one yet' })).toBeVisible();
   await expect(page.getByRole('listitem').filter({ hasText: 'A bonus as cash or into pensions' })).toBeVisible();
@@ -137,7 +137,8 @@ test('an owner sets up Larkfield and an employee asks their first question', asy
 
   await ella.getByRole('textbox', { name: 'What do you want to work out?' }).fill('should I pay more into my pension?');
   await ella.getByRole('button', { name: 'Ask Fork' }).click();
-  await expect(ella.getByRole('heading', { level: 1, name: 'How much to pay into your pension' })).toBeVisible();
+  await expect(ella.locator('figure').getByRole('heading', { name: 'Into your pension a year' })).toBeVisible();
+  await expect(ella.getByText('80p').first()).toBeVisible();
   await check(ella, 'step7-ella-contribution');
   await ellaContext.close();
 });

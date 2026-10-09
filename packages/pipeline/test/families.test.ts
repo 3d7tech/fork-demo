@@ -154,3 +154,10 @@ describe('families are separated by audience', () => {
     }
   });
 });
+
+describe('money on screen', () => {
+  it('keeps pence only where whole pounds would mislead', async () => {
+    const { formatGBP } = await import('../src');
+    expect([formatGBP(0.72), formatGBP(0.8), formatGBP(1.4), formatGBP(1), formatGBP(128.4), formatGBP(-0.5), formatGBP(47950)]).toEqual(['72p', '80p', '£1.40', '£1', '£128', '−50p', '£47,950']);
+  });
+});

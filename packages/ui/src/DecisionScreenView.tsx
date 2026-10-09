@@ -20,10 +20,19 @@ export interface DecisionScreenViewProps {
 type Lever = DecisionSpec['levers'][number];
 type Ask = Extract<DecisionSpec['constraints'][number], { kind: 'ask' }>;
 
-const HARD_TEXT: Record<string, { pass: string; excluded: string }> = {
-  min_wage: {
-    pass: 'Checked automatically: your pay stays above the minimum wage.',
-    excluded: 'Salary sacrifice would take your pay below the minimum wage, so it isn’t available to you.',
+type HardOutcome = 'pass' | 'caution' | 'excluded';
+const HARD_TEXT: Record<'employee' | 'owner', Record<string, Partial<Record<HardOutcome, string>>>> = {
+  employee: {
+    min_wage: {
+      pass: 'Checked automatically: your pay stays above the minimum wage.',
+      excluded: 'Salary sacrifice would take your pay below the minimum wage, so it isn’t available to you.',
+    },
+  },
+  owner: {
+    min_wage: {
+      pass: 'Checked automatically: no one’s pay drops below the minimum wage.',
+      caution: 'Checked automatically: staff whose pay would drop below the minimum wage are left out.',
+    },
   },
 };
 
@@ -69,7 +78,7 @@ function ConstraintPanel({ screen, onAnswer }: Pick<DecisionScreenViewProps, 'sc
     <section className="fk-constraints" aria-label="Things that could change the answer">
       {hard.map((c) => {
         const outcome = screen.calc.constraints.find((x) => x.id === c.id)?.outcome ?? 'pass';
-        const text = HARD_TEXT[c.id]?.[outcome === 'excluded' ? 'excluded' : 'pass'];
+        const text = HARD_TEXT[screen.spec.audience][c.id]?.[outcome as HardOutcome] ?? HARD_TEXT[screen.spec.audience][c.id]?.pass;
         return text ? (
           <p key={c.id} className={`fk-hard fk-hard-${outcome}`}>
             {text}
