@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { listRulePacks, loadRulePack, RuleNotFoundError } from '../src';
+import { listRulePacks, loadRulePack, reviewSummary, RuleNotFoundError } from '../src';
 
 const OFFICIAL = /^https:\/\/(www\.)?(gov\.uk|legislation\.gov\.uk|thepensionsregulator\.gov\.uk)\//;
 
@@ -27,7 +27,7 @@ describe.each(listRulePacks())('rule pack %s', (id) => {
   it('a published pack has every value checked by a person', () => {
     if (pack.status !== 'published') return;
     expect(pack.data.review.checkedBy).toBeTruthy();
-    for (const r of pack.data.rules) for (const v of r.values) expect(v.lastChecked, r.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(reviewSummary(pack.data).canPublish).toBe(true);
   });
 });
 

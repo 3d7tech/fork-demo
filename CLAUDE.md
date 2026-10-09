@@ -1,6 +1,6 @@
 # Fork: project memory
 
-Read this first in every session. Last updated 2026-10-09 (evening).
+Read this first in every session. Last updated 2026-10-09 (late evening).
 
 Fork (3d7 Technologies) helps employees of small UK companies (20 to 100 people) decide about pay, pensions and benefits, and saves the employer National Insurance through salary sacrifice. The full brief is [`BUILD_PROMPT.md`](BUILD_PROMPT.md); its principles are non-negotiable. Product owner: Richard Awe (richard.awe@3d7tech.com).
 
@@ -27,7 +27,7 @@ Three plans, agreed with Richard on 2026-10-09. Read them before changing the en
 
 | Plan | What | Status |
 |---|---|---|
-| [ADR 0010](docs/adr/0010-tax-profile.md) | **Tax profile**: Scottish tax, student loans, Child Benefit charge, annual allowance, other income and variable pay, minimum wage by age | Steps 1 to 4 built. **Next: step 5, a rule pack review tool** (every value with its source, signed off by a person), then bonus per person from payroll |
+| [ADR 0010](docs/adr/0010-tax-profile.md) | **Tax profile**: Scottish tax, student loans, Child Benefit charge, annual allowance, other income and variable pay, minimum wage by age | Steps 1 to 5 built (step 5: `pnpm rules`, checklist in `docs/rule-pack-review.md`; 0 of 60 values signed so far, Richard to check). **Next: bonus per person from payroll**, then ADR 0011 steps 1 and 2 |
 | [ADR 0011](docs/adr/0011-take-up.md) | **Take-up**: switching looks like a pay cut; real take-up from payroll instead of the assumed 70%; opt-out introduction and notional salary; each employee's own figure by email; objections answered; an "opt out of the pension" decision | Proposed, not started. Steps 1 and 2 matter most: they decide whether the sales promise holds |
 | [ADR 0012](docs/adr/0012-visuals-that-feel-real.md) | **Visuals that feel real**: payslip before and after, where each £1 goes, pension pot over time, the tax cliff as terrain (three.js, with static fallbacks) | Proposed, not started. Start with the payslip view (no 3D needed) |
 
@@ -38,6 +38,8 @@ Also done on 2026-10-09:
 - A new employee decision, the Child Benefit charge (8 families now: 3 owner, 5 employee).
 - Tax profile facts: payroll (tax code with an `S` prefix, student loan column) or the person's own answers in `tax_profile`, readable only by them (migration 0007). Fork asks region and student loan before the first screen; the rest are on "Your tax details" (`/me/tax`).
 - Profile assumptions are code-written and shown as written (`asWritten`); the explainer never rewrites them.
+- Top bar: "Fork" and a Home link go back home (a full page load, so an answer clears); a colour switch cycles Auto, Light, Dark, kept in the browser.
+- Rule pack review tool (ADR 0010 step 5). The pack file is now one line per value, so each sign-off is a one-line diff.
 
 **Model key:** `FORK_ANTHROPIC_API_KEY` in the Default environment (`ANTHROPIC_API_KEY` is reserved for Claude Code). The live check passed on 2026-10-08; `pnpm smoke:models` re-runs it. Never print, log or commit the key. Live screenshots are in `docs/screens/`.
 
@@ -64,7 +66,7 @@ Also done on 2026-10-09:
 
 ```sh
 pnpm install
-pnpm test            # unit, golden and database tests (277)
+pnpm test            # unit, golden and database tests (287)
 pnpm typecheck
 pnpm e2e             # builds the web app, Playwright + axe at 360px, light and dark (12)
 pnpm --filter web dev
@@ -74,6 +76,7 @@ pnpm --filter web e2e:db   # setup flow end to end with the database
 pnpm fork monthly     # pay explained, owner reports, saved-decision re-checks (FORK_DEV_OUTBOX=1)
 pnpm smoke:models    # live pipeline on four questions, needs a working Anthropic key
 pnpm smoke:documents # live document interpreter on the fixtures, including a hidden-instruction test
+pnpm rules status    # rule pack review: next, check, correct, publish, sheet (scripts/rules.ts)
 pnpm eval [suite]    # evaluation suites per role against live models (~$1.30 for all); report in .data/evals/
 ```
 

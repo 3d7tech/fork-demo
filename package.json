@@ -12,7 +12,8 @@
     "db": "tsx scripts/db.ts",
     "fork": "tsx scripts/fork.ts",
     "smoke:documents": "tsx scripts/smoke-documents.ts",
-    "eval": "tsx scripts/eval.ts"
+    "eval": "tsx scripts/eval.ts",
+    "rules": "tsx scripts/rules.ts"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

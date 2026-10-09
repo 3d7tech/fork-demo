@@ -63,7 +63,7 @@ thresholds, annual allowance, taper limits, money purchase allowance, minimum wa
 | 2 | `TaxProfile` through every employee module (`jobPay`); annual allowance check; minimum wage by age | **Done** (`412b8b9`) |
 | 3 | Profile storage (RLS), payroll columns for tax code and student loan, "a few details first", "Your tax details" page | **Done** (`28c8217`) |
 | 4 | Child Benefit charge decision (£60,000 to £80,000); owner minimum wage by each person's age | **Done** (`611ec93`, `f1ed1ce`). Bonus per person from payroll still to do |
-| 5 | Rule pack review tool: every value with source, checked and signed off by a person | To do |
+| 5 | Rule pack review tool: every value with source, checked and signed off by a person | **Done**: `pnpm rules` (status, next, check, correct, publish, sheet) and the checklist in `docs/rule-pack-review.md`. A sign-off needs the value the person read at the source; a mismatch signs nothing. A correction needs a reason and bumps the pack version. Publishing needs every value signed. The values themselves still need Richard's check (0 of 60) |
 | 6 | Evaluation cases and wording for the new assumptions and constraints | Mostly done with steps 2 to 4 (router, screen, spec cases; screens pass at 10.6s). Wording needs Richard's review |
 
 Built along the way: profile assumptions are written by code and shown as written (the explainer never

@@ -17,6 +17,8 @@ export interface RuleValue {
   note?: string;
   source: RuleSource;
   lastChecked: string | null;
+  /** The person who checked it against the source (see `review.ts`). */
+  checkedBy?: string | null;
 }
 
 export interface Rule {
@@ -113,3 +115,5 @@ export function loadRulePack(id: string): RulePack {
 export function listRulePacks(): string[] {
   return Object.keys(PACKS);
 }
+
+export * from './review';

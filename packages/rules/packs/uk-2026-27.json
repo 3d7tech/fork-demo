@@ -14,163 +14,194 @@
       "id": "income_tax.personal_allowance",
       "description": "Standard personal allowance a year",
       "unit": "GBP",
-      "values": [{ "value": 12570, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 12570, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.allowance_taper_threshold",
       "description": "Adjusted net income above which the personal allowance is reduced",
       "unit": "GBP",
-      "values": [{ "value": 100000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 100000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.allowance_taper_rate",
       "description": "Personal allowance lost for each £1 of income above the taper threshold (£1 for every £2)",
       "unit": "rate",
-      "values": [{ "value": 0.5, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.5, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.basic_band",
       "description": "Width of the basic rate band in taxable income (£12,571 to £50,270 of pay with a full allowance)",
       "unit": "GBP",
-      "values": [{ "value": 37700, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 37700, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.additional_threshold",
       "description": "Taxable income above which the additional rate applies",
       "unit": "GBP",
-      "values": [{ "value": 125140, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 125140, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.basic_rate",
       "description": "Basic rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.2, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.2, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.higher_rate",
       "description": "Higher rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.4, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.4, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.additional_rate",
       "description": "Additional rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.45, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.45, "from": "2026-04-06", "status": "in_force", "source": { "title": "Income Tax rates and Personal Allowances", "url": "https://www.gov.uk/income-tax-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "ee_ni.primary_threshold",
       "description": "Employee Class 1 National Insurance primary threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 12570, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 12570, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "ee_ni.upper_earnings_limit",
       "description": "Employee Class 1 National Insurance upper earnings limit a year",
       "unit": "GBP",
-      "values": [{ "value": 50270, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 50270, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "ee_ni.main_rate",
       "description": "Employee National Insurance between the primary threshold and the upper earnings limit",
       "unit": "rate",
-      "values": [{ "value": 0.08, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.08, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "ee_ni.upper_rate",
       "description": "Employee National Insurance above the upper earnings limit",
       "unit": "rate",
-      "values": [{ "value": 0.02, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.02, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "er_ni.secondary_threshold",
       "description": "Employer Class 1 National Insurance secondary threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 5000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 5000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "er_ni.rate",
       "description": "Employer Class 1 National Insurance rate above the secondary threshold",
       "unit": "rate",
-      "values": [{ "value": 0.15, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.15, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "er_ni.class_1a_rate",
       "description": "Class 1A employer National Insurance on benefits in kind, such as a company car",
       "unit": "rate",
-      "values": [{ "value": 0.15, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.15, "from": "2026-04-06", "status": "in_force", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "er_ni.employment_allowance",
       "description": "Employment Allowance: reduction in an eligible employer's yearly National Insurance bill",
       "unit": "GBP",
-      "values": [{ "value": 10500, "from": "2026-04-06", "status": "in_force", "source": { "title": "Employment Allowance", "url": "https://www.gov.uk/claim-employment-allowance" }, "lastChecked": null }]
+      "values": [
+        { "value": 10500, "from": "2026-04-06", "status": "in_force", "source": { "title": "Employment Allowance", "url": "https://www.gov.uk/claim-employment-allowance" }, "lastChecked": null }
+      ]
     },
     {
       "id": "min_wage.nlw_21_plus",
       "description": "National Living Wage an hour, workers aged 21 and over",
       "unit": "GBP_per_hour",
-      "values": [{ "value": 12.71, "from": "2026-04-01", "status": "in_force", "source": { "title": "National Minimum Wage and National Living Wage rates", "url": "https://www.gov.uk/national-minimum-wage-rates" }, "lastChecked": null }]
+      "values": [
+        { "value": 12.71, "from": "2026-04-01", "status": "in_force", "source": { "title": "National Minimum Wage and National Living Wage rates", "url": "https://www.gov.uk/national-minimum-wage-rates" }, "lastChecked": null }
+      ]
     },
     {
       "id": "salary_sacrifice.pension_ni_cap",
       "description": "Salary-sacrificed pension contributions free of employee and employer Class 1 National Insurance, a year per employee. Sacrifice above this is charged both.",
       "unit": "GBP",
       "values": [
-        {
-          "value": null,
-          "from": "2026-04-06",
-          "to": "2029-04-05",
-          "status": "in_force",
-          "note": "No cap before 6 April 2029.",
-          "source": { "title": "National Insurance Contributions (Employer Pensions Contributions) Act 2026", "url": "https://www.legislation.gov.uk/ukpga/2026/15/contents/enacted" },
-          "lastChecked": null
-        },
-        {
-          "value": 2000,
-          "from": "2029-04-06",
-          "status": "legislated",
-          "note": "The Act (Royal Assent 29 April 2026) sets the framework; the £2,000 limit for 2029-30 is to be set by regulations. Treat as confirmed in principle, amount pending regulations.",
-          "source": { "title": "Changes to salary sacrifice for pensions from April 2029 (HM Treasury)", "url": "https://www.gov.uk/government/publications/changes-to-salary-sacrifice-for-pensions-from-april-2029/changes-to-salary-sacrifice-for-pensions-from-april-2029" },
-          "lastChecked": null
-        }
+        { "value": null, "from": "2026-04-06", "to": "2029-04-05", "status": "in_force", "note": "No cap before 6 April 2029.", "source": { "title": "National Insurance Contributions (Employer Pensions Contributions) Act 2026", "url": "https://www.legislation.gov.uk/ukpga/2026/15/contents/enacted" }, "lastChecked": null },
+        { "value": 2000, "from": "2029-04-06", "status": "legislated", "note": "The Act (Royal Assent 29 April 2026) sets the framework; the £2,000 limit for 2029-30 is to be set by regulations. Treat as confirmed in principle, amount pending regulations.", "source": { "title": "Changes to salary sacrifice for pensions from April 2029 (HM Treasury)", "url": "https://www.gov.uk/government/publications/changes-to-salary-sacrifice-for-pensions-from-april-2029/changes-to-salary-sacrifice-for-pensions-from-april-2029" }, "lastChecked": null }
       ]
     },
     {
       "id": "tax_free_childcare.top_up_rate",
       "description": "Government top-up as a share of what the parent pays in (£2 for every £8)",
       "unit": "rate",
-      "values": [{ "value": 0.25, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.25, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }
+      ]
     },
     {
       "id": "tax_free_childcare.max_per_child",
       "description": "Maximum government top-up a year per child (not disabled)",
       "unit": "GBP",
-      "values": [{ "value": 2000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }]
+      "values": [
+        { "value": 2000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }
+      ]
     },
     {
       "id": "tax_free_childcare.income_limit",
       "description": "Adjusted net income above which a parent loses Tax-Free Childcare",
       "unit": "GBP",
-      "values": [{ "value": 100000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare: eligibility", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }]
+      "values": [
+        { "value": 100000, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax-Free Childcare: eligibility", "url": "https://www.gov.uk/tax-free-childcare" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.relief_at_source_rate",
       "description": "Tax relief the provider adds to a relief-at-source contribution paid from take-home pay (basic rate)",
       "unit": "rate",
-      "values": [{ "value": 0.2, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax on your private pension contributions: tax relief", "url": "https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.2, "from": "2026-04-06", "status": "in_force", "source": { "title": "Tax on your private pension contributions: tax relief", "url": "https://www.gov.uk/tax-on-your-private-pension/pension-tax-relief" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.qualifying_earnings_lower",
       "description": "Auto-enrolment qualifying earnings lower limit a year",
       "unit": "GBP",
-      "values": [{ "value": 6240, "from": "2026-04-06", "status": "in_force", "source": { "title": "Automatic enrolment earnings thresholds (The Pensions Regulator)", "url": "https://www.thepensionsregulator.gov.uk/" }, "lastChecked": null }]
+      "values": [
+        { "value": 6240, "from": "2026-04-06", "status": "in_force", "source": { "title": "Automatic enrolment earnings thresholds (The Pensions Regulator)", "url": "https://www.thepensionsregulator.gov.uk/" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.qualifying_earnings_upper",
       "description": "Auto-enrolment qualifying earnings upper limit a year",
       "unit": "GBP",
-      "values": [{ "value": 50270, "from": "2026-04-06", "status": "in_force", "source": { "title": "Automatic enrolment earnings thresholds (The Pensions Regulator)", "url": "https://www.thepensionsregulator.gov.uk/" }, "lastChecked": null }]
+      "values": [
+        { "value": 50270, "from": "2026-04-06", "status": "in_force", "source": { "title": "Automatic enrolment earnings thresholds (The Pensions Regulator)", "url": "https://www.thepensionsregulator.gov.uk/" }, "lastChecked": null }
+      ]
     },
     {
       "id": "company_car.appropriate_pct_zero_emission",
@@ -187,187 +218,249 @@
       "id": "income_tax.scotland.starter_limit",
       "description": "Scottish starter rate (19%) applies to taxable income up to this amount (£12,571 to £16,537 of pay with a full allowance)",
       "unit": "GBP",
-      "values": [{ "value": 3967, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 3967, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.basic_limit",
       "description": "Scottish basic rate (20%) applies to taxable income up to this amount (to £29,526 of pay)",
       "unit": "GBP",
-      "values": [{ "value": 16956, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 16956, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.intermediate_limit",
       "description": "Scottish intermediate rate (21%) applies to taxable income up to this amount (to £43,662 of pay)",
       "unit": "GBP",
-      "values": [{ "value": 31092, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 31092, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.higher_limit",
       "description": "Scottish higher rate (42%) applies to taxable income up to this amount (to £75,000 of pay)",
       "unit": "GBP",
-      "values": [{ "value": 62430, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 62430, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.advanced_limit",
       "description": "Scottish advanced rate (45%) applies to taxable income up to this amount; the top rate above",
       "unit": "GBP",
-      "values": [{ "value": 125140, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 125140, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.starter_rate",
       "description": "Scottish starter rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.19, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.19, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.basic_rate",
       "description": "Scottish basic rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.2, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.2, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.intermediate_rate",
       "description": "Scottish intermediate rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.21, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.21, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.higher_rate",
       "description": "Scottish higher rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.42, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.42, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.advanced_rate",
       "description": "Scottish advanced rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.45, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.45, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }
+      ]
     },
     {
       "id": "income_tax.scotland.top_rate",
       "description": "Scottish top rate of income tax",
       "unit": "rate",
-      "values": [{ "value": 0.48, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.48, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Scottish Income Tax: 2026 to 2027 rates", "url": "https://www.gov.uk/scottish-income-tax" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.plan_1_threshold",
       "description": "Student loan Plan 1 repayment threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 26900, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 26900, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.plan_2_threshold",
       "description": "Student loan Plan 2 repayment threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 29385, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 29385, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.plan_4_threshold",
       "description": "Student loan Plan 4 (Scotland) repayment threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 33795, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 33795, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.plan_5_threshold",
       "description": "Student loan Plan 5 repayment threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 25000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 25000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.postgraduate_threshold",
       "description": "Postgraduate loan repayment threshold a year",
       "unit": "GBP",
-      "values": [{ "value": 21000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 21000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.rate",
       "description": "Student loan repayment rate above the threshold (Plans 1, 2, 4 and 5)",
       "unit": "rate",
-      "values": [{ "value": 0.09, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.09, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "student_loan.postgraduate_rate",
       "description": "Postgraduate loan repayment rate above the threshold",
       "unit": "rate",
-      "values": [{ "value": 0.06, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.06, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "min_wage.rate_18_20",
       "description": "National Minimum Wage an hour, workers aged 18 to 20",
       "unit": "GBP_per_hour",
-      "values": [{ "value": 10.85, "from": "2026-04-01", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027: National Minimum Wage", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 10.85, "from": "2026-04-01", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027: National Minimum Wage", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "min_wage.rate_under_18",
       "description": "National Minimum Wage an hour, workers aged under 18",
       "unit": "GBP_per_hour",
-      "values": [{ "value": 8.0, "from": "2026-04-01", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027: National Minimum Wage", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 8, "from": "2026-04-01", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027: National Minimum Wage", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "min_wage.apprentice",
       "description": "National Minimum Wage an hour for apprentices under 19, or 19 and over in their first year",
       "unit": "GBP_per_hour",
-      "values": [{ "value": 8.0, "from": "2026-04-01", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027: National Minimum Wage", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }]
+      "values": [
+        { "value": 8, "from": "2026-04-01", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Rates and thresholds for employers 2026 to 2027: National Minimum Wage", "url": "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027" }, "lastChecked": null }
+      ]
     },
     {
       "id": "child_benefit.eldest_weekly",
       "description": "Child Benefit a week for the eldest or only child",
       "unit": "GBP",
-      "values": [{ "value": 27.05, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Child Benefit: what you'll get", "url": "https://www.gov.uk/child-benefit/what-youll-get" }, "lastChecked": null }]
+      "values": [
+        { "value": 27.05, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Child Benefit: what you'll get", "url": "https://www.gov.uk/child-benefit/what-youll-get" }, "lastChecked": null }
+      ]
     },
     {
       "id": "child_benefit.additional_weekly",
       "description": "Child Benefit a week for each additional child",
       "unit": "GBP",
-      "values": [{ "value": 17.9, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Child Benefit: what you'll get", "url": "https://www.gov.uk/child-benefit/what-youll-get" }, "lastChecked": null }]
+      "values": [
+        { "value": 17.9, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Child Benefit: what you'll get", "url": "https://www.gov.uk/child-benefit/what-youll-get" }, "lastChecked": null }
+      ]
     },
     {
       "id": "child_benefit_charge.threshold",
       "description": "Adjusted net income above which the High Income Child Benefit Charge starts",
       "unit": "GBP",
-      "values": [{ "value": 60000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "High Income Child Benefit Charge", "url": "https://www.gov.uk/child-benefit-tax-charge" }, "lastChecked": null }]
+      "values": [
+        { "value": 60000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "High Income Child Benefit Charge", "url": "https://www.gov.uk/child-benefit-tax-charge" }, "lastChecked": null }
+      ]
     },
     {
       "id": "child_benefit_charge.income_per_percent",
       "description": "Income above the threshold for each 1% of Child Benefit paid back (all of it by £80,000)",
       "unit": "GBP",
-      "values": [{ "value": 200, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "High Income Child Benefit Charge", "url": "https://www.gov.uk/child-benefit-tax-charge" }, "lastChecked": null }]
+      "values": [
+        { "value": 200, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "High Income Child Benefit Charge", "url": "https://www.gov.uk/child-benefit-tax-charge" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.annual_allowance",
       "description": "Pension annual allowance: most that can be saved into pensions in a tax year before a tax charge",
       "unit": "GBP",
-      "values": [{ "value": 60000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Tax on your private pension contributions: annual allowance", "url": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance" }, "lastChecked": null }]
+      "values": [
+        { "value": 60000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Tax on your private pension contributions: annual allowance", "url": "https://www.gov.uk/tax-on-your-private-pension/annual-allowance" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.annual_allowance_taper_threshold_income",
       "description": "Threshold income at or below which the annual allowance is not tapered",
       "unit": "GBP",
-      "values": [{ "value": 200000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }]
+      "values": [
+        { "value": 200000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.annual_allowance_taper_adjusted_income",
       "description": "Adjusted income above which the annual allowance is tapered",
       "unit": "GBP",
-      "values": [{ "value": 260000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }]
+      "values": [
+        { "value": 260000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.annual_allowance_taper_rate",
       "description": "Annual allowance lost for each £1 of adjusted income above the taper limit (£1 for every £2)",
       "unit": "rate",
-      "values": [{ "value": 0.5, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }]
+      "values": [
+        { "value": 0.5, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.annual_allowance_minimum",
       "description": "Lowest the tapered annual allowance can fall to",
       "unit": "GBP",
-      "values": [{ "value": 10000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }]
+      "values": [
+        { "value": 10000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "Pension schemes: work out your tapered annual allowance", "url": "https://www.gov.uk/guidance/pension-schemes-work-out-your-tapered-annual-allowance" }, "lastChecked": null }
+      ]
     },
     {
       "id": "pension.money_purchase_annual_allowance",
       "description": "Money purchase annual allowance, after taking money flexibly from a pension",
       "unit": "GBP",
-      "values": [{ "value": 10000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "PTM056510: money purchase annual allowance", "url": "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm056510" }, "lastChecked": null }]
+      "values": [
+        { "value": 10000, "from": "2026-04-06", "status": "in_force", "note": "Read from the source on 2026-10-09; needs a person's check.", "source": { "title": "PTM056510: money purchase annual allowance", "url": "https://www.gov.uk/hmrc-internal-manuals/pensions-tax-manual/ptm056510" }, "lastChecked": null }
+      ]
     }
   ]
 }
