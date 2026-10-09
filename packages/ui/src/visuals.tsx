@@ -3,11 +3,11 @@
 import type { PayslipVisual as Payslip, VisualData } from '@fork/spec';
 import { useId } from 'react';
 import { useCountUp } from './motion';
+import { CoinsVisual, JarVisual, MeterVisual, ReceiptVisual, RiverVisual, TagVisual, TowersVisual } from './shapes';
 
 type Bars = Extract<VisualData, { type: 'bars' }>;
 type Ladder = Extract<VisualData, { type: 'ladder' }>;
 type Checklist = Extract<VisualData, { type: 'checklist' }>;
-type Flow = Extract<VisualData, { type: 'flow' }>;
 
 const pct = (v: number) => `${Math.max(0, Math.min(100, v)).toFixed(2)}%`;
 
@@ -58,6 +58,12 @@ function LadderVisual({ v }: { v: Ladder }) {
         <div className="fk-ladder-track">
           <div className="fk-ladder-band" style={{ left: at(v.band.from), width: pct(((v.band.to - v.band.from) / (v.max - v.min)) * 100) }} />
         </div>
+        {v.markers.length === 2 && v.markers[0]!.value !== v.markers[1]!.value && (
+          <div
+            className={`fk-ladder-move${v.markers[1]!.value < v.markers[0]!.value ? ' fk-left' : ''}`}
+            style={{ left: at(Math.min(v.markers[0]!.value, v.markers[1]!.value)), width: pct((Math.abs(v.markers[1]!.value - v.markers[0]!.value) / (v.max - v.min)) * 100) }}
+          />
+        )}
         {v.markers.map((m) => (
           <div key={m.label} className={`fk-ladder-mark fk-tone-text-${m.tone}`} style={{ left: at(m.value) }}>
             {m.label} {m.display}
@@ -95,37 +101,6 @@ function ChecklistVisual({ v }: { v: Checklist }) {
           </li>
         ))}
       </ul>
-    </figure>
-  );
-}
-
-function FlowVisual({ v }: { v: Flow }) {
-  const max = Math.max(...v.columns.map((c) => c.total.value)) || 1;
-  return (
-    <figure className="fk-vis">
-      <h3>{v.title}</h3>
-      <div className="fk-flow">
-        {v.columns.map((c) => (
-          <section key={c.label} aria-label={`${c.label}: ${c.total.display}`}>
-            <h4>
-              {c.label} <span className="fk-num">{c.total.display}</span>
-            </h4>
-            <span className="fk-stack" aria-hidden="true">
-              {c.parts.map((p) => (
-                <span key={p.label} className={`fk-tone-${p.tone}`} style={{ width: pct((p.value / max) * 100) }} />
-              ))}
-            </span>
-            <ul className="fk-flow-parts">
-              {c.parts.map((p) => (
-                <li key={p.label}>
-                  <i className={`fk-tone-${p.tone}`} aria-hidden="true" />
-                  {p.label} <span className="fk-num">{p.display}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
     </figure>
   );
 }
@@ -229,6 +204,18 @@ export function Visual({ v }: { v: VisualData }) {
     case 'checklist':
       return <ChecklistVisual v={v} />;
     case 'flow':
-      return <FlowVisual v={v} />;
+      return <RiverVisual v={v} />;
+    case 'jar':
+      return <JarVisual v={v} />;
+    case 'meter':
+      return <MeterVisual v={v} />;
+    case 'towers':
+      return <TowersVisual v={v} />;
+    case 'tag':
+      return <TagVisual v={v} />;
+    case 'receipt':
+      return <ReceiptVisual v={v} />;
+    case 'coins':
+      return <CoinsVisual v={v} />;
   }
 }

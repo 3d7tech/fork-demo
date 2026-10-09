@@ -34,6 +34,9 @@ export function bonusCashOrPension(r: Rules, i: BonusInput): CalcResult {
       cash_reaches_employee: q(reachesPerPound.times(i.amountPerPerson), 'GBP', 'A cash bonus reaches a typical employee as'),
       cash_reaches_per_pound: q(reachesPerPound, 'GBP', 'Each £1 of cash bonus reaches them as'),
       cash_cost_per_pound: q(D(1).plus(rate), 'GBP', 'Each £1 of cash bonus costs the company'),
+      // An employer pension contribution carries no employer NI and no tax or NI for the employee.
+      pension_cost_per_pound: q(D(1), 'GBP', 'Each £1 paid into pensions costs the company'),
+      pension_reaches_per_pound: q(D(1), 'GBP', 'Each £1 paid into pensions reaches their pension as'),
     },
     leverRanges: [],
     constraints: [{ id: 'sacrifice_timing', outcome: 'caution', detail: 'A bonus sacrifice has to be agreed before the bonus is paid' }],

@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { floorFor, num, profileFrom } from './shared';
+import { num, profileFrom } from './shared';
 
 export const cycleToWork: FamilyDef<'benefits.cycle_to_work'> = {
   id: 'benefits.cycle_to_work',
@@ -53,19 +53,14 @@ export const cycleToWork: FamilyDef<'benefits.cycle_to_work'> = {
     highlightConstraint: null,
   },
   visual(calc, display) {
-    const o = calc.outputs;
+    const l = (k: string, label: string) => ({ value: calc.outputs[k]!.value, display: display(k), label });
     return {
-      type: 'bars',
-      title: 'What the bike costs you',
-      rows: [
-        { label: 'Buying outright', total: { value: o.bike_price!.value, display: display('bike_price') }, segments: [{ value: o.bike_price!.value, tone: 'a', label: 'Buying outright' }] },
-        { label: 'Through the scheme', total: { value: o.scheme_cost!.value, display: display('scheme_cost') }, segments: [{ value: o.scheme_cost!.value, tone: 'b', label: 'Through the scheme' }] },
-      ],
-      keys: [
-        { tone: 'a', label: 'Buying outright' },
-        { tone: 'b', label: 'Through the scheme' },
-      ],
-      floor: o.bike_price!.value > 2000 ? floorFor(o.bike_price!.value, o.scheme_cost!.value) : null,
+      type: 'tag',
+      title: 'What the bike really costs you',
+      was: l('bike_price', 'In the shop'),
+      now: l('scheme_cost', 'Through the scheme'),
+      saving: l('saving', 'You save'),
+      extra: l('monthly_sacrifice', 'From your pay each month'),
     };
   },
   request(r) {

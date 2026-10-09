@@ -4,6 +4,6 @@ export { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type 
 export { FAMILIES, factIds, familiesFor, type FamilyDef, type FactDef } from './families';
 export { InMemoryFactStore, type FactStore, type Subject } from './facts';
 export type { ForkMessage, MessageReason } from './messages';
-export { DemoModels, DEMO_FACTS, DEMO_SUBJECT } from './demo';
+export { DemoModels, DEMO_FACTS, DEMO_SUBJECT, GALLERY, GALLERY_FACTS } from './demo';
 export { guard, type GuardResult } from './guards';
 export { sweepLever, type LeverSweep } from './sweep';

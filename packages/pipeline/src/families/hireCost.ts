@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num } from './shared';
+import { num, partOf } from './shared';
 
 export const hireCost: FamilyDef<'employer.hire_cost'> = {
   id: 'employer.true_cost_of_hire',
@@ -51,29 +51,13 @@ export const hireCost: FamilyDef<'employer.hire_cost'> = {
     highlightConstraint: null,
   },
   visual(calc, display) {
-    const o = calc.outputs;
+    const p = (k: string, label: string, tone: 'a' | 'b' | 'c' | 'd') => partOf(calc, display, k, label, tone);
     return {
-      type: 'bars',
-      title: 'What the hire costs a year',
-      rows: [
-        {
-          label: 'Total cost',
-          total: { value: o.total!.value, display: display('total') },
-          segments: [
-            { value: o.salary!.value, tone: 'a', label: 'Salary' },
-            { value: o.employer_ni!.value, tone: 'b', label: 'Employer NI' },
-            { value: o.employer_pension!.value, tone: 'c', label: 'Employer pension' },
-            { value: o.extras!.value, tone: 'd', label: 'Equipment and extras' },
-          ],
-        },
-      ],
-      keys: [
-        { tone: 'a', label: 'Salary' },
-        { tone: 'b', label: 'Employer NI' },
-        { tone: 'c', label: 'Employer pension' },
-        { tone: 'd', label: 'Equipment and extras' },
-      ],
-      floor: null,
+      type: 'receipt',
+      title: 'What the hire really costs a year',
+      lines: [p('salary', 'Salary', 'a'), p('employer_ni', 'Employer NI', 'b'), p('employer_pension', 'Employer pension', 'c'), p('extras', 'Equipment and extras', 'd')].filter((x) => x.value > 0),
+      total: { value: calc.outputs.total!.value, display: display('total'), label: 'Total a year' },
+      stamp: { value: calc.outputs.above_salary_pct!.value, display: display('above_salary_pct'), label: 'on top of salary' },
     };
   },
   sweep: { lever: 'salary', series: [{ key: 'total', label: 'Total cost a year' }] },

@@ -127,7 +127,7 @@ function Verdict({ screen, copyStale }: Pick<DecisionScreenViewProps, 'screen' |
   );
 }
 
-/** 4. Levers: two or three inputs, each with its value and where it came from. */
+/** 5. Levers: two or three inputs, each with its value and where it came from. */
 function Levers({ screen, onLever }: Pick<DecisionScreenViewProps, 'screen' | 'onLever'>) {
   const base = useId();
   const order = screen.layout.leverOrder;
@@ -183,7 +183,7 @@ function Tile({ label, display, estimate, hero }: { label: string; display: stri
   );
 }
 
-/** 5. Outcome tiles: three numbers, the first being the one that answers the question. */
+/** 6. Outcome tiles: three numbers, the first being the one that answers the question. */
 function OutcomeTiles({ screen }: { screen: DecisionScreen }) {
   return (
     <section className="fk-tiles" aria-label="Key numbers">
@@ -259,9 +259,9 @@ export function DecisionScreenView(props: DecisionScreenViewProps) {
       <QuestionHeader screen={screen} />
       <ConstraintPanel screen={screen} onAnswer={props.onAnswer} />
       <Verdict screen={screen} copyStale={props.copyStale} />
+      <Visual v={screen.visual} />
       <Levers screen={screen} onLever={props.onLever} />
       <OutcomeTiles screen={screen} />
-      <Visual v={screen.visual} />
       <Method screen={screen} />
       <Action screen={screen} actionDone={props.actionDone} onAction={props.onAction} copyStale={props.copyStale} />
       <p className="fk-guidance">Fork gives guidance, not regulated financial advice. It uses your own numbers to show what happens either way. For your own situation, talk to an adviser, mortgage broker or accountant.</p>

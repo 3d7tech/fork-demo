@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num } from './shared';
+import { num, partOf } from './shared';
 
 export const bonus: FamilyDef<'employer.bonus_cash_or_pension'> = {
   id: 'employer.bonus_cash_or_pension',
@@ -53,19 +53,14 @@ export const bonus: FamilyDef<'employer.bonus_cash_or_pension'> = {
     highlightConstraint: null,
   },
   visual(calc, display) {
-    const o = calc.outputs;
+    const p = (k: string, label: string, tone: 'a' | 'b') => partOf(calc, display, k, label, tone);
     return {
-      type: 'bars',
-      title: 'What the bonus costs the company',
-      rows: [
-        { label: 'All as cash', total: { value: o.all_cash_cost!.value, display: display('all_cash_cost') }, segments: [{ value: o.all_cash_cost!.value, tone: 'a', label: 'All as cash' }] },
-        { label: 'With your split', total: { value: o.chosen_cost!.value, display: display('chosen_cost') }, segments: [{ value: o.chosen_cost!.value, tone: 'b', label: 'With your split' }] },
+      type: 'coins',
+      title: 'What each £1 of bonus does',
+      routes: [
+        { label: 'As cash', pays: p('cash_cost_per_pound', 'Company pays', 'a'), gets: p('cash_reaches_per_pound', 'Reaches a typical employee', 'a') },
+        { label: 'Into their pension', pays: p('pension_cost_per_pound', 'Company pays', 'b'), gets: p('pension_reaches_per_pound', 'Reaches their pension', 'b') },
       ],
-      keys: [
-        { tone: 'a', label: 'All as cash' },
-        { tone: 'b', label: 'With your split' },
-      ],
-      floor: null,
     };
   },
   request(r) {

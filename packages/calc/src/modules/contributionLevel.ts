@@ -54,6 +54,7 @@ export function contributionLevel(r: Rules, i: ContributionLevelInput): CalcResu
       employer_contribution: q(chosen.employer, 'GBP', 'Your employer puts in a year'),
       pension_total: q(chosen.total, 'GBP', 'Into your pension a year'),
       take_home_cost: q(chosen.cost, 'GBP', 'Cost to your take-home a year'),
+      tax_relief: q(chosen.con.minus(chosen.cost), 'GBP', 'Tax relief and savings on what you put in a year'),
       take_home_cost_monthly: q(chosen.cost.div(12), 'GBP', 'Cost to your take-home a month'),
       cost_per_pound: q(chosen.con.gt(0) ? chosen.cost.div(chosen.con) : D(0), 'GBP', 'Each £1 you put in costs your take-home'),
       pension_total_today: q(now.total, 'GBP', 'Into your pension a year today'),

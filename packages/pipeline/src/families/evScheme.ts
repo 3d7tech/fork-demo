@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num, taxYearStart, profileFrom } from './shared';
+import { num, partOf, profileFrom, taxYearStart } from './shared';
 
 /**
  * Starting estimates for the person's own car and charging, shown as estimates and changeable.
@@ -61,37 +61,16 @@ export const evScheme: FamilyDef<'benefits.ev_scheme'> = {
     highlightConstraint: null,
   },
   visual(calc, display) {
-    const o = calc.outputs;
+    const p = (k: string, label: string, tone: 'a' | 'b' | 'c' | 'd') => partOf(calc, display, k, label, tone);
+    const saving = calc.outputs.saving!.value;
     return {
-      type: 'bars',
+      type: 'towers',
       title: 'What each costs you a year',
-      rows: [
-        {
-          label: 'Own petrol car',
-          total: { value: o.own_car_cost!.value, display: display('own_car_cost') },
-          segments: [
-            { value: o.own_car_lease!.value, tone: 'a', label: 'Lease' },
-            { value: o.own_car_insurance!.value, tone: 'c', label: 'Insurance and servicing' },
-            { value: o.own_car_fuel!.value, tone: 'd', label: 'Fuel' },
-          ],
-        },
-        {
-          label: 'Electric car scheme',
-          total: { value: o.scheme_cost!.value, display: display('scheme_cost') },
-          segments: [
-            { value: o.scheme_net_lease!.value, tone: 'b', label: 'Lease after tax savings' },
-            { value: o.scheme_bik_tax!.value, tone: 'c', label: 'Company car tax' },
-            { value: o.scheme_charging!.value, tone: 'd', label: 'Charging' },
-          ],
-        },
+      towers: [
+        { label: 'Own petrol car', total: { value: calc.outputs.own_car_cost!.value, display: display('own_car_cost') }, parts: [p('own_car_lease', 'Lease', 'a'), p('own_car_insurance', 'Insurance and servicing', 'c'), p('own_car_fuel', 'Fuel', 'd')] },
+        { label: 'Electric car scheme', total: { value: calc.outputs.scheme_cost!.value, display: display('scheme_cost') }, parts: [p('scheme_net_lease', 'Lease after tax savings', 'b'), p('scheme_bik_tax', 'Company car tax', 'c'), p('scheme_charging', 'Charging', 'd')] },
       ],
-      keys: [
-        { tone: 'a', label: 'Own car lease' },
-        { tone: 'b', label: 'Scheme lease after tax savings' },
-        { tone: 'c', label: 'Insurance, servicing or company car tax' },
-        { tone: 'd', label: 'Fuel or charging' },
-      ],
-      floor: null,
+      difference: { value: saving, display: display('saving').replace(/^[−-]/, ''), label: saving >= 0 ? 'less a year on the scheme' : 'more a year on the scheme' },
     };
   },
   request(r) {

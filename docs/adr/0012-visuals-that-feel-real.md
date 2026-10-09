@@ -1,6 +1,6 @@
 # 0012: Visuals that feel real
 
-Date: 2026-10-09 · Status: accepted; step 1 built (salary sacrifice switch)
+Date: 2026-10-09 · Status: accepted; step 1 built, and every decision has its own visual
 
 ## Problem
 
@@ -46,3 +46,26 @@ then 3 (needs a reviewed projection source), then 5 with ADR 0011.
 
 - Projection growth rates for step 3: use the FCA's standard projection rates, or none until reviewed?
 - ~~Should the payslip view be the default visual for salary sacrifice, replacing the bars?~~ Yes (Richard, 2026-10-09: the screens felt basic). Built: `payslipMonth`/`payslipOutputs` in `packages/calc/src/uk.ts` (to the penny, lines always add up; a `GBP_pence` unit), the `payslip` visual, and a motion pass (checks tick in, verdict rule, hero sheen, rows slide in, changed lines highlighted; all off with reduced motion). Next: payslips for pension amount and cycle to work, then step 2.
+
+## Update (2026-10-09, late): a visual of its own for every decision
+
+Richard asked that each question, owner ones included, look different. Each family's `visual()` now
+builds its own type from engine outputs only (`packages/ui/src/shapes.tsx`):
+
+| Decision | Visual |
+|---|---|
+| Switch to salary sacrifice | Payslip, today and on sacrifice |
+| How much to pay into your pension | Jar filling in layers: your take-home, tax relief, employer |
+| Child Benefit charge | Dial: how much of your Child Benefit is paid back |
+| Around £100,000 | Ladder, with an arrow from today to your choice |
+| Electric car or own car | Two cost towers with the saving between them |
+| Cycle to work | Price tag: shop price struck through, your real price |
+| Owner: introduce salary sacrifice | River: the NI saving splitting into company, staff pensions and fee |
+| Owner: true cost of a hire | Till receipt printing line by line, stamped with the cost above salary |
+| Owner: bonus as cash or pensions | Coins: what £1 costs the company and what arrives, per route |
+
+The visual now sits under the verdict, above the levers and their chart. New engine outputs:
+`tax_relief` (contribution level) and `pension_cost_per_pound`/`pension_reaches_per_pound` (bonus).
+`/preview/visuals` shows them all; `packages/pipeline/test/visuals.test.ts` checks each decision gets
+its own type and that every figure on it is an engine number. An iceberg was considered for the hire
+cost and dropped: salary is most of the cost, so the picture would mislead.

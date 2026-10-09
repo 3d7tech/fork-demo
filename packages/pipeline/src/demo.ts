@@ -24,6 +24,59 @@ export const DEMO_FACTS = new InMemoryFactStore({
 
 export const DEMO_SUBJECT: Subject = { audience: 'employee', companyId: 'larkfield', employeeId: 'ella' };
 
+const person = (salary: number, more: Fact[] = []) => [
+  f('tax_region', 'rest_of_uk', 'payroll_export'),
+  f('student_loans', '', 'payroll_export'),
+  f('salary', salary, 'payroll_export'),
+  f('contribution_pct', 5, 'pension_scheme'),
+  f('hours_per_week', 37.5, 'payroll_export'),
+  ...more,
+];
+// Larkfield's 34 salaries, as in the calculation tests' fixture.
+const LARKFIELD_PAY = [
+  25200, 26000, 28500, 29000, 30000, 31000, 32000, 32000, 33500, 34000, 35000, 35000, 36000, 37500, 38000, 39000, 40000, 41000, 42000, 42000, 44000, 45000, 46000,
+  48000, 50000, 52000, 55000, 58000, 60000, 65000, 72000, 80000, 95000, 108000,
+].map((salary) => ({ salary, hoursPerWeek: 37.5 }));
+
+/** Enough of Larkfield for every decision, owner and employee: for the visuals gallery and its tests. */
+export const GALLERY_FACTS = new InMemoryFactStore({
+  company: {
+    larkfield: [
+      f('employer_share_pct', 50, 'company_setting'),
+      f('employer_contribution_pct', 3, 'pension_scheme'),
+      f('relief_method', 'relief_at_source', 'pension_scheme'),
+      f('pension_basis', 'full_salary', 'pension_scheme'),
+      f('headcount', 34, 'payroll_export'),
+      f('median_salary', 30000, 'payroll_export'),
+      f('fee_per_employee', 4, 'company_setting'),
+      f('employment_allowance', false, 'company_setting'),
+      f('contribution_pct', 5, 'pension_scheme'),
+      f('cycle_to_work_limit', 2500, 'policy_document'),
+    ],
+  },
+  employee: {
+    'larkfield/ella': person(32000),
+    'larkfield/priya': person(108000),
+    'larkfield/dan': person(70000, [f('child_benefit_children', 2, 'user_answer'), f('higher_earner', true, 'user_answer')]),
+  },
+  payroll: { larkfield: LARKFIELD_PAY },
+});
+
+const who = (id: string): Subject => (id === 'owner' ? { audience: 'owner', companyId: 'larkfield' } : { audience: 'employee', companyId: 'larkfield', employeeId: id });
+
+/** One question per decision, who asks it, and the visual it gets (ADR 0012). */
+export const GALLERY: Array<{ question: string; subject: Subject; visual: string }> = [
+  { question: 'is salary sacrifice worth it?', subject: who('ella'), visual: 'payslip' },
+  { question: 'should I pay more into my pension?', subject: who('ella'), visual: 'jar' },
+  { question: 'do I have to pay back child benefit?', subject: who('dan'), visual: 'meter' },
+  { question: 'what about the £100,000 allowance?', subject: who('priya'), visual: 'ladder' },
+  { question: 'is the electric car scheme worth it?', subject: who('ella'), visual: 'towers' },
+  { question: 'should I get a bike through cycle to work?', subject: who('ella'), visual: 'tag' },
+  { question: 'should we introduce salary sacrifice for our staff?', subject: who('owner'), visual: 'flow' },
+  { question: 'what does hiring someone on £40,000 cost?', subject: who('owner'), visual: 'receipt' },
+  { question: 'should we pay the bonus as cash or pension?', subject: who('owner'), visual: 'coins' },
+];
+
 const n = (numbers: ScreenNumber[], key: string) => numbers.find((x) => x.key === key)?.display ?? '';
 
 function route(question: string) {

@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num, relief, profileFrom } from './shared';
+import { num, partOf, profileFrom, relief } from './shared';
 
 export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
   id: 'pension.how_much_to_contribute',
@@ -70,24 +70,12 @@ export const contributionLevel: FamilyDef<'pension.contribution_level'> = {
     highlightConstraint: null,
   },
   visual(calc, display) {
-    const o = calc.outputs;
-    const row = (label: string, totalKey: string, you: number) => ({
-      label,
-      total: { value: o[totalKey]!.value, display: display(totalKey) },
-      segments: [
-        { value: you, tone: 'b' as const, label: 'You' },
-        { value: o.employer_contribution!.value, tone: 'a' as const, label: 'Your employer' },
-      ],
-    });
+    const p = (k: string, label: string, tone: 'a' | 'b' | 'c') => partOf(calc, display, k, label, tone);
     return {
-      type: 'bars',
-      title: 'Into your pension a year',
-      rows: [row('Today', 'pension_total_today', o.pension_total_today!.value - o.employer_contribution!.value), row('Your choice', 'pension_total', o.your_contribution!.value)],
-      keys: [
-        { tone: 'b', label: 'You' },
-        { tone: 'a', label: 'Your employer' },
-      ],
-      floor: null,
+      type: 'jar',
+      title: 'Where your pension money comes from each year',
+      total: { ...p('pension_total', 'Into your pension a year', 'b'), label: 'Into your pension a year' },
+      layers: [p('take_home_cost', 'From your take-home pay', 'b'), p('tax_relief', 'Tax relief', 'c'), p('employer_contribution', 'From your employer', 'a')],
     };
   },
   request(r) {

@@ -1104,7 +1104,8 @@ a {
   border: 1px solid var(--fk-line);
   border-bottom: 0;
   border-radius: 14px 14px 0 0;
-  padding: 6px 14px 18px;
+  padding: 6px 10px 18px;
+  overflow-x: auto;
   --fk-tear: 10px;
   -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--fk-tear)) no-repeat,
     conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--fk-tear) * 2) var(--fk-tear) repeat-x;
@@ -1114,7 +1115,7 @@ a {
 .fk-paper table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 13px;
 }
 .fk-paper thead th {
   padding: 10px 0 8px;
@@ -1139,7 +1140,7 @@ a {
 .fk-paper td {
   text-align: right;
   white-space: nowrap;
-  padding: 9px 0 9px 10px;
+  padding: 9px 0 9px 6px;
   font-variant-numeric: tabular-nums;
   color: var(--fk-muted);
 }
@@ -1204,7 +1205,7 @@ a {
   font-size: 15px;
 }
 .fk-paper tr.fk-slip-take_home td.fk-col-new {
-  font-size: 17px;
+  font-size: 15px;
   font-family: var(--fk-display);
   font-weight: var(--fk-display-weight);
 }
@@ -1331,4 +1332,633 @@ body {
 }
 :root[data-theme='dark'] .fk-verdict {
   padding-left: 18px;
+}
+
+/* ---------- One visual per decision (ADR 0012) ---------- */
+.fk-fill-a { fill: var(--fk-tone-a); }
+.fk-fill-b { fill: var(--fk-tone-b); }
+.fk-fill-c { fill: var(--fk-tone-c); }
+.fk-fill-d { fill: var(--fk-tone-d); }
+.fk-fill-muted { fill: var(--fk-line); }
+.fk-stroke-a { stroke: var(--fk-tone-a); }
+.fk-stroke-b { stroke: var(--fk-tone-b); }
+.fk-stroke-c { stroke: var(--fk-tone-c); }
+.fk-stroke-d { stroke: var(--fk-tone-d); }
+.fk-vis h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fk-ink-2);
+}
+.fk-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.fk-legend li {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  color: var(--fk-ink-2);
+  animation: fk-slip-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(0.4s + var(--i, 0) * 0.1s);
+}
+.fk-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+.fk-legend strong {
+  font-weight: 500;
+  color: var(--fk-ink);
+}
+
+/* Jar: layers fill from the bottom, one after another, with a gentle wave on top. */
+.fk-jar-body {
+  display: grid;
+  grid-template-columns: minmax(96px, 128px) 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.fk-jar svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.fk-jar-glass {
+  fill: var(--fk-surface-2);
+}
+.fk-jar-layer {
+  transform-box: view-box;
+  transform-origin: 50% 190px;
+  animation: fk-fill-up 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.2s + var(--i, 0) * 0.35s);
+}
+@keyframes fk-fill-up {
+  from {
+    transform: scaleY(0);
+  }
+}
+.fk-jar-wave {
+  fill: color-mix(in srgb, var(--fk-surface) 35%, transparent);
+  animation: fk-wave 3.5s linear infinite, fk-fade-in 0.4s 1.3s both;
+}
+@keyframes fk-wave {
+  to {
+    transform: translateX(-70px);
+  }
+}
+@keyframes fk-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.fk-jar-outline {
+  fill: none;
+  stroke: var(--fk-ink-2);
+  stroke-width: 2.5;
+}
+.fk-jar-lid {
+  fill: var(--fk-ink-2);
+}
+.fk-jar-shine {
+  stroke: color-mix(in srgb, var(--fk-surface) 70%, transparent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  transform: translateX(8px);
+}
+.fk-jar-total {
+  margin: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fk-jar-total > span {
+  font-size: 13px;
+  color: var(--fk-muted);
+}
+.fk-jar-total strong {
+  font-family: var(--fk-display);
+  font-weight: var(--fk-display-weight);
+  font-size: 30px;
+  letter-spacing: -0.03em;
+  color: var(--fk-gain);
+}
+
+/* Meter: the arc fills and the needle swings to its place. */
+.fk-meter svg {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  display: block;
+  overflow: visible;
+}
+.fk-meter-track,
+.fk-meter-fill {
+  fill: none;
+  stroke-width: 16;
+  stroke-linecap: round;
+}
+.fk-meter-track {
+  stroke: var(--fk-surface-2);
+}
+.fk-meter-fill {
+  stroke-dasharray: var(--k) 1;
+  animation: fk-meter-fill 1.2s 0.3s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+  transition: stroke-dasharray 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fk-meter-ghost {
+  opacity: 0.35;
+}
+@keyframes fk-meter-fill {
+  from {
+    stroke-dasharray: 0 1;
+  }
+}
+.fk-meter-needle {
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transform-origin: 100px 100px;
+  transform: rotate(var(--deg));
+  animation: fk-needle 1.4s 0.3s cubic-bezier(0.3, 1.4, 0.4, 1) both;
+  transition: transform 0.5s cubic-bezier(0.3, 1.4, 0.4, 1);
+}
+@keyframes fk-needle {
+  from {
+    transform: rotate(-90deg);
+  }
+}
+.fk-meter-hub {
+  fill: var(--fk-ink);
+}
+.fk-meter text {
+  font-size: 10px;
+  fill: var(--fk-muted);
+  font-family: var(--fk-mono);
+}
+.fk-meter-read {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--fk-ink-2);
+}
+.fk-meter-read strong {
+  display: block;
+  font-family: var(--fk-display);
+  font-weight: var(--fk-display-weight);
+  font-size: 30px;
+  letter-spacing: -0.03em;
+  color: var(--fk-ink);
+}
+
+/* Towers: each stack builds from the ground; the difference sits between them. */
+.fk-towers-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 10px;
+  height: 230px;
+}
+.fk-tower {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+}
+.fk-tower:nth-of-type(2) {
+  order: 3;
+}
+.fk-tower-total {
+  font-size: 16px;
+  font-weight: 600;
+}
+.fk-tower-shaft {
+  width: min(96px, 100%);
+  max-height: calc(100% - 52px);
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 2px;
+  border-radius: 12px 12px 4px 4px;
+  overflow: hidden;
+}
+.fk-tower-shaft > span {
+  flex-basis: 0;
+  min-height: 3px;
+  transform-origin: bottom;
+  animation: fk-fill-up 0.6s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.2s + var(--i, 0) * 0.18s);
+  transition: flex-grow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.fk-tower-label {
+  font-size: 12px;
+  color: var(--fk-muted);
+  text-align: center;
+  min-height: 2.6em;
+}
+.fk-towers-diff {
+  order: 2;
+  align-self: center;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--fk-gain-soft);
+  color: var(--fk-gain);
+  text-align: center;
+  font-size: 12px;
+  max-width: 110px;
+  animation: fk-pop 0.7s 1.2s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+.fk-towers-diff strong {
+  font-family: var(--fk-display);
+  font-weight: var(--fk-display-weight);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.fk-towers-keys {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.fk-towers-keys section {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.fk-towers-keys .fk-legend li {
+  grid-template-columns: 10px 1fr;
+  font-size: 12px;
+}
+.fk-towers-keys .fk-legend strong {
+  grid-column: 2;
+}
+
+/* Price tag: swings in on its string, the old price is struck through. */
+.fk-tag-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 14px 0 6px;
+}
+.fk-tag {
+  position: relative;
+  width: min(280px, 100%);
+  padding: 26px 22px 20px 44px;
+  background: var(--fk-ground);
+  border: 1.5px solid var(--fk-line);
+  border-radius: 10px 18px 18px 10px;
+  clip-path: polygon(22px 0, 100% 0, 100% 100%, 22px 100%, 0 50%);
+  transform-origin: 0 50%;
+  animation: fk-swing 1.4s cubic-bezier(0.3, 1.2, 0.4, 1) both;
+  display: grid;
+  gap: 8px;
+}
+@keyframes fk-swing {
+  0% {
+    opacity: 0;
+    transform: rotate(-14deg) translateY(-8px);
+  }
+  40% {
+    opacity: 1;
+    transform: rotate(6deg);
+  }
+  70% {
+    transform: rotate(-2deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+.fk-tag-hole {
+  position: absolute;
+  left: 22px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--fk-surface);
+  box-shadow: inset 0 0 0 1.5px var(--fk-line);
+}
+.fk-tag p {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.fk-tag p > span:first-child {
+  font-size: 12px;
+  color: var(--fk-muted);
+}
+.fk-tag-was s {
+  position: relative;
+  font-size: 18px;
+  color: var(--fk-muted);
+  text-decoration: none;
+  width: fit-content;
+}
+.fk-tag-was s::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 52%;
+  height: 2px;
+  background: var(--fk-warn);
+  transform-origin: left;
+  animation: fk-grow 0.5s 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.fk-tag-now strong {
+  font-family: var(--fk-display);
+  font-weight: var(--fk-display-weight);
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: var(--fk-gain);
+}
+.fk-tag-extra {
+  font-size: 13px;
+  color: var(--fk-ink-2);
+  flex-direction: row !important;
+  gap: 4px;
+}
+.fk-tag-ribbon {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--fk-gain);
+  color: var(--fk-surface);
+  font-size: 13px;
+  transform: rotate(6deg);
+  animation: fk-pop 0.6s 1.2s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+/* Receipt: lines print one by one, then the total, then the stamp lands. */
+.fk-receipt {
+  position: relative;
+  background: var(--fk-ground);
+  border: 1px solid var(--fk-line);
+  border-top: 0;
+  padding: 16px 16px 26px;
+  font-family: var(--fk-mono);
+  font-size: 13px;
+  --fk-tear: 10px;
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--fk-tear)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--fk-tear) * 2) var(--fk-tear) repeat-x;
+  mask: linear-gradient(#000 0 0) top / 100% calc(100% - var(--fk-tear)) no-repeat,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / calc(var(--fk-tear) * 2) var(--fk-tear) repeat-x;
+  animation: fk-print 0.9s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+  transform-origin: top;
+}
+@keyframes fk-print {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 -20px 0);
+  }
+}
+.fk-receipt ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.fk-receipt li,
+.fk-receipt-total {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  animation: fk-fade-in 0.3s both;
+  animation-delay: calc(0.35s + var(--i, 0) * 0.22s);
+}
+.fk-receipt-dots {
+  flex: 1;
+  border-bottom: 1.5px dotted var(--fk-line);
+  transform: translateY(-3px);
+}
+.fk-receipt-total {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 2px dashed var(--fk-ink-2);
+  justify-content: space-between;
+  font-weight: 700;
+}
+.fk-receipt-total strong {
+  font-size: 20px;
+}
+.fk-receipt-stamp {
+  width: fit-content;
+  margin: 18px 4px 0 auto;
+  padding: 6px 10px;
+  border: 2.5px solid var(--fk-warn);
+  border-radius: 8px;
+  color: var(--fk-warn);
+  font-family: var(--fk-sans);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transform: rotate(-8deg);
+  opacity: 0.9;
+  animation: fk-stamp 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  animation-delay: calc(0.6s + var(--n, 4) * 0.22s);
+}
+.fk-receipt-stamp strong {
+  font-size: 16px;
+}
+@keyframes fk-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-8deg) scale(2.2);
+  }
+}
+
+/* Coins: the company's coin drops in, then what arrives rolls out beside it. */
+.fk-coin-route {
+  display: grid;
+  gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid var(--fk-line-soft);
+}
+.fk-coin-route:first-of-type {
+  border-top: 0;
+}
+.fk-coin-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: end;
+  gap: 24px;
+}
+.fk-coin-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  min-height: 140px;
+  justify-content: flex-end;
+}
+.fk-coin-cell strong {
+  font-size: 18px;
+  font-weight: 600;
+}
+.fk-coin {
+  display: block;
+  border-radius: 50%;
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.16), inset 0 0 0 4px rgba(255, 255, 255, 0.22);
+  animation: fk-coin-drop 0.8s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  animation-delay: calc(0.25s + var(--i, 0) * 0.5s + var(--j, 0) * 0.35s);
+}
+.fk-coin-a {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--fk-tone-a) 55%, #fff), var(--fk-tone-a) 70%);
+}
+.fk-coin-b {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--fk-tone-b) 55%, #fff), var(--fk-tone-b) 70%);
+}
+@keyframes fk-coin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.6);
+  }
+}
+.fk-coin-arrow {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  width: 22px;
+  height: 2px;
+  margin-left: -11px;
+  background: var(--fk-muted);
+}
+.fk-coin-arrow::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: -4px;
+  border: 5px solid transparent;
+  border-left-color: var(--fk-muted);
+  border-right: 0;
+}
+
+/* River: the streams pour out from the total, with a slow current along each. */
+.fk-river-col {
+  display: grid;
+  gap: 6px;
+}
+.fk-river-col + .fk-river-col {
+  padding-top: 12px;
+  border-top: 1px solid var(--fk-line-soft);
+}
+.fk-river svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.fk-river-stream {
+  opacity: 0.85;
+  clip-path: inset(0 100% 0 0);
+  animation: fk-pour 1s cubic-bezier(0.3, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.25s + var(--i, 0) * 0.15s);
+}
+@keyframes fk-pour {
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.fk-river-flow {
+  fill: none;
+  stroke: color-mix(in srgb, var(--fk-surface) 60%, transparent);
+  stroke-width: 2;
+  stroke-dasharray: 3 12;
+  animation: fk-current 1.6s linear infinite, fk-fade-in 0.5s 1.2s both;
+}
+@keyframes fk-current {
+  to {
+    stroke-dashoffset: -30;
+  }
+}
+.fk-river-label {
+  font-size: 11px;
+  fill: var(--fk-ink-2);
+}
+.fk-river-value {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--fk-ink);
+  font-family: var(--fk-mono);
+}
+
+/* Ladder: an arrow travels from today to your choice. */
+.fk-ladder-move {
+  position: absolute;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  background: var(--fk-gain);
+  border-radius: 2px;
+  transform-origin: left;
+  animation: fk-grow 0.9s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition: left 0.4s, width 0.4s;
+}
+.fk-ladder-move.fk-left {
+  transform-origin: right;
+}
+.fk-ladder-move::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: -5px;
+  border: 6.5px solid transparent;
+  border-left: 9px solid var(--fk-gain);
+  border-right: 0;
+}
+.fk-ladder-move.fk-left::after {
+  right: auto;
+  left: -2px;
+  border-left: 0;
+  border-right: 9px solid var(--fk-gain);
+}
+/* Payslip figures use the text face with even-width digits: the monospace is too wide at 360px. */
+.fk-paper .fk-num {
+  font-family: var(--fk-sans);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 400px) {
+  .fk-payslip {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .fk-paper {
+    padding: 4px 8px 16px;
+  }
+  .fk-paper table {
+    font-size: 12px;
+  }
+  .fk-paper .fk-hl {
+    padding: 2px 4px;
+  }
+  .fk-paper thead th {
+    font-size: 10px;
+  }
+  .fk-paper tr.fk-slip-take_home th,
+  .fk-paper tr.fk-slip-take_home td {
+    font-size: 13px;
+  }
+  .fk-paper tr.fk-slip-take_home td.fk-col-new {
+    font-size: 14px;
+  }
 }

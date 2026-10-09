@@ -108,3 +108,12 @@ export function payslipVisual(
     ...(o.note ? { note: o.note } : {}),
   };
 }
+
+type Tone = 'a' | 'b' | 'c' | 'd' | 'muted';
+
+/** One engine output as a visual part: its value, the screen's display of it, a label and a tone. */
+export function partOf(calc: CalcResult, display: (key: string) => string, key: string, label?: string, tone: Tone = 'a') {
+  const o = calc.outputs[key];
+  if (!o) throw new Error(`No output ${key} for the visual`);
+  return { value: o.value, display: display(key), label: label ?? o.label, tone };
+}

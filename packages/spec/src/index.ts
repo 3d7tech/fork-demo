@@ -203,6 +203,8 @@ export type ScreenCopy = z.infer<typeof ScreenCopy>;
 
 const Shown = z.object({ value: z.number(), display: z.string() });
 const Tone = z.enum(['a', 'b', 'c', 'd', 'muted']);
+const Labelled = Shown.extend({ label: z.string() });
+const Part = z.object({ value: z.number(), display: z.string(), label: z.string(), tone: Tone });
 
 export const VisualData = z.discriminatedUnion('type', [
   z.object({
@@ -252,6 +254,18 @@ export const VisualData = z.discriminatedUnion('type', [
     /** A plain sentence under the slip, with no numbers of its own. */
     note: z.string().optional(),
   }),
+  /** A jar filling in layers: where a yearly pension total comes from. */
+  z.object({ type: z.literal('jar'), title: z.string(), total: Labelled, layers: z.array(Part) }),
+  /** A dial: how much of something is lost, today and with the person's choice. */
+  z.object({ type: z.literal('meter'), title: z.string(), of: Labelled, needles: z.array(Part).min(1).max(2) }),
+  /** Upright stacks side by side, with the difference marked between them. */
+  z.object({ type: z.literal('towers'), title: z.string(), towers: z.array(z.object({ label: z.string(), total: Shown, parts: z.array(Part) })).length(2), difference: Labelled }),
+  /** A price tag: the shop price crossed out, the real price, and the saving. */
+  z.object({ type: z.literal('tag'), title: z.string(), was: Labelled, now: Labelled, saving: Labelled, extra: Labelled.optional() }),
+  /** A till receipt that prints line by line, with a total and an optional stamp. */
+  z.object({ type: z.literal('receipt'), title: z.string(), lines: z.array(Part), total: Labelled, stamp: Labelled.optional() }),
+  /** Coins sized by value: what goes in and what comes out, per route. */
+  z.object({ type: z.literal('coins'), title: z.string(), routes: z.array(z.object({ label: z.string(), pays: Part, gets: Part })).min(1).max(2) }),
 ]);
 export type VisualData = z.infer<typeof VisualData>;
 export type PayslipVisual = Extract<VisualData, { type: 'payslip' }>;

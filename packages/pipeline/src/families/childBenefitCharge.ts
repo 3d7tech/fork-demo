@@ -1,5 +1,5 @@
 import type { FamilyDef } from './types';
-import { num, profileFrom, relief } from './shared';
+import { num, partOf, profileFrom, relief } from './shared';
 
 const CHILDREN: Record<string, number> = { one: 1, two: 2, three: 3, four: 4 };
 const ANSWER_FOR = ['', 'one', 'two', 'three', 'four'];
@@ -98,21 +98,14 @@ export const childBenefitCharge: FamilyDef<'pay.child_benefit_charge'> = {
   },
   visual(calc, display) {
     const o = calc.outputs;
-    const limit = calc.tippingPoint!.at;
-    const values = [o.adjusted_net_income!.value, o.adjusted_net_income_choice!.value, limit];
-    const min = Math.floor((Math.min(...values) - 5000) / 5000) * 5000;
-    const max = Math.ceil((Math.max(...values) + 5000) / 5000) * 5000;
+    const same = o.charge_now!.value === o.charge_choice!.value;
     return {
-      type: 'ladder',
-      title: 'Your adjusted net income',
-      min,
-      max,
-      band: { from: limit, to: max, label: 'above £60,000, where Child Benefit is paid back' },
-      markers: [
-        { value: o.adjusted_net_income!.value, display: display('adjusted_net_income'), label: 'Today', tone: 'a' },
-        { value: o.adjusted_net_income_choice!.value, display: display('adjusted_net_income_choice'), label: 'With your choice', tone: 'b' },
-      ],
-      ticks: [{ value: limit, display: display('tipping_point') }],
+      type: 'meter',
+      title: 'How much Child Benefit you pay back',
+      of: { ...partOf(calc, display, 'child_benefit'), label: 'Child Benefit a year' },
+      needles: same
+        ? [partOf(calc, display, 'charge_now', 'You pay back', 'a')]
+        : [partOf(calc, display, 'charge_now', 'Today', 'a'), partOf(calc, display, 'charge_choice', 'With your choice', 'b')],
     };
   },
   request(r) {
