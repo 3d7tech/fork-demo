@@ -8,7 +8,7 @@ import { FAMILIES, familiesFor, type FamilyData, type FamilyDef } from './famili
 import type { FactStore, Subject } from './facts';
 import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
 import { withStatedPay } from './stated';
-import { blocked, clarify, DISTRESS, failed, HUMAN, LOOKUP_UNKNOWN, needsFacts, notYet, type ForkMessage } from './messages';
+import { about, blocked, clarify, DISTRESS, failed, HUMAN, lookupUnknown, needsFacts, notYet, type ForkMessage } from './messages';
 
 export interface PipelineDeps {
   roles: RoleContext;
@@ -340,7 +340,8 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
 
     if (route.distress) return DISTRESS;
     if (route.route === 'human') return HUMAN;
-    if (route.route === 'lookup') return (await deps.lookup?.(question, input.subject)) ?? LOOKUP_UNKNOWN;
+    if (route.route === 'about') return about(audience, families.map((f) => f.title));
+    if (route.route === 'lookup') return (await deps.lookup?.(question, input.subject)) ?? lookupUnknown(families.map((f) => f.title));
     const family = route.family ? FAMILIES[route.family] : undefined;
     if (route.route === 'not_supported' || !family || family.audience !== audience) return notYet(families.map((f) => f.title));
     if (route.confidence === 'low') return clarify(family.description);

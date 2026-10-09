@@ -84,9 +84,9 @@ describe('runRole', () => {
     const { log, ctx } = setup([{ text: goodRoute }]);
     const run = await runRole(ctx, 'router', routerInput);
     expect(run.output.family).toBe('pension.salary_sacrifice_switch');
-    expect(run.promptVersion).toBe('v1');
+    expect(run.promptVersion).toBe('v2');
     expect(log.entries.map((e) => e.outcome)).toEqual(['valid']);
-    expect(log.entries[0]).toMatchObject({ role: 'router', model: 'claude-haiku-5-5', promptVersion: 'v1' });
+    expect(log.entries[0]).toMatchObject({ role: 'router', model: 'claude-haiku-5-5', promptVersion: 'v2' });
   });
 
   it('retries once on the same model with the validation error', async () => {

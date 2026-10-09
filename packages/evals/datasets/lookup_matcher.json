@@ -21,7 +21,10 @@
   "cycle_to_work_offered",
   "cycle_to_work_limit",
   "childcare_support",
-  "reenrolment_date"
+  "reenrolment_date",
+  "my_salary",
+  "my_hours",
+  "my_pension_pct"
  ],
  "cases": [
   {
@@ -86,6 +89,30 @@
   },
   {
    "question": "what's the dress code",
+   "expect": null
+  },
+  {
+   "question": "what is m y salary?",
+   "expect": "my_salary"
+  },
+  {
+   "question": "how much do i get paid a year",
+   "expect": "my_salary"
+  },
+  {
+   "question": "what are my contracted hours",
+   "expect": "my_hours"
+  },
+  {
+   "question": "what % do i put in my pension",
+   "expect": "my_pension_pct"
+  },
+  {
+   "question": "how much does the company put in my pension?",
+   "expect": "employer_pct"
+  },
+  {
+   "question": "what's my hourly rate",
    "expect": null
   }
  ]

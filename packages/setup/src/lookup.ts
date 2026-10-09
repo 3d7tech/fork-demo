@@ -7,6 +7,8 @@ import type { RoleInput, RoleOutput } from '@fork/models';
 import { DOCUMENT_KINDS } from './documents/store';
 import { displayValue, policyKey } from './documents/keys';
 import { confirmedFacts } from './documents/store';
+import { DbFactStore } from './facts';
+import type { Fact } from '@fork/spec';
 
 export type LookupMatcher = (input: RoleInput<'lookup_matcher'>) => Promise<RoleOutput<'lookup_matcher'>>;
 
@@ -28,9 +30,29 @@ interface Available {
 
 const longDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
-/** Everything a lookup may answer from: confirmed document facts and a few company settings. */
-export async function lookupSources(db: ForkDatabase, ctx: RequestContext): Promise<Available[]> {
+/** An employee's own figures from payroll, for "what is my salary?". Labels go to the matcher; values never do. */
+export const OWN_FIGURES: Array<{ id: string; key: string; label: string; text: (v: number) => string }> = [
+  { id: 'salary', key: 'my_salary', label: 'Your pay a year (salary)', text: (v) => `£${Math.round(v).toLocaleString('en-GB')} a year` },
+  { id: 'hours_per_week', key: 'my_hours', label: 'Your contracted hours a week', text: (v) => `${v} hours a week` },
+  { id: 'contribution_pct', key: 'my_pension_pct', label: 'Your own pension contribution', text: (v) => `${v}% of your pay` },
+];
+
+const factSource = (f: Fact) =>
+  f.source === 'payroll_export' ? (f.asOf ? `Your payroll, period ending ${longDate(f.asOf)}` : 'Your payroll') : f.source === 'pension_scheme' ? 'Your company’s pension scheme' : 'Company settings';
+
+/**
+ * Everything a lookup may answer from: confirmed document facts, a few company settings and,
+ * for an employee, their own payroll figures (read through row-level security, so only theirs).
+ */
+export async function lookupSources(db: ForkDatabase, ctx: RequestContext, employeeId?: string): Promise<Available[]> {
   const out: Available[] = [];
+  if (ctx.role === 'employee' && employeeId) {
+    const own = await new DbFactStore(db, ctx).get({ companyId: ctx.companyId, employeeId }, OWN_FIGURES.map((o) => o.id));
+    for (const o of OWN_FIGURES) {
+      const f = own.find((x) => x.id === o.id);
+      if (typeof f?.value === 'number') out.push({ key: o.key, label: o.label, text: o.text(f.value), source: factSource(f) });
+    }
+  }
   const docs = await confirmedFacts(db, ctx);
   const kinds = await db.asMember(ctx, (tx) => tx.select({ id: s.policyDocument.id, kind: s.policyDocument.kind }).from(s.policyDocument));
   for (const f of docs.values()) {
@@ -44,8 +66,8 @@ export async function lookupSources(db: ForkDatabase, ctx: RequestContext): Prom
 }
 
 /** Answer a lookup, or null when nothing confirmed answers it (the pipeline then says so honestly). */
-export async function answerLookup(db: ForkDatabase, ctx: RequestContext, matcher: LookupMatcher | undefined, question: string): Promise<LookupAnswer | null> {
-  const available = await lookupSources(db, ctx);
+export async function answerLookup(db: ForkDatabase, ctx: RequestContext, matcher: LookupMatcher | undefined, question: string, employeeId?: string): Promise<LookupAnswer | null> {
+  const available = await lookupSources(db, ctx, employeeId);
   if (!available.length || !matcher) return null;
   let keys: string[];
   try {

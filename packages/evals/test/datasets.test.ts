@@ -1,5 +1,5 @@
 import { FAMILIES } from '@fork/pipeline';
-import { POLICY_KEYS } from '@fork/setup';
+import { OWN_FIGURES, POLICY_KEYS } from '@fork/setup';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -30,7 +30,7 @@ describe('evaluation datasets', () => {
       const levers = (FAMILIES[c.family]!.template.levers ?? []).map((l) => l.id);
       for (const id of Object.keys(c.expect)) expect(levers, c.question).toContain(id);
     }
-    const keys = new Set([...POLICY_KEYS.map((k) => k.key), 'reenrolment_date']);
+    const keys = new Set([...POLICY_KEYS.map((k) => k.key), ...OWN_FIGURES.map((o) => o.key), 'reenrolment_date']);
     const lookups = load<LookupSet>('lookup_matcher');
     for (const k of lookups.available) expect(keys.has(k), k).toBe(true);
     for (const c of lookups.cases) if (c.expect) expect(lookups.available).toContain(c.expect);

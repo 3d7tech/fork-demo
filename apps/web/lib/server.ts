@@ -33,7 +33,7 @@ export async function asker(): Promise<{ subject: Subject; deps: PipelineDeps; v
   const facts: FactStore = new DbFactStore(database(), viewer.ctx);
   const base = pipelineDeps();
   const matcher = DEMO ? undefined : async (input: Parameters<typeof runRole<'lookup_matcher'>>[2]) => (await runRole(base.roles, 'lookup_matcher', input)).output;
-  const lookup = (question: string) => answerLookup(database(), viewer.ctx, matcher, question);
+  const lookup = (question: string) => answerLookup(database(), viewer.ctx, matcher, question, viewer.subject.employeeId);
   return { subject: viewer.subject, deps: { ...base, facts, lookup }, viewer };
 }
 

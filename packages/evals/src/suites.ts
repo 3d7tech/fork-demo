@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MemoryLogger, runRole, type ModelProvider, type Registry } from '@fork/models';
 import { askFork, checkCopy, FAMILIES, familiesFor, guard, recalculate, type DecisionScreen } from '@fork/pipeline';
-import { cleanFacts, keysFor, POLICY_KEYS, prepareDocument, typeLabel } from '@fork/setup';
+import { cleanFacts, keysFor, OWN_FIGURES, POLICY_KEYS, prepareDocument, typeLabel } from '@fork/setup';
 import { DecisionSpec, type ScreenCopy } from '@fork/spec';
 import { load, type DocumentSet, type LeverSet, type LookupSet, type RouterSet, type ScreenSet, type SpecSet, type VerifierSet } from './datasets';
 import { FACTS, SUBJECTS } from './larkfield';
@@ -141,7 +141,7 @@ export async function leverSuite(env: EvalEnv): Promise<SuiteResult> {
 
 export async function lookupSuite(env: EvalEnv): Promise<SuiteResult> {
   const set = load<LookupSet>('lookup_matcher');
-  const label = (k: string) => POLICY_KEYS.find((p) => p.key === k)?.label ?? 'Next auto-enrolment re-enrolment date';
+  const label = (k: string) => POLICY_KEYS.find((p) => p.key === k)?.label ?? OWN_FIGURES.find((o) => o.key === k)?.label ?? 'Next auto-enrolment re-enrolment date';
   const available = set.available.map((key) => ({ key, label: label(key) }));
   const failures: string[] = [];
   let right = 0;

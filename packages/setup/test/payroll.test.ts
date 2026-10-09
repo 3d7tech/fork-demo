@@ -7,6 +7,7 @@ import { freshDatabase, type TestDatabase } from '@fork/db/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   columnShapes,
+  answerLookup,
   DbFactStore,
   importPayroll,
   listPeople,
@@ -221,5 +222,17 @@ describe('importing into the database', () => {
     // Ella asking about someone else's record gets nothing.
     const tom = (await listPeople(t.db, ctx)).find((p) => p.name === 'Tom Hale')!;
     expect(await asElla.get({ companyId: ctx.companyId, employeeId: tom.id }, ['salary'])).toEqual([]);
+
+    // "What is my salary?" is answered from her own payroll record. The matcher sees labels, never values.
+    const ellaCtx = { userId: ellaUser, companyId: ctx.companyId, role: 'employee' as const };
+    const own = await answerLookup(t.db, ellaCtx, async (input) => {
+      expect(JSON.stringify(input)).not.toContain('32,000');
+      return { keys: ['my_salary'] };
+    }, 'what is m y salary?', ella.id);
+    expect(own).toEqual({ kind: 'message', reason: 'lookup', title: 'Your pay a year (salary)', body: '£32,000 a year', routeTo: null, source: 'Your payroll, period ending 31 October 2026' });
+    // Asking with someone else's record finds nothing of theirs.
+    expect(await answerLookup(t.db, ellaCtx, async () => ({ keys: ['my_salary'] }), 'what is my salary', tom.id)).toBeNull();
+    // An owner has no "my salary" to look up.
+    expect(await answerLookup(t.db, ctx, async () => ({ keys: ['my_salary'] }), 'what is my salary', ella.id)).toBeNull();
   });
 });

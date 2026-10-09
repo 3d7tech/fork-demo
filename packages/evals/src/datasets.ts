@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const dir = join(dirname(fileURLToPath(import.meta.url)), '../datasets');
 export const load = <T>(name: string): T => JSON.parse(readFileSync(join(dir, `${name}.json`), 'utf8'));
 
-export type Route = 'decision' | 'lookup' | 'not_supported' | 'human';
+export type Route = 'decision' | 'lookup' | 'about' | 'not_supported' | 'human';
 
 export interface RouterSet {
   threshold: { accuracy: number; distress_recall: number; false_confidence_max: number };

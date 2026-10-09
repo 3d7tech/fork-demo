@@ -31,7 +31,7 @@ describe('golden end to end: employee switches to salary sacrifice', () => {
     expect(models.rolesCalled().sort()).toEqual(['explainer', 'router', 'screen_composer', 'verifier']);
     expect(s.provenance.specFrom).toBe('template');
     expect(s.provenance.rulePack.id).toBe('uk-2026-27');
-    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v3', 'router:v1', 'screen_composer:v1', 'verifier:v3']);
+    expect(s.provenance.roles.map((r) => `${r.role}:${r.promptVersion}`).sort()).toEqual(['explainer:v3', 'router:v2', 'screen_composer:v1', 'verifier:v3']);
   });
 
   it('a less certain route still starts from the reviewed template', async () => {
@@ -173,6 +173,26 @@ describe('knowing when not to build a screen', () => {
     const lookup = async () => ({ kind: 'message' as const, reason: 'lookup' as const, title: 'Your P60', body: 'It’s in your documents from 31 May 2026.', routeTo: 'documents' as const });
     const { deps: d } = deps({ router: route({ route: 'lookup' }) }, { lookup });
     expect(await askFork(d, { question: 'where is my p60 lol', subject: ELLA })).toMatchObject({ title: 'Your P60' });
+  });
+
+  it('a lookup nothing answers says so, and lists what Fork can help with instead', async () => {
+    const { deps: d, models } = deps({ router: route({ route: 'lookup' }) }, { lookup: async () => null });
+    const a = await askFork(d, { question: 'whats my tax code', subject: ELLA });
+    expect(a).toMatchObject({ kind: 'message', reason: 'lookup', title: 'Fork couldn’t find that yet', routeTo: 'owner' });
+    expect(a.kind === 'message' && a.canHelpWith).toContain('Switching your pension to salary sacrifice');
+    expect(models.rolesCalled()).toEqual(['router']);
+  });
+
+  it('"what can you do?" gets a fixed reply listing this person’s decisions, with no model writing it', async () => {
+    const { deps: d, models } = deps({ router: route({ route: 'about' }) });
+    const a = await askFork(d, { question: 'List all the questions you can answer....', subject: ELLA });
+    expect(a).toMatchObject({ kind: 'message', reason: 'about', title: 'What Fork can help with', routeTo: null });
+    if (a.kind !== 'message') throw new Error('expected a message');
+    expect(a.body).toContain('Your employer never sees your questions');
+    expect(a.canHelpWith).toContain('Switching your pension to salary sacrifice');
+    // Only this person's decisions: an employee isn't offered the owner's.
+    expect(a.canHelpWith).not.toContain('Introducing salary sacrifice for pensions');
+    expect(models.rolesCalled()).toEqual(['router']);
   });
 
   it('an unsupported decision gets an honest "not yet"', async () => {

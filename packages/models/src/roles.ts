@@ -20,7 +20,7 @@ export const RouterInput = z.strictObject({
   families: z.array(z.strictObject({ family: z.string(), description: z.string() })).min(1),
 });
 export const RouterOutput = z.strictObject({
-  route: z.enum(['decision', 'lookup', 'not_supported', 'human']),
+  route: z.enum(['decision', 'lookup', 'about', 'not_supported', 'human']),
   family: z.string().nullable(),
   confidence: z.enum(['high', 'medium', 'low']),
   /** The person may be in distress: answer supportively and route to help, never a decision screen. */
@@ -172,7 +172,7 @@ const def = <I extends z.ZodType, O extends z.ZodType>(id: RoleId, promptVersion
 });
 
 export const ROLES = {
-  router: def('router', 'v1', RouterInput, RouterOutput),
+  router: def('router', 'v2', RouterInput, RouterOutput),
   spec_writer: def('spec_writer', 'v1', SpecWriterInput, SpecWriterOutput),
   screen_composer: def('screen_composer', 'v1', ScreenComposerInput, ScreenComposerOutput),
   explainer: def('explainer', 'v3', ExplainerInput, ExplainerOutput),

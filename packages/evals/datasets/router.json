@@ -875,6 +875,73 @@
     "lookup",
     "decision"
    ]
+  },
+  {
+   "question": "List all the questions you can answer....",
+   "audience": "employee",
+   "route": "about"
+  },
+  {
+   "question": "what can you do",
+   "audience": "employee",
+   "route": "about"
+  },
+  {
+   "question": "what can i ask you?",
+   "audience": "employee",
+   "route": "about"
+  },
+  {
+   "question": "what data do you have on me",
+   "audience": "employee",
+   "route": "about",
+   "accept": [
+    "about",
+    "lookup"
+   ]
+  },
+  {
+   "question": "can my boss see what i ask here",
+   "audience": "employee",
+   "route": "about",
+   "accept": [
+    "about",
+    "lookup"
+   ]
+  },
+  {
+   "question": "how does fork work",
+   "audience": "owner",
+   "route": "about"
+  },
+  {
+   "question": "what can fork do for my company",
+   "audience": "owner",
+   "route": "about"
+  },
+  {
+   "question": "what is m y salary?",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "how much do i earn",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "what are my contracted hours",
+   "audience": "employee",
+   "route": "lookup"
+  },
+  {
+   "question": "how much am i putting in my pension right now",
+   "audience": "employee",
+   "route": "lookup",
+   "accept": [
+    "lookup",
+    "decision"
+   ]
   }
  ]
 }
