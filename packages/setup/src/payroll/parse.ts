@@ -13,9 +13,13 @@ export interface PayrollRow {
   hoursPerWeek: string;
   pensionPct: string | null;
   startDate: string | null;
+  /** Upper case with spaces removed, such as "S1257L". */
+  taxCode: string | null;
+  /** Comma-separated plans, '' for none, or null when the export doesn't say. */
+  studentLoans: string | null;
 }
 
-export type ProblemCode = 'missing' | 'not_a_number' | 'out_of_range' | 'not_a_date' | 'not_an_email' | 'duplicate';
+export type ProblemCode = 'missing' | 'not_a_number' | 'out_of_range' | 'not_a_date' | 'not_an_email' | 'duplicate' | 'not_recognised';
 /** A problem with one value. `row` counts people from 1. No values are kept, only where and what. */
 export interface RowProblem {
   row: number;
@@ -52,6 +56,29 @@ export function parseDate(c: Cell): string | null | 'bad' {
   const date = new Date(Date.UTC(y, m - 1, d));
   if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return 'bad';
   return date.toISOString().slice(0, 10);
+}
+
+/** A tax code: letters and numbers, with an optional emergency marker (W1, M1, X). */
+const TAX_CODE = /^[SC]?(K?\d{1,6}[LMNT]?|BR|D[0-2]|0T|NT)(W1|M1|X)?$/;
+
+/**
+ * Student loan plans as payroll exports write them: "Plan 2", "2", "Plan 1 & PGL", "Postgraduate",
+ * "None". Returns the plans in Fork's names, '' for none, or 'bad' for anything unrecognised.
+ */
+export function parseStudentLoans(c: Cell): string | null | 'bad' {
+  const t = text(c);
+  if (t === null) return null;
+  const plans = new Set<string>();
+  for (const raw of t.toLowerCase().split(/\s*(?:,|\/|&|\+|;|\band\b)\s*/)) {
+    const part = raw.trim();
+    if (!part) continue;
+    if (/^(none|no|n|0|-|n\/a)$/.test(part)) continue;
+    const plan = part.match(/^(?:plan|type|sl)?\s*([1245])$/);
+    if (plan) plans.add(`plan_${plan[1]}`);
+    else if (/^(pg|pgl|postgrad(uate)?( loan)?|pgl loan)$/.test(part)) plans.add('postgraduate');
+    else return 'bad';
+  }
+  return [...plans].sort().join(',');
 }
 
 export function parseRows(table: Table, mapping: Mapping): { rows: PayrollRow[]; problems: RowProblem[] } {
@@ -112,6 +139,11 @@ export function parseRows(table: Table, mapping: Mapping): { rows: PayrollRow[];
     const start = parseDate(get(r, 'start_date'));
     if (start === 'bad') flag('start_date', 'not_a_date');
 
+    const taxCode = text(get(r, 'tax_code'))?.toUpperCase().replace(/\s+/g, '') ?? null;
+    if (taxCode && !TAX_CODE.test(taxCode)) flag('tax_code', 'not_recognised');
+    const loans = parseStudentLoans(get(r, 'student_loan'));
+    if (loans === 'bad') flag('student_loan', 'not_recognised');
+
     if (problems.length > before) return;
     rows.push({
       payrollRef: ref!,
@@ -122,6 +154,8 @@ export function parseRows(table: Table, mapping: Mapping): { rows: PayrollRow[];
       hoursPerWeek: (hours as Decimal).toFixed(2),
       pensionPct: pension instanceof Decimal ? pension.toFixed(2) : null,
       startDate: start as string | null,
+      taxCode,
+      studentLoans: loans as string | null,
     });
   });
   return { rows, problems };

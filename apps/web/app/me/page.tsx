@@ -30,6 +30,11 @@ export default async function MyData({ searchParams }: { searchParams: Promise<{
       <a className="fk-btn fk-secondary" href="/me/download" download>
         Download my data
       </a>
+      <h2>Your tax details</h2>
+      <p>Scottish tax, student loans, other income and Child Benefit change Fork’s numbers. Only you can see them.</p>
+      <a className="fk-btn fk-secondary" href="/me/tax">
+        See or change my tax details
+      </a>
       <h2>Delete my questions</h2>
       <p>This deletes every question you asked and every answer Fork gave you, and the decisions you saved. Requests you sent stay with your accountant, because they may already be acting on them.</p>
       <form action={deleteAll}>

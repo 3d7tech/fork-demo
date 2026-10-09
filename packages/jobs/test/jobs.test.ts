@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { asAdmin, schema as s } from '@fork/db';
 import { freshDatabase, type TestDatabase } from '@fork/db/testing';
 import { askFork, type DecisionScreen } from '@fork/pipeline';
-import { DbFactStore, factRecord, listSaved, readOutbox, recordRun, saveCompanySettings, saveDecision, saveScheme } from '@fork/setup';
+import { DbFactStore, factRecord, listSaved, readOutbox, recordRun, saveCompanySettings, saveDecision, saveScheme, saveTaxProfile } from '@fork/setup';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { deps as pipelineDeps, good, QUESTION } from '../../pipeline/test/helpers';
 import { runMonthly, runRecheck } from '../src';
@@ -42,6 +42,9 @@ describe('saved decisions are re-checked when pay changes', () => {
     const subject = { audience: 'employee' as const, companyId: ids.company, employeeId: ids.ellaEmp };
     const store = new DbFactStore(t.db, ella);
     const { deps } = pipelineDeps(good, { facts: store });
+    // Before her first screen, Fork asks how she's taxed.
+    expect(await askFork(deps, { question: QUESTION, subject })).toMatchObject({ reason: 'profile', profileQuestions: ['tax_region', 'student_loans'] });
+    await saveTaxProfile(t.db, ella, ids.ellaEmp, { taxRegion: 'rest_of_uk', studentLoans: [] });
     const screen = (await askFork(deps, { question: QUESTION, subject })) as DecisionScreen;
     expect(screen.kind).toBe('decision');
     await recordRun(t.db, ella, { question: QUESTION, answer: screen });

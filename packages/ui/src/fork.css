@@ -1042,3 +1042,13 @@ a {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* "A few details first" (ADR 0010): the profile questions under their message. */
+.fk-profile {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+.fk-profile .fk-pills {
+  flex-wrap: wrap;
+}

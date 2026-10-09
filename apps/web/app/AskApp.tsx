@@ -1,7 +1,7 @@
 'use client';
 
 import type { BuildStep, DecisionScreen, ForkAnswer } from '@fork/pipeline';
-import { BuildingSteps, DecisionScreenView, ForkField, MessageCard } from '@fork/ui';
+import { BuildingSteps, DecisionScreenView, ForkField, MessageCard, ProfileQuestions, type ProfileAnswers } from '@fork/ui';
 import { useRef, useState } from 'react';
 
 export const EMPLOYEE_SUGGESTIONS = [
@@ -74,6 +74,22 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS, canSave = false, na
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Save how the person is taxed, then ask their question again. */
+  async function saveProfile(a: ProfileAnswers) {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/profile', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(a) });
+      if (!res.ok) throw new Error((await res.json().catch(() => null))?.error ?? 'Fork couldn’t save that. Try again.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Fork couldn’t save that. Try again.');
+      setBusy(false);
+      return;
+    }
+    setBusy(false);
+    await ask(question);
   }
 
   /** Numbers update at once (code only); the words are rewritten once the person settles. */
@@ -193,6 +209,9 @@ export function AskApp({ suggestions = EMPLOYEE_SUGGESTIONS, canSave = false, na
         </div>
       )}
       {answer?.kind === 'message' && <MessageCard message={answer} />}
+      {answer?.kind === 'message' && answer.reason === 'profile' && answer.profileQuestions && (
+        <ProfileQuestions questions={answer.profileQuestions} busy={busy} onSubmit={(a) => void saveProfile(a)} />
+      )}
     </>
   );
 }

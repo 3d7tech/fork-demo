@@ -24,9 +24,9 @@ const store = new InMemoryFactStore({
     ],
   },
   employee: {
-    'larkfield/ella': [f('salary', 32000, 'payroll_export'), f('contribution_pct', 5, 'pension_scheme'), f('hours_per_week', 37.5, 'payroll_export')],
-    'larkfield/priya': [f('salary', 108000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
-    'larkfield/ravi': [f('salary', 58000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
+    'larkfield/ella': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 32000, 'payroll_export'), f('contribution_pct', 5, 'pension_scheme'), f('hours_per_week', 37.5, 'payroll_export')],
+    'larkfield/priya': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 108000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
+    'larkfield/ravi': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 58000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')],
   },
   payroll: { larkfield: LARKFIELD },
 });
@@ -131,7 +131,7 @@ describe('the family added by following the guide', () => {
 
   it('without a confirmed scheme limit, Fork asks for it rather than guessing', async () => {
     const family = FAMILIES['benefits.cycle_to_work']!;
-    const noLimit = new InMemoryFactStore({ company: { larkfield: [] }, employee: { 'larkfield/ella': [f('salary', 32000, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')] } });
+    const noLimit = new InMemoryFactStore({ company: { larkfield: [] }, employee: { 'larkfield/ella': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 32000, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')] } });
     const { deps: d } = deps(modelsFor(family), { facts: noLimit });
     expect(await askFork(d, { question: 'bike through work?', subject: emp('ella') })).toMatchObject({ kind: 'message', reason: 'needs_facts' });
   });

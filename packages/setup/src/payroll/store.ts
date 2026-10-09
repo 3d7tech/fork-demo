@@ -105,6 +105,8 @@ export async function importPayroll(deps: SetupDeps, ctx: RequestContext, upload
         annualSalary: r.annualSalary,
         hoursPerWeek: r.hoursPerWeek,
         pensionPct: r.pensionPct,
+        taxCode: r.taxCode,
+        studentLoans: r.studentLoans,
       })),
     );
     await tx

@@ -14,3 +14,4 @@ export * from './documents/store';
 export * from './lookup';
 export * from './decisions';
 export * from './mail';
+export * from './profile';

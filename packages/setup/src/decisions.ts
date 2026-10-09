@@ -209,6 +209,8 @@ export async function exportMyData(db: ForkDatabase, ctx: RequestContext) {
     questionsAndAnswers: await tx.select().from(s.decisionRun).where(eq(s.decisionRun.userId, ctx.userId)),
     savedDecisions: await tx.select().from(s.savedDecision).where(eq(s.savedDecision.userId, ctx.userId)),
     requests: await tx.select().from(s.actionRequest).where(eq(s.actionRequest.createdBy, ctx.userId)),
+    // Row-level security returns only the reader's own profile.
+    taxDetails: await tx.select().from(s.taxProfile),
   }));
 }
 

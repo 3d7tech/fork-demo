@@ -56,6 +56,26 @@ export class DbFactStore {
           if (pay.pensionPct !== null) add('contribution_pct', Number(pay.pensionPct), 'payroll_export', pay.periodEnd);
         }
         if (!out.some((f) => f.id === 'contribution_pct') && scheme) add('contribution_pct', Number(scheme.employeeDefaultPct), 'pension_scheme', day(scheme.updatedAt));
+        // Tax profile (ADR 0010): what payroll says, then what the person told Fork, which wins.
+        if (pay?.taxCode) add('tax_region', pay.taxCode.startsWith('S') ? 'scotland' : 'rest_of_uk', 'payroll_export', pay.periodEnd);
+        if (pay && pay.studentLoans !== null) add('student_loans', pay.studentLoans, 'payroll_export', pay.periodEnd);
+        const [own] = await tx.select().from(s.taxProfile).where(eq(s.taxProfile.employeeId, subject.employeeId));
+        if (own) {
+          const answered = (id: string, value: Fact['value'] | null) => {
+            if (value === null) return;
+            const i = out.findIndex((f) => f.id === id);
+            if (i >= 0) out.splice(i, 1);
+            add(id, value, 'user_answer', day(own.updatedAt));
+          };
+          answered('tax_region', own.taxRegion);
+          answered('student_loans', own.studentLoans);
+          answered('variable_pay', own.variablePay === null ? null : Number(own.variablePay));
+          answered('other_income', own.otherIncome === null ? null : Number(own.otherIncome));
+          answered('child_benefit_children', own.childBenefitChildren);
+          answered('higher_earner', own.higherEarner);
+          answered('other_pension_savings', own.otherPensionSavings === null ? null : Number(own.otherPensionSavings));
+          answered('flexibly_accessed', own.flexiblyAccessed);
+        }
         // Age today, for the minimum wage band. From the date of birth in the payroll export.
         const [person] = await tx.select({ dob: s.employee.dateOfBirth }).from(s.employee).where(eq(s.employee.id, subject.employeeId));
         if (person?.dob) add('age', ageOn(new Date(person.dob), new Date()), 'payroll_export', day(new Date()));

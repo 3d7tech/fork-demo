@@ -1,6 +1,6 @@
 // The payroll columns Fork needs. Contracted hours are required (open question 2).
 
-export const FIELD_IDS = ['payroll_ref', 'name', 'first_name', 'last_name', 'email', 'date_of_birth', 'annual_salary', 'hours_per_week', 'pension_pct', 'start_date'] as const;
+export const FIELD_IDS = ['payroll_ref', 'name', 'first_name', 'last_name', 'email', 'date_of_birth', 'annual_salary', 'hours_per_week', 'pension_pct', 'start_date', 'tax_code', 'student_loan'] as const;
 export type FieldId = (typeof FIELD_IDS)[number];
 
 export interface FieldDef {
@@ -23,6 +23,8 @@ export const FIELDS: FieldDef[] = [
   { id: 'annual_salary', label: 'Annual salary', description: 'Contracted pay for a full year before deductions', required: true, synonyms: ['annual salary', 'salary', 'annual pay', 'basic salary', 'yearly salary', 'salary pa', 'annual gross'] },
   { id: 'hours_per_week', label: 'Contracted hours a week', description: 'Contracted hours in a normal week', required: true, synonyms: ['hours', 'contracted hours', 'weekly hours', 'hours per week', 'contract hours', 'normal hours'] },
   { id: 'pension_pct', label: 'Employee pension contribution %', description: 'The employee’s own pension contribution as a percentage of pay', required: false, synonyms: ['pension %', 'employee pension %', 'ee pension %', 'pension contribution %', 'ee contribution %', 'employee contribution %', 'pension rate'] },
+  { id: 'tax_code', label: 'Tax code', description: 'The person’s tax code, such as 1257L or S1257L. An S at the start means Scottish income tax', required: false, synonyms: ['tax code', 'taxcode', 'tax cd', 'paye code'] },
+  { id: 'student_loan', label: 'Student loan plan', description: 'Student or postgraduate loan plan deducted through payroll, such as Plan 2 or PGL', required: false, synonyms: ['student loan', 'student loan plan', 'sl plan', 'student loan type', 'sl', 'pgl', 'postgraduate loan'] },
   { id: 'start_date', label: 'Start date', description: 'Date the person started working for the company', required: false, synonyms: ['start date', 'date started', 'employment start', 'start', 'date joined', 'joined'] },
 ];
 

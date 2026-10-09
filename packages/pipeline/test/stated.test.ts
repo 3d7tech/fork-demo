@@ -10,7 +10,7 @@ const f = (id: string, value: Fact['value'], source: Fact['source']): Fact => ({
 const CALLUM = { audience: 'employee' as const, companyId: 'larkfield', employeeId: 'callum' };
 const callumFacts = new InMemoryFactStore({
   company: { larkfield: [f('employer_share_pct', 50, 'company_setting'), f('employer_contribution_pct', 3, 'pension_scheme'), f('relief_method', 'relief_at_source', 'pension_scheme')] },
-  employee: { 'larkfield/callum': [f('salary', 95000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')] },
+  employee: { 'larkfield/callum': [f('tax_region', 'rest_of_uk', 'payroll_export'), f('student_loans', '', 'payroll_export'), f('salary', 95000, 'payroll_export'), f('contribution_pct', 5, 'payroll_export'), f('hours_per_week', 37.5, 'payroll_export')] },
 });
 
 const explainerInput = (models: { calls: Array<{ role: string; input: any }> }) => models.calls.find((c) => c.role === 'explainer')!.input;
@@ -88,6 +88,6 @@ describe('the person’s tax profile reaches the sums (ADR 0010)', () => {
     const { deps: d } = deps(good);
     const s = (await askFork(d, { question: QUESTION, subject: ELLA })) as DecisionScreen;
     expect(s.calc.outputs.take_home_gain!.value).toBeCloseTo(128, 6);
-    expect(s.calc.assumptions.filter((a) => a.source === 'estimate').map((a) => a.text)).toContain('No student loan to repay');
+    expect(s.calc.assumptions.filter((a) => a.source === 'estimate').map((a) => a.text)).toContain('No overtime, commission or income outside this job');
   });
 });

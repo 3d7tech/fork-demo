@@ -177,6 +177,10 @@ export const payRecord = pgTable(
     hoursPerWeek: numeric('hours_per_week', { precision: 5, scale: 2 }).notNull(),
     /** Employee pension contribution as a % of pay, when the export has it. */
     pensionPct: pct('pension_pct'),
+    /** Tax code, when the export has it: an S prefix means Scottish income tax (ADR 0010). */
+    taxCode: text('tax_code'),
+    /** Student loan plans payroll deducts, when the export has them, such as "plan_2" or "plan_1,postgraduate". */
+    studentLoans: text('student_loans'),
     createdAt: createdAt(),
   },
   (t) => [uniqueIndex('pay_record_employee_upload_key').on(t.employeeId, t.uploadId), index('pay_record_employee_idx').on(t.employeeId, t.periodEnd)],
@@ -239,6 +243,27 @@ export const requestStatus = pgEnum('request_status', ['draft', 'sent', 'acknowl
  * Every answer Fork gave: the question, the screen or message, and what produced it (rule pack,
  * models, prompt versions). An employee's runs are readable by that employee only.
  */
+/**
+ * What an employee has told Fork about their tax position (ADR 0010). Theirs alone: the only
+ * policy is for that employee, so owners and accountants can't read it at all. Null is unanswered.
+ */
+export const taxProfile = pgTable('tax_profile', {
+  employeeId: uuid('employee_id')
+    .primaryKey()
+    .references(() => employee.id, { onDelete: 'cascade' }),
+  companyId: companyId(),
+  taxRegion: text('tax_region').$type<'rest_of_uk' | 'scotland'>(),
+  /** Comma-separated plans, or '' for none. */
+  studentLoans: text('student_loans'),
+  variablePay: money('variable_pay'),
+  otherIncome: money('other_income'),
+  childBenefitChildren: integer('child_benefit_children'),
+  higherEarner: boolean('higher_earner'),
+  otherPensionSavings: money('other_pension_savings'),
+  flexiblyAccessed: boolean('flexibly_accessed'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const decisionRun = pgTable(
   'decision_run',
   {

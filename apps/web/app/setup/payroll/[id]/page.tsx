@@ -12,6 +12,7 @@ const PROBLEM: Record<string, string> = {
   out_of_range: 'looks wrong',
   not_a_date: 'isn’t a date we can read (use 31/01/1990)',
   not_an_email: 'isn’t an email address',
+  not_recognised: 'isn’t one Fork recognises',
   duplicate: 'is used twice',
 };
 

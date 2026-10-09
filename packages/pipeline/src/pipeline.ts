@@ -8,7 +8,7 @@ import { FAMILIES, factIds, familiesFor, type FamilyData, type FamilyDef } from 
 import type { FactStore, Subject } from './facts';
 import { extractNumbers, formatDate, formatGBP, formatPct, formatQuantity, type ScreenNumber } from './format';
 import { withStatedPay } from './stated';
-import { about, blocked, clarify, DISTRESS, failed, HUMAN, lookupUnknown, needsFacts, notYet, type ForkMessage } from './messages';
+import { about, blocked, clarify, DISTRESS, failed, HUMAN, lookupUnknown, needsFacts, needsProfile, notYet, type ForkMessage } from './messages';
 
 export interface PipelineDeps {
   roles: RoleContext;
@@ -350,6 +350,11 @@ export async function askFork(deps: PipelineDeps, input: AskInput): Promise<Fork
     const facts = await deps.facts.get(input.subject, factIds(family));
     const missing = family.facts.filter((d) => !facts.some((f) => f.id === d.id));
     if (missing.length) return needsFacts(missing.map((m) => m.label));
+    // Region and student loan change almost every answer, so they're asked, never assumed (ADR 0010).
+    if (family.profile) {
+      const unknown = (['tax_region', 'student_loans'] as const).filter((id) => !facts.some((f) => f.id === id));
+      if (unknown.length) return needsProfile(unknown);
+    }
     step({ id: 'facts', label: family.steps.facts });
 
     // The family's reviewed template is the spec. The spec writer, the strongest and slowest

@@ -16,6 +16,10 @@ import {
   mappingProblems,
   matchByHeader,
   parseRows,
+  parseStudentLoans,
+  readTaxProfile,
+  saveTaxProfile,
+  deleteTaxProfile,
   readTable,
   saveCompanySettings,
   saveScheme,
@@ -43,7 +47,27 @@ describe('reading payroll exports', () => {
       hours_per_week: 'Contracted Hours',
       pension_pct: 'EE Pension %',
       start_date: 'Start Date',
+      tax_code: null,
+      student_loan: null,
     });
+  });
+
+  it('reads tax codes and student loan plans as payroll exports write them', () => {
+    expect(['Plan 2', '2', 'Plan 1 & PGL', 'postgraduate', 'None', '', 'plan 4, plan 1'].map((v) => parseStudentLoans(v))).toEqual([
+      'plan_2',
+      'plan_2',
+      'plan_1,postgraduate',
+      'postgraduate',
+      '',
+      null,
+      'plan_1,plan_4',
+    ]);
+    expect(parseStudentLoans('yes please')).toBe('bad');
+    const table = { headers: ['Ref', 'Name', 'Salary', 'Hours', 'Tax code', 'Student loan'], rows: [['A1', 'Ann', 30000, 37.5, 's1257l', 'Plan 4'], ['A2', 'Bo', 30000, 37.5, '1257L W1', ''], ['A3', 'Cy', 30000, 37.5, 'hello', 'Plan 9']] };
+    const mapping: Mapping = { payroll_ref: 'Ref', name: 'Name', annual_salary: 'Salary', hours_per_week: 'Hours', tax_code: 'Tax code', student_loan: 'Student loan' };
+    const { rows, problems } = parseRows(table as never, mapping);
+    expect(rows.map((r) => [r.taxCode, r.studentLoans])).toEqual([['S1257L', 'plan_4'], ['1257LW1', null]]);
+    expect(problems).toEqual([{ row: 3, field: 'tax_code', code: 'not_recognised' }, { row: 3, field: 'student_loan', code: 'not_recognised' }]);
   });
 
   it('reads Excel, skipping a title row, with dates and 5% stored as 0.05', async () => {
@@ -195,7 +219,8 @@ describe('importing into the database', () => {
     await saveScheme(t.db, ctx, { name: 'Larkfield pension', provider: null, reliefMethod: 'relief_at_source', basis: 'full_salary', employerPct: 3, employeeDefaultPct: 5 });
     const ella = (await listPeople(t.db, ctx)).find((p) => p.name === 'Ella Brooks')!;
     await asAdmin(t.adminUrl, (db) => db.insert(s.membership).values({ userId: ellaUser, companyId: ctx.companyId, role: 'employee', employeeId: ella.id }));
-    const asElla = new DbFactStore(t.db, { userId: ellaUser, companyId: ctx.companyId, role: 'employee' });
+    const ellaCtx0 = { userId: ellaUser, companyId: ctx.companyId, role: 'employee' as const };
+    const asElla = new DbFactStore(t.db, ellaCtx0);
     const facts = await asElla.get({ companyId: ctx.companyId, employeeId: ella.id }, ['salary', 'contribution_pct', 'hours_per_week', 'employer_share_pct', 'employer_contribution_pct', 'relief_method']);
     expect(facts.map((f) => [f.id, f.value, f.source, f.asOf])).toEqual([
       ['salary', 32000, 'payroll_export', '2026-10-31'],
@@ -224,6 +249,21 @@ describe('importing into the database', () => {
     expect((await asElla.get({ companyId: ctx.companyId, employeeId: ella.id }, ['age']))[0]).toMatchObject({ id: 'age', value: ageOn(new Date('2000-07-02'), new Date()), source: 'payroll_export' });
     expect(ageOn(new Date('2000-07-02'), new Date('2026-07-01'))).toBe(25);
     expect(ageOn(new Date('2000-07-02'), new Date('2026-07-02'))).toBe(26);
+
+    // Her tax details are hers alone: what she tells Fork becomes a fact; her employer can't read it.
+    await saveTaxProfile(t.db, ellaCtx0, ella.id, { taxRegion: 'scotland', studentLoans: ['plan_2'], otherIncome: 4000 });
+    const profileFacts = await asElla.get({ companyId: ctx.companyId, employeeId: ella.id }, ['tax_region', 'student_loans', 'other_income']);
+    expect(profileFacts.map((f) => [f.id, f.value, f.source])).toEqual([
+      ['tax_region', 'scotland', 'user_answer'],
+      ['student_loans', 'plan_2', 'user_answer'],
+      ['other_income', 4000, 'user_answer'],
+    ]);
+    expect(await readTaxProfile(t.db, ctx, ella.id)).toMatchObject({ taxRegion: null, studentLoans: null, otherIncome: null });
+    expect(await t.db.asMember(ctx, (db) => db.select().from(s.taxProfile))).toEqual([]);
+    expect(await asOwner.get({ companyId: ctx.companyId, employeeId: ella.id }, ['tax_region', 'other_income'])).toEqual([]);
+    await expect(saveTaxProfile(t.db, ctx, ella.id, { taxRegion: 'scotland' })).rejects.toThrow();
+    await deleteTaxProfile(t.db, ellaCtx0);
+    expect(await readTaxProfile(t.db, ellaCtx0, ella.id)).toMatchObject({ taxRegion: null });
 
     // Ella asking about someone else's record gets nothing.
     const tom = (await listPeople(t.db, ctx)).find((p) => p.name === 'Tom Hale')!;
