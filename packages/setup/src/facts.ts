@@ -57,6 +57,22 @@ export class DbFactStore {
         }
         if (!out.some((f) => f.id === 'contribution_pct') && scheme) add('contribution_pct', Number(scheme.employeeDefaultPct), 'pension_scheme', day(scheme.updatedAt));
       }
+      // Any fact an owner confirmed from a company document, with where it came from.
+      const wanted = new Set(ids.filter((id) => !out.some((f) => f.id === id)));
+      if (wanted.size) {
+        const docs = await tx
+          .select({ key: s.policyFact.key, value: s.policyFact.value, page: s.policyFact.page, fileName: s.policyDocument.fileName, confirmedAt: s.policyFact.confirmedAt })
+          .from(s.policyFact)
+          .innerJoin(s.policyDocument, eq(s.policyDocument.id, s.policyFact.documentId))
+          .where(eq(s.policyFact.confidence, 'confirmed'))
+          .orderBy(desc(s.policyFact.confirmedAt));
+        for (const d of docs) {
+          if (!wanted.has(d.key) || out.some((f) => f.id === d.key)) continue;
+          const v = d.value;
+          if (typeof v !== 'string' && typeof v !== 'number' && typeof v !== 'boolean') continue;
+          out.push({ id: d.key, value: v, source: 'policy_document', asOf: day(d.confirmedAt ?? new Date()), confidence: 'confirmed', reference: d.page ? `${d.fileName}, page ${d.page}` : d.fileName });
+        }
+      }
       return out;
     });
     return ids.flatMap((id) => facts.filter((f) => f.id === id));

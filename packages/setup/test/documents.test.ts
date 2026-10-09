@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { asAdmin, schema as s } from '@fork/db';
 import { freshDatabase, type TestDatabase } from '@fork/db/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { answerLookup, saveCompanySettings, cleanFacts, confirmAllFacts, confirmedFacts, confirmFact, documentType, listDocuments, LocalFileStore, parseTyped, prepareDocument, readDocument, removeFact, uploadDocument, type DocumentInterpreter } from '../src';
+import { answerLookup, DbFactStore, saveCompanySettings, cleanFacts, confirmAllFacts, confirmedFacts, confirmFact, documentType, listDocuments, LocalFileStore, parseTyped, prepareDocument, readDocument, removeFact, uploadDocument, type DocumentInterpreter } from '../src';
 
 const fixture = (name: string) => new Uint8Array(readFileSync(join(import.meta.dirname, '../fixtures', name)));
 
@@ -156,6 +156,12 @@ describe('documents in the database', () => {
     });
     expect(await where(['made_up_key'])).toBeNull();
     expect(await where([])).toBeNull();
+  });
+
+  it('confirmed document facts reach decisions as facts with their source and page', async () => {
+    const store = new DbFactStore(t.db, employee);
+    const [f] = await store.get({ companyId: employee.companyId }, ['employer_pct']);
+    expect(f).toMatchObject({ id: 'employer_pct', value: 4, source: 'policy_document', reference: 'scheme.pdf, page 2' });
   });
 
   it('owners can answer "when is re-enrolment?" from company settings', async () => {
