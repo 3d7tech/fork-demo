@@ -1,11 +1,13 @@
 import type { CalcResult } from '@fork/spec';
 import { D, Decimal, leverRanges, max, q, ZERO, type Rules } from '../core';
-import { employeeNI, employerNI, employerNISaving, meetsNLW, niablePay } from '../uk';
+import { employeeNI, employerNI, employerNISaving, minimumWage, niablePay, yearlyHours } from '../uk';
 import { SS_CAP_FROM } from './ssSwitch';
 
 export interface PayrollRow {
   salary: number;
   hoursPerWeek: number;
+  /** Age today, from the date of birth on payroll; unknown uses the adult rate. */
+  age?: number | null;
 }
 
 export interface SsIntroduceInput {
@@ -31,7 +33,7 @@ interface Totals {
 
 function totals(r: Rules, i: SsIntroduceInput): Totals {
   const c = D(i.contributionPct).div(100);
-  const eligible = i.employees.filter((e) => meetsNLW(r, D(e.salary).times(D(1).minus(c)), e.hoursPerWeek));
+  const eligible = i.employees.filter((e) => D(e.salary).times(D(1).minus(c)).div(yearlyHours(e.hoursPerWeek)).gte(minimumWage(r, e.age ?? null)));
   let full = ZERO;
   let eeNISaving = ZERO;
   for (const e of eligible) {
@@ -98,7 +100,7 @@ export function ssIntroduce(r: Rules, i: SsIntroduceInput): CalcResult {
       scenario(r, { ...i, takeUpPct: v }, fee).keep.gt(0) ? 'introduce' : 'saving_below_fee',
     ),
     // Leaving people out is a caution, not a pass: the owner needs to know who can't join.
-    constraints: [{ id: 'min_wage', outcome: i.employees.length - n > 0 ? 'caution' : 'pass', detail: `${i.employees.length - n} employees left out so sacrifice never takes anyone below the National Living Wage` }],
+    constraints: [{ id: 'min_wage', outcome: i.employees.length - n > 0 ? 'caution' : 'pass', detail: `${i.employees.length - n} employees left out so sacrifice never takes anyone below the minimum wage for their age` }],
     rulesUsed: r.rulesUsed(),
     assumptions: [
       { text: `${i.employees.length} salaries and contracted hours from the payroll export`, source: 'payroll_export', estimate: false },

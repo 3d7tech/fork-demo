@@ -5,7 +5,7 @@ import { z } from 'zod';
 /** Data a module needs beyond single facts. Goes to code only, never to a model. */
 export interface FamilyData {
   /** Every employee's salary and contracted hours, for company-wide decisions. Owners only. */
-  payrollRows?: Array<{ salary: number; hoursPerWeek: number }>;
+  payrollRows?: Array<{ salary: number; hoursPerWeek: number; age?: number | null }>;
 }
 
 export interface RequestInput {

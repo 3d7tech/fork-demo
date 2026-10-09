@@ -105,15 +105,17 @@ export class DbFactStore {
   async payrollRows(subject: { companyId: string }) {
     if (subject.companyId !== this.ctx.companyId || this.ctx.role !== 'owner') return [];
     const rows = await this.db.asMember(this.ctx, latestPay);
-    return rows.map((r) => ({ salary: Number(r.annualSalary), hoursPerWeek: Number(r.hoursPerWeek) }));
+    const today = new Date();
+    return rows.map((r) => ({ salary: Number(r.annualSalary), hoursPerWeek: Number(r.hoursPerWeek), age: r.dob ? ageOn(new Date(r.dob), today) : null }));
   }
 }
 
 /** The most recent pay record for each employee the reader can see. */
 function latestPay(tx: Db) {
   return tx
-    .selectDistinctOn([s.payRecord.employeeId], { annualSalary: s.payRecord.annualSalary, hoursPerWeek: s.payRecord.hoursPerWeek, periodEnd: s.payRecord.periodEnd })
+    .selectDistinctOn([s.payRecord.employeeId], { annualSalary: s.payRecord.annualSalary, hoursPerWeek: s.payRecord.hoursPerWeek, periodEnd: s.payRecord.periodEnd, dob: s.employee.dateOfBirth })
     .from(s.payRecord)
+    .innerJoin(s.employee, eq(s.employee.id, s.payRecord.employeeId))
     .orderBy(s.payRecord.employeeId, desc(s.payRecord.periodEnd), desc(s.payRecord.createdAt));
 }
 
